@@ -1,0 +1,862 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI-Powered Agentic Test Automation System</title>
+<style>
+:root {
+  --bg:#f5f7fa;--bg-card:#ffffff;--bg-card2:#eef1f5;--bg-sidebar:#ffffff;
+  --border:#d8dce3;--text:#1f2328;--text-dim:#5a6270;
+  --blue:#1a73e8;--blue-glow:rgba(26,115,232,.10);
+  --green:#1a9a56;--red:#d32f2f;--orange:#e67e00;--purple:#7c3aed;--cyan:#0891b2;
+  --font:'Segoe UI',system-ui,-apple-system,sans-serif;
+  --mono:'Cascadia Code','Fira Code','Consolas',monospace;
+  --radius:10px;--shadow:0 2px 12px rgba(0,0,0,.08);
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html,body{height:100%;font-family:var(--font);background:var(--bg);color:var(--text);overflow:hidden;}
+a{color:var(--blue);text-decoration:none;}a:hover{text-decoration:underline;}
+button{cursor:pointer;font-family:var(--font);}
+input,select,textarea{font-family:var(--font);background:#fff;color:var(--text);border:1px solid var(--border);border-radius:6px;padding:8px 12px;outline:none;transition:.2s;}
+input:focus,select:focus,textarea:focus{border-color:var(--blue);box-shadow:0 0 0 3px var(--blue-glow);}
+
+.app{display:flex;height:100vh;}
+.sidebar{width:240px;min-width:240px;background:var(--bg-sidebar);border-right:1px solid var(--border);display:flex;flex-direction:column;}
+.sidebar .logo{padding:24px 20px 20px;border-bottom:1px solid var(--border);}
+.sidebar .logo h2{font-size:15px;color:var(--blue);letter-spacing:.5px;}
+.sidebar .logo span{font-size:11px;color:var(--text-dim);display:block;margin-top:2px;}
+.sidebar nav{flex:1;padding:12px 10px;}
+.sidebar nav a{display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:8px;color:var(--text-dim);font-size:13.5px;font-weight:500;transition:.15s;margin-bottom:2px;}
+.sidebar nav a:hover{background:var(--bg-card2);color:var(--text);text-decoration:none;}
+.sidebar nav a.active{background:var(--blue-glow);color:var(--blue);font-weight:600;}
+.sidebar nav a .icon{font-size:18px;width:22px;text-align:center;}
+.sidebar .version{padding:14px 20px;border-top:1px solid var(--border);font-size:11px;color:var(--text-dim);}
+
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden;}
+.topbar{height:52px;min-height:52px;border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 28px;gap:16px;}
+.topbar h1{font-size:16px;font-weight:600;}
+.topbar .badge{font-size:11px;background:var(--blue);color:#fff;padding:2px 10px;border-radius:12px;font-weight:600;}
+.content{flex:1;overflow-y:auto;padding:28px;}
+
+.page{display:none;}.page.active{display:block;}
+
+/* Cards */
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:16px;margin-bottom:28px;}
+.card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:20px;transition:.2s;box-shadow:var(--shadow);}
+.card:hover{border-color:var(--blue);box-shadow:0 0 0 3px var(--blue-glow);}
+.card .label{font-size:12px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.8px;margin-bottom:6px;}
+.card .value{font-size:32px;font-weight:700;}
+.card .value.green{color:var(--green);}.card .value.red{color:var(--red);}.card .value.blue{color:var(--blue);}.card .value.orange{color:var(--orange);}
+
+/* Architecture diagram */
+.arch-diagram{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:32px;margin-bottom:28px;overflow-x:auto;box-shadow:var(--shadow);}
+
+/* Tables */
+.tbl{width:100%;border-collapse:collapse;background:var(--bg-card);border-radius:var(--radius);overflow:hidden;border:1px solid var(--border);box-shadow:var(--shadow);}
+.tbl th{background:var(--bg-card2);color:var(--text-dim);font-size:11.5px;text-transform:uppercase;letter-spacing:.8px;padding:12px 16px;text-align:left;font-weight:600;border-bottom:1px solid var(--border);}
+.tbl td{padding:10px 16px;font-size:13.5px;border-bottom:1px solid var(--border);}
+.tbl tr:last-child td{border-bottom:none;}
+.tbl tr:hover td{background:var(--bg-card2);}
+.status{display:inline-block;padding:2px 10px;border-radius:12px;font-size:11.5px;font-weight:600;text-transform:uppercase;}
+.status.passed{background:rgba(46,204,113,.15);color:var(--green);}
+.status.failed{background:rgba(231,76,60,.15);color:var(--red);}
+.status.running{background:rgba(26,115,232,.15);color:var(--blue);}
+.status.skipped,.status.no_steps{background:rgba(243,156,18,.15);color:var(--orange);}
+.status.error{background:rgba(231,76,60,.15);color:var(--red);}
+
+/* Buttons */
+.btn{display:inline-flex;align-items:center;gap:6px;padding:9px 20px;border-radius:8px;font-size:13.5px;font-weight:600;border:none;transition:.15s;}
+.btn-primary{background:var(--blue);color:#fff;}.btn-primary:hover{background:#1557b0;box-shadow:0 0 0 3px var(--blue-glow);}
+.btn-secondary{background:var(--bg-card2);color:var(--text);border:1px solid var(--border);}.btn-secondary:hover{border-color:var(--blue);color:var(--blue);background:#e8ebf0;}
+.btn-sm{padding:5px 12px;font-size:12px;}
+.btn-green{background:var(--green);color:#fff;}.btn-green:hover{background:#27ae60;}
+.btn:disabled{opacity:.5;cursor:not-allowed;}
+
+/* Forms */
+.form-group{margin-bottom:14px;}
+.form-group label{display:block;font-size:12px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.6px;margin-bottom:5px;font-weight:600;}
+.form-group input,.form-group select,.form-group textarea{width:100%;}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.form-row-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;}
+
+/* Timeline */
+.timeline{max-height:440px;overflow-y:auto;padding:8px 0;}
+.timeline-item{display:flex;gap:12px;padding:7px 0;border-bottom:1px solid var(--border);font-size:13px;align-items:flex-start;}
+.timeline-item:last-child{border-bottom:none;}
+.timeline-item .t-time{font-size:11px;color:var(--text-dim);min-width:75px;font-family:var(--mono);}
+.timeline-item .t-agent{font-size:11px;font-weight:700;min-width:85px;padding:2px 8px;border-radius:4px;text-align:center;}
+.timeline-item .t-agent.orchestrator{background:rgba(26,115,232,.15);color:var(--blue);}
+.timeline-item .t-agent.qtest{background:rgba(155,89,182,.15);color:var(--purple);}
+.timeline-item .t-agent.generator{background:rgba(0,184,212,.15);color:var(--cyan);}
+.timeline-item .t-agent.executor{background:rgba(46,204,113,.15);color:var(--green);}
+.timeline-item .t-agent.fixer{background:rgba(243,156,18,.15);color:var(--orange);}
+.timeline-item .t-msg{flex:1;color:var(--text);}
+
+/* Code */
+.code-block{background:#f6f8fa;border:1px solid var(--border);border-radius:var(--radius);padding:20px;overflow:auto;max-height:500px;font-family:var(--mono);font-size:13px;line-height:1.6;white-space:pre;color:#24292f;tab-size:4;}
+.code-block .kw{color:#cf222e;}.code-block .str{color:#0a3069;}.code-block .cmt{color:#6e7781;font-style:italic;}.code-block .fn{color:#8250df;}.code-block .dec{color:#953800;}.code-block .num{color:#0550ae;}.code-block .cls{color:#953800;}
+
+/* Config */
+.config-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;}
+.config-section{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:var(--shadow);}
+.config-section h3{font-size:14px;color:var(--blue);margin-bottom:14px;padding-bottom:8px;border-bottom:1px solid var(--border);}
+.config-row{display:flex;justify-content:space-between;padding:6px 0;font-size:13px;}
+.config-row .ck{color:var(--text-dim);}.config-row .cv{font-family:var(--mono);font-size:12.5px;}
+
+/* Wizard steps */
+.wizard-steps{display:flex;gap:4px;margin-bottom:24px;background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:6px;}
+.wizard-step{flex:1;display:flex;align-items:center;gap:8px;padding:10px 14px;border-radius:8px;font-size:12.5px;font-weight:600;color:var(--text-dim);transition:.2s;}
+.wizard-step .ws-num{width:24px;height:24px;border-radius:50%;background:var(--border);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--text-dim);flex-shrink:0;}
+.wizard-step.active{color:var(--blue);background:var(--blue-glow);}
+.wizard-step.active .ws-num{background:var(--blue);color:#fff;}
+.wizard-step.done{color:var(--green);}
+.wizard-step.done .ws-num{background:var(--green);color:#fff;}
+
+/* Wizard panels */
+.wiz-panel{display:none;}.wiz-panel.active{display:block;}
+
+/* Analysis boxes */
+.analysis-box{border-radius:var(--radius);padding:20px;margin-bottom:16px;border:1px solid var(--border);}
+.analysis-box.script_issue{background:rgba(243,156,18,.08);border-color:var(--orange);}
+.analysis-box.product_issue{background:rgba(231,76,60,.08);border-color:var(--red);}
+.analysis-box.environment_issue{background:rgba(26,115,232,.08);border-color:var(--blue);}
+.analysis-box h4{font-size:14px;margin-bottom:8px;}
+.analysis-box.script_issue h4{color:var(--orange);}
+.analysis-box.product_issue h4{color:var(--red);}
+.analysis-box.environment_issue h4{color:var(--blue);}
+.analysis-tag{display:inline-block;padding:3px 10px;border-radius:12px;font-size:11px;font-weight:700;text-transform:uppercase;margin-right:6px;}
+.analysis-tag.script_issue{background:rgba(243,156,18,.15);color:var(--orange);}
+.analysis-tag.product_issue{background:rgba(231,76,60,.15);color:var(--red);}
+.analysis-tag.environment_issue{background:rgba(26,115,232,.15);color:var(--blue);}
+.analysis-tag.auto-fix{background:rgba(46,204,113,.15);color:var(--green);}
+.exp-act{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:12px;}
+.exp-act div{background:var(--bg-card2);border-radius:8px;padding:14px;}
+.exp-act .ea-label{font-size:11px;text-transform:uppercase;letter-spacing:.6px;color:var(--text-dim);margin-bottom:6px;}
+.exp-act .ea-val{font-family:var(--mono);font-size:13px;}
+
+/* Input groups */
+.input-group{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:18px;margin-bottom:16px;}
+.input-group h4{font-size:13px;color:var(--blue);margin-bottom:12px;padding-bottom:6px;border-bottom:1px solid var(--border);}
+
+/* Misc */
+.empty{text-align:center;padding:60px 20px;color:var(--text-dim);}
+.empty .icon{font-size:48px;margin-bottom:12px;opacity:.4;}
+.empty p{font-size:14px;}
+.mb-20{margin-bottom:20px;}.mb-12{margin-bottom:12px;}.mt-16{margin-top:16px;}
+.flex-between{display:flex;justify-content:space-between;align-items:center;}
+.spinner{display:inline-block;width:18px;height:18px;border:2.5px solid var(--border);border-top-color:var(--blue);border-radius:50%;animation:spin .7s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg)}}
+.fade-in{animation:fadeIn .3s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+::-webkit-scrollbar{width:6px;height:6px;}::-webkit-scrollbar-track{background:var(--bg-card2);}::-webkit-scrollbar-thumb{background:#c1c7cf;border-radius:3px;}::-webkit-scrollbar-thumb:hover{background:#a0a7b0;}
+.step-card{background:var(--bg-card2);border:1px solid var(--border);border-radius:8px;padding:12px 16px;margin-bottom:8px;font-size:13px;}
+.step-card strong{color:var(--cyan);}
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar">
+    <div class="logo"><h2>AI Test Automation</h2><span>ShopEasy E-Commerce Platform</span></div>
+    <nav>
+      <a href="#" data-page="dashboard" class="active"><span class="icon">&#9671;</span> Dashboard</a>
+      <a href="#" data-page="pipeline"><span class="icon">&#9654;</span> Pipeline Runner</a>
+      <a href="#" data-page="testcases"><span class="icon">&#9776;</span> Test Cases</a>
+      <a href="#" data-page="reports"><span class="icon">&#9744;</span> Reports</a>
+      <a href="#" data-page="generated"><span class="icon">&#10100;</span> Generated Tests</a>
+      <a href="#" data-page="config"><span class="icon">&#9881;</span> Configuration</a>
+    </nav>
+    <div class="version">v1.0 &mdash; M.Tech Project 2024TM93022</div>
+  </aside>
+  <div class="main">
+    <header class="topbar"><h1 id="pageTitle">Dashboard</h1><span class="badge">Multi-Agent System</span></header>
+    <div class="content" id="content">
+
+<!-- ===================== DASHBOARD ===================== -->
+<div class="page active" id="page-dashboard">
+  <div class="cards" id="dashCards">
+    <div class="card"><div class="label">Total Runs</div><div class="value blue" id="dTotal">-</div></div>
+    <div class="card"><div class="label">Passed</div><div class="value green" id="dPassed">-</div></div>
+    <div class="card"><div class="label">Failed</div><div class="value red" id="dFailed">-</div></div>
+    <div class="card"><div class="label">Total Attempts</div><div class="value orange" id="dAttempts">-</div></div>
+    <div class="card"><div class="label">Total Duration</div><div class="value" id="dDuration">-</div></div>
+  </div>
+  <h3 style="margin-bottom:16px;font-size:15px;">System Architecture &amp; Pipeline Workflow</h3>
+  <div class="arch-diagram">
+    <svg width="920" height="400" viewBox="0 0 920 400" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <!-- Title -->
+      <text x="460" y="24" text-anchor="middle" fill="#1f2328" font-size="14" font-weight="700" font-family="Segoe UI,sans-serif">Agentic Pipeline: Fetch Steps  &#8594;  Generate Script  &#8594;  Collect Inputs  &#8594;  Execute  &#8594;  Analyse &amp; Fix</text>
+      <!-- Orchestrator -->
+      <rect x="60" y="44" width="800" height="50" rx="12" fill="#1a73e8" fill-opacity=".12" stroke="#1a73e8" stroke-width="2"/>
+      <text x="460" y="68" text-anchor="middle" fill="#1a73e8" font-size="14" font-weight="700" font-family="Segoe UI,sans-serif">OrchestratorAgent  (coordinates full lifecycle)</text>
+      <text x="460" y="84" text-anchor="middle" fill="#5a6270" font-size="10" font-family="Segoe UI,sans-serif">fetch &#8594; generate &#8594; collect inputs &#8594; execute &#8594; analyse (script vs product) &#8594; fix / report</text>
+      <!-- Arrows down -->
+      <line x1="160" y1="94" x2="160" y2="130" stroke="#9b59b6" stroke-width="2" stroke-dasharray="5,3"/>
+      <line x1="360" y1="94" x2="360" y2="130" stroke="#00b8d4" stroke-width="2" stroke-dasharray="5,3"/>
+      <line x1="560" y1="94" x2="560" y2="130" stroke="#2ecc71" stroke-width="2" stroke-dasharray="5,3"/>
+      <line x1="760" y1="94" x2="760" y2="130" stroke="#f39c12" stroke-width="2" stroke-dasharray="5,3"/>
+      <!-- Step 1: QTestAgent -->
+      <rect x="70" y="130" width="180" height="80" rx="12" fill="#9b59b6" fill-opacity=".1" stroke="#9b59b6" stroke-width="1.5"/>
+      <text x="80" y="148" fill="#5a6270" font-size="10" font-family="Segoe UI,sans-serif">Step 1</text>
+      <text x="160" y="166" text-anchor="middle" fill="#9b59b6" font-size="13" font-weight="700" font-family="Segoe UI,sans-serif">QTestAgent</text>
+      <text x="160" y="184" text-anchor="middle" fill="#5a6270" font-size="10.5" font-family="Segoe UI,sans-serif">Fetch test steps from</text>
+      <text x="160" y="198" text-anchor="middle" fill="#5a6270" font-size="10.5" font-family="Segoe UI,sans-serif">test case source</text>
+      <!-- Step 2: GeneratorAgent -->
+      <rect x="270" y="130" width="180" height="80" rx="12" fill="#00b8d4" fill-opacity=".1" stroke="#00b8d4" stroke-width="1.5"/>
+      <text x="280" y="148" fill="#5a6270" font-size="10" font-family="Segoe UI,sans-serif">Step 2</text>
+      <text x="360" y="166" text-anchor="middle" fill="#00b8d4" font-size="13" font-weight="700" font-family="Segoe UI,sans-serif">GeneratorAgent</text>
+      <text x="360" y="184" text-anchor="middle" fill="#5a6270" font-size="10.5" font-family="Segoe UI,sans-serif">AI / Template-based</text>
+      <text x="360" y="198" text-anchor="middle" fill="#5a6270" font-size="10.5" font-family="Segoe UI,sans-serif">script generation</text>
+      <!-- Step 3: ExecutorAgent -->
+      <rect x="470" y="130" width="180" height="80" rx="12" fill="#2ecc71" fill-opacity=".1" stroke="#2ecc71" stroke-width="1.5"/>
+      <text x="480" y="148" fill="#5a6270" font-size="10" font-family="Segoe UI,sans-serif">Step 3</text>
+      <text x="560" y="166" text-anchor="middle" fill="#2ecc71" font-size="13" font-weight="700" font-family="Segoe UI,sans-serif">ExecutorAgent</text>
+      <text x="560" y="184" text-anchor="middle" fill="#5a6270" font-size="10.5" font-family="Segoe UI,sans-serif">Run with user inputs</text>
+      <text x="560" y="198" text-anchor="middle" fill="#5a6270" font-size="10.5" font-family="Segoe UI,sans-serif">pytest execution</text>
+      <!-- Step 4: FixerAgent -->
+      <rect x="670" y="130" width="180" height="80" rx="12" fill="#f39c12" fill-opacity=".1" stroke="#f39c12" stroke-width="1.5"/>
+      <text x="680" y="148" fill="#5a6270" font-size="10" font-family="Segoe UI,sans-serif">Step 4</text>
+      <text x="760" y="166" text-anchor="middle" fill="#f39c12" font-size="13" font-weight="700" font-family="Segoe UI,sans-serif">FixerAgent</text>
+      <text x="760" y="184" text-anchor="middle" fill="#5a6270" font-size="10.5" font-family="Segoe UI,sans-serif">Analyse failures</text>
+      <text x="760" y="198" text-anchor="middle" fill="#5a6270" font-size="10.5" font-family="Segoe UI,sans-serif">Script vs Product issue</text>
+      <!-- Flow arrows -->
+      <defs><marker id="ah" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8" fill="#1a73e8"/></marker></defs>
+      <line x1="250" y1="170" x2="268" y2="170" stroke="#1a73e8" stroke-width="2" marker-end="url(#ah)"/>
+      <line x1="450" y1="170" x2="468" y2="170" stroke="#1a73e8" stroke-width="2" marker-end="url(#ah)"/>
+      <line x1="650" y1="170" x2="668" y2="170" stroke="#1a73e8" stroke-width="2" marker-end="url(#ah)"/>
+      <!-- Retry loop -->
+      <path d="M760,210 L760,242 Q760,258 744,258 L360,258 Q344,258 344,242 L344,212" stroke="#f39c12" stroke-width="1.5" fill="none" stroke-dasharray="5,3" marker-end="url(#ah2)"/>
+      <defs><marker id="ah2" markerWidth="8" markerHeight="8" refX="4" refY="0" orient="auto"><path d="M0,8 L4,0 L8,8" fill="#f39c12"/></marker></defs>
+      <text x="552" y="275" text-anchor="middle" fill="#f39c12" font-size="11" font-family="Segoe UI,sans-serif" font-weight="600">Script Issue &#8594; Auto-fix &amp; Retry</text>
+      <!-- Analysis outcomes -->
+      <rect x="120" y="300" width="230" height="70" rx="10" fill="#f39c12" fill-opacity=".06" stroke="#f39c12" stroke-width="1"/>
+      <text x="235" y="325" text-anchor="middle" fill="#f39c12" font-size="12" font-weight="700" font-family="Segoe UI,sans-serif">Script Issue</text>
+      <text x="235" y="345" text-anchor="middle" fill="#5a6270" font-size="10.5" font-family="Segoe UI,sans-serif">Auto-fix: imports, syntax, attributes</text>
+      <text x="235" y="359" text-anchor="middle" fill="#5a6270" font-size="10.5" font-family="Segoe UI,sans-serif">Regenerate &amp; retry (up to MAX_RETRIES)</text>
+      <rect x="390" y="300" width="230" height="70" rx="10" fill="#e74c3c" fill-opacity=".06" stroke="#e74c3c" stroke-width="1"/>
+      <text x="505" y="325" text-anchor="middle" fill="#e74c3c" font-size="12" font-weight="700" font-family="Segoe UI,sans-serif">Product Issue</text>
+      <text x="505" y="345" text-anchor="middle" fill="#5a6270" font-size="10.5" font-family="Segoe UI,sans-serif">Assertion: Expected vs Actual mismatch</text>
+      <text x="505" y="359" text-anchor="middle" fill="#5a6270" font-size="10.5" font-family="Segoe UI,sans-serif">Report product behaviour change</text>
+      <rect x="660" y="300" width="200" height="70" rx="10" fill="#1a73e8" fill-opacity=".06" stroke="#1a73e8" stroke-width="1"/>
+      <text x="760" y="325" text-anchor="middle" fill="#1a73e8" font-size="12" font-weight="700" font-family="Segoe UI,sans-serif">Environment Issue</text>
+      <text x="760" y="345" text-anchor="middle" fill="#5a6270" font-size="10.5" font-family="Segoe UI,sans-serif">Connection / SSL / Auth errors</text>
+      <text x="760" y="359" text-anchor="middle" fill="#5a6270" font-size="10.5" font-family="Segoe UI,sans-serif">User action required</text>
+      <!-- External services -->
+      <rect x="10" y="130" width="50" height="80" rx="8" fill="none" stroke="#9b59b6" stroke-width="1" stroke-dasharray="4,2"/>
+      <text x="35" y="168" text-anchor="middle" fill="#9b59b6" font-size="8" font-family="Segoe UI,sans-serif" transform="rotate(-90 35 168)">Test Data</text>
+      <line x1="60" y1="170" x2="68" y2="170" stroke="#9b59b6" stroke-width="1" stroke-dasharray="3,2"/>
+      <rect x="860" y="130" width="50" height="80" rx="8" fill="none" stroke="#2ecc71" stroke-width="1" stroke-dasharray="4,2"/>
+      <text x="885" y="176" text-anchor="middle" fill="#2ecc71" font-size="8" font-family="Segoe UI,sans-serif" transform="rotate(90 885 168)">ShopEasy</text>
+      <line x1="850" y1="170" x2="860" y2="170" stroke="#2ecc71" stroke-width="1" stroke-dasharray="3,2"/>
+    </svg>
+  </div>
+  <h3 style="margin-bottom:12px;font-size:15px;">Recent Test Results</h3>
+  <div id="dashRecentTable"></div>
+</div>
+
+<!-- ===================== PIPELINE RUNNER (Wizard) ===================== -->
+<div class="page" id="page-pipeline">
+  <!-- Wizard step indicators -->
+  <div class="wizard-steps" id="wizSteps">
+    <div class="wizard-step active" data-wstep="1"><span class="ws-num">1</span> Fetch Steps</div>
+    <div class="wizard-step" data-wstep="2"><span class="ws-num">2</span> Generate Script</div>
+    <div class="wizard-step" data-wstep="3"><span class="ws-num">3</span> Provide Inputs</div>
+    <div class="wizard-step" data-wstep="4"><span class="ws-num">4</span> Execute</div>
+    <div class="wizard-step" data-wstep="5"><span class="ws-num">5</span> Analysis</div>
+  </div>
+
+  <!-- Step 1: Fetch -->
+  <div class="wiz-panel active" id="wiz-1">
+    <div style="max-width:600px;">
+      <h3 style="font-size:15px;margin-bottom:16px;color:var(--blue);">Step 1: Fetch Test Case</h3>
+      <p style="color:var(--text-dim);font-size:13px;margin-bottom:16px;">Enter a test case ID to fetch its steps. The system will retrieve the test case details including all test steps from the configured source (local JSON or qTest).</p>
+      <div class="form-group">
+        <label>Test Case ID</label>
+        <input type="text" id="wTcId" placeholder="e.g. TC-001" style="font-size:15px;padding:12px;">
+      </div>
+      <button class="btn btn-primary" id="btnWizFetch" style="padding:12px 28px;">Fetch Test Case &#8594;</button>
+      <div id="wizFetchResult" style="margin-top:20px;"></div>
+    </div>
+  </div>
+
+  <!-- Step 2: Generate -->
+  <div class="wiz-panel" id="wiz-2">
+    <h3 style="font-size:15px;margin-bottom:16px;color:var(--cyan);">Step 2: Generated Test Script</h3>
+    <div id="wizGenInfo" class="mb-12"></div>
+    <div id="wizGenCode"></div>
+    <div style="margin-top:16px;">
+      <button class="btn btn-secondary" onclick="wizGoTo(1)">&larr; Back</button>
+      <button class="btn btn-primary" onclick="wizGoTo(3)">Next: Provide Inputs &#8594;</button>
+    </div>
+  </div>
+
+  <!-- Step 3: Provide Inputs -->
+  <div class="wiz-panel" id="wiz-3">
+    <h3 style="font-size:15px;margin-bottom:6px;color:var(--blue);">Step 3: Provide Required Inputs</h3>
+    <p style="color:var(--text-dim);font-size:13px;margin-bottom:16px;">The generated test needs these inputs to execute against your ShopEasy environment. Fill in what you have; optional fields can be left blank.</p>
+    <div id="wizInputs"></div>
+    <div class="form-group" style="margin-top:8px;">
+      <label>Max Retries on Failure</label>
+      <input type="number" id="wMaxRetries" value="3" min="1" max="10" style="width:100px;">
+    </div>
+    <div style="margin-top:16px;">
+      <button class="btn btn-secondary" onclick="wizGoTo(2)">&larr; Back</button>
+      <button class="btn btn-green" id="btnWizExecute" style="padding:12px 28px;">&#9654; Execute Pipeline</button>
+    </div>
+  </div>
+
+  <!-- Step 4: Execute (live) -->
+  <div class="wiz-panel" id="wiz-4">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
+      <div>
+        <h3 style="font-size:15px;margin-bottom:12px;color:var(--green);">Step 4: Executing...</h3>
+        <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:16px;">
+          <div class="timeline" id="wizTimeline"></div>
+        </div>
+      </div>
+      <div>
+        <h3 style="font-size:15px;margin-bottom:12px;">Pipeline Progress</h3>
+        <div id="wizProgress" style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:20px;">
+          <div style="text-align:center;padding:40px;"><div class="spinner" style="width:32px;height:32px;border-width:3px;"></div><p style="margin-top:12px;color:var(--text-dim);">Pipeline running...</p></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Step 5: Analysis -->
+  <div class="wiz-panel" id="wiz-5">
+    <h3 style="font-size:15px;margin-bottom:16px;">Step 5: Analysis &amp; Results</h3>
+    <div id="wizAnalysis"></div>
+    <div style="margin-top:20px;">
+      <button class="btn btn-primary" onclick="wizReset()">&#8634; Run Another Test Case</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== TEST CASES ===================== -->
+<div class="page" id="page-testcases">
+  <div class="flex-between mb-20">
+    <div><h3 style="font-size:15px;">Test Case Browser</h3><p style="color:var(--text-dim);font-size:13px;margin-top:4px;">Browse ShopEasy test cases from the configured source</p></div>
+    <div style="display:flex;gap:10px;align-items:center;">
+      <label style="font-size:12px;color:var(--text-dim);">Limit:</label>
+      <input type="number" id="tcLimit" value="10" min="1" max="100" style="width:70px;">
+      <button class="btn btn-primary btn-sm" id="btnFetchTc">Fetch Test Cases</button>
+      <input type="text" id="tcSingleId" placeholder="TC-001" style="width:120px;">
+      <button class="btn btn-secondary btn-sm" id="btnFetchSingle">Fetch by ID</button>
+    </div>
+  </div>
+  <div id="tcResults"><div class="empty"><div class="icon">&#9776;</div><p>Click "Fetch Test Cases" or enter a TC ID.</p></div></div>
+</div>
+
+<!-- ===================== REPORTS ===================== -->
+<div class="page" id="page-reports">
+  <div class="flex-between mb-20"><h3 style="font-size:15px;">Execution Reports</h3><button class="btn btn-secondary btn-sm" id="btnRefreshReports">&#8635; Refresh</button></div>
+  <div id="reportsList"></div>
+  <div id="reportDetail" style="display:none;"></div>
+</div>
+
+<!-- ===================== GENERATED TESTS ===================== -->
+<div class="page" id="page-generated">
+  <div class="flex-between mb-20"><h3 style="font-size:15px;">Generated Test Scripts</h3><button class="btn btn-secondary btn-sm" id="btnRefreshGen">&#8635; Refresh</button></div>
+  <div id="genList"></div>
+  <div id="genDetail" style="display:none;margin-top:20px;"></div>
+</div>
+
+<!-- ===================== CONFIGURATION ===================== -->
+<div class="page" id="page-config">
+  <div class="flex-between mb-20">
+    <div>
+      <h3 style="font-size:15px;">System Configuration</h3>
+      <p style="color:var(--text-dim);font-size:13px;margin-top:4px;">Edit settings below. Changes are saved to <code style="color:var(--cyan);">config.py</code> and applied immediately.</p>
+    </div>
+    <div style="display:flex;gap:8px;" id="cfgActions">
+      <button class="btn btn-secondary btn-sm" id="btnCfgCancel" style="display:none;" onclick="loadConfig()">Cancel</button>
+      <button class="btn btn-primary btn-sm" id="btnCfgSave" style="display:none;">Save Changes</button>
+    </div>
+  </div>
+  <div id="cfgSaveMsg"></div>
+  <div class="config-grid" id="configGrid"><div class="empty" style="grid-column:1/-1;"><div class="icon">&#9881;</div><p>Loading...</p></div></div>
+</div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+const API='';
+// --- State ---
+let wizData = {};   // holds tc_data, gen data, required_inputs across wizard steps
+
+// --- Nav ---
+document.querySelectorAll('.sidebar nav a').forEach(a=>{
+  a.addEventListener('click',e=>{
+    e.preventDefault();
+    const p=a.dataset.page;
+    document.querySelectorAll('.sidebar nav a').forEach(x=>x.classList.remove('active'));
+    a.classList.add('active');
+    document.querySelectorAll('.page').forEach(pg=>pg.classList.remove('active'));
+    document.getElementById('page-'+p).classList.add('active');
+    document.getElementById('pageTitle').textContent=a.textContent.trim();
+    if(p==='reports')loadReports();if(p==='generated')loadGeneratedTests();if(p==='config')loadConfig();if(p==='dashboard')loadDashboard();
+  });
+});
+
+// --- Helpers ---
+async function api(u){const r=await fetch(API+u);return r.json();}
+function esc(s){const d=document.createElement('div');d.textContent=s;return d.innerHTML;}
+function fmtTime(iso){if(!iso)return'-';return new Date(iso).toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit',second:'2-digit'});}
+
+// ===================== DASHBOARD =====================
+async function loadDashboard(){
+  try{
+    const files=await api('/api/reports');
+    if(!files.length){
+      ['dTotal','dPassed','dFailed','dAttempts'].forEach(id=>document.getElementById(id).textContent='0');
+      document.getElementById('dDuration').textContent='0s';
+      document.getElementById('dashRecentTable').innerHTML='<div class="empty"><p>No reports yet. Run the pipeline to generate results.</p></div>';return;
+    }
+    const latest=await api('/api/reports/'+files[0]);const s=latest.summary;
+    document.getElementById('dTotal').textContent=s.total_test_cases;
+    document.getElementById('dPassed').textContent=s.passed;
+    document.getElementById('dFailed').textContent=s.failed;
+    document.getElementById('dAttempts').textContent=s.total_attempts;
+    document.getElementById('dDuration').textContent=s.total_duration_s+'s';
+    let rows='';
+    (latest.test_cases||[]).forEach(tc=>{
+      rows+=`<tr><td><strong>${esc(tc.test_case_id)}</strong></td><td>${esc(tc.test_case_name||'').substring(0,70)}</td><td><span class="status ${tc.final_status}">${tc.final_status}</span></td><td>${tc.total_attempts}</td><td>${tc.step_count}</td><td>${tc.duration_seconds}s</td></tr>`;
+    });
+    document.getElementById('dashRecentTable').innerHTML=`<table class="tbl"><tr><th>Test Case</th><th>Name</th><th>Status</th><th>Attempts</th><th>Steps</th><th>Duration</th></tr>${rows}</table>`;
+  }catch(e){console.error(e);}
+}
+
+// ===================== WIZARD =====================
+function wizGoTo(step){
+  document.querySelectorAll('.wiz-panel').forEach(p=>p.classList.remove('active'));
+  document.getElementById('wiz-'+step).classList.add('active');
+  document.querySelectorAll('.wizard-step').forEach(s=>{
+    const n=parseInt(s.dataset.wstep);
+    s.classList.remove('active','done');
+    if(n<step)s.classList.add('done');
+    if(n===step)s.classList.add('active');
+  });
+}
+function wizReset(){
+  wizData={};wizGoTo(1);
+  document.getElementById('wTcId').value='';
+  document.getElementById('wizFetchResult').innerHTML='';
+  document.getElementById('wizGenCode').innerHTML='';
+  document.getElementById('wizGenInfo').innerHTML='';
+  document.getElementById('wizInputs').innerHTML='';
+  document.getElementById('wizTimeline').innerHTML='';
+  document.getElementById('wizAnalysis').innerHTML='';
+}
+
+// Step 1: Fetch
+document.getElementById('btnWizFetch').addEventListener('click',async()=>{
+  const id=document.getElementById('wTcId').value.trim();
+  if(!id){alert('Enter a test case ID');return;}
+  const btn=document.getElementById('btnWizFetch');
+  btn.disabled=true;btn.innerHTML='<span class="spinner"></span> Fetching...';
+  document.getElementById('wizFetchResult').innerHTML='';
+  try{
+    const tc=await api('/api/testcases/'+id);
+    if(tc.error)throw new Error(tc.error);
+    wizData.tc=tc;
+    // Show fetched steps
+    let stepsHtml='';
+    (tc.steps||[]).forEach((s,i)=>{
+      stepsHtml+=`<div class="step-card"><strong>Step ${i+1}:</strong> ${esc(s.description||s.action||'').substring(0,250)}${s.expected_result?`<br><span style="color:var(--text-dim);font-size:12px;">Expected: ${esc(s.expected_result).substring(0,200)}</span>`:''}</div>`;
+    });
+    document.getElementById('wizFetchResult').innerHTML=`
+      <div class="fade-in" style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:20px;margin-top:16px;">
+        <div style="font-size:14px;font-weight:600;margin-bottom:4px;">${esc(tc.name||'')}</div>
+        <div style="font-size:12px;color:var(--text-dim);margin-bottom:12px;">${esc(tc.pid)} &mdash; ${tc.step_count||tc.steps?.length||0} steps</div>
+        <div style="max-height:300px;overflow-y:auto;">${stepsHtml}</div>
+        <button class="btn btn-primary mt-16" id="btnWizGenerate">Generate Test Script &#8594;</button>
+      </div>`;
+    document.getElementById('btnWizGenerate').addEventListener('click',wizGenerate);
+  }catch(e){
+    document.getElementById('wizFetchResult').innerHTML=`<div style="color:var(--red);margin-top:12px;">Error: ${esc(e.message)}</div>`;
+  }finally{btn.disabled=false;btn.innerHTML='Fetch Test Case &#8594;';}
+});
+
+// Step 2: Generate
+async function wizGenerate(){
+  const id=document.getElementById('wTcId').value.trim();
+  wizGoTo(2);
+  document.getElementById('wizGenInfo').innerHTML='<div style="display:flex;align-items:center;gap:8px;"><span class="spinner"></span> Generating test script...</div>';
+  document.getElementById('wizGenCode').innerHTML='';
+  try{
+    const resp=await fetch(API+'/api/pipeline/generate',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({test_case_id:id})});
+    const data=await resp.json();
+    if(data.error)throw new Error(data.error);
+    wizData.gen=data;
+    document.getElementById('wizGenInfo').innerHTML=`
+      <div class="cards" style="grid-template-columns:repeat(5,1fr);">
+        <div class="card"><div class="label">Method</div><div class="value blue" style="font-size:18px;">${esc(data.generation_method)}</div></div>
+        <div class="card"><div class="label">Lines</div><div class="value" style="font-size:18px;">${data.code_lines}</div></div>
+        <div class="card"><div class="label">File</div><div class="value" style="font-size:13px;font-family:var(--mono);word-break:break-all;">${esc(data.generated_file)}</div></div>
+        <div class="card"><div class="label">Steps</div><div class="value" style="font-size:18px;">${data.test_case_data?.step_count||'-'}</div></div>
+        <div class="card"><div class="label">Ref. Repo</div><div class="value ${data.repo_context_used?'green':'orange'}" style="font-size:16px;">${data.repo_context_used?'Active':'N/A'}</div></div>
+      </div>`;
+    document.getElementById('wizGenCode').innerHTML=`
+      <details><summary style="cursor:pointer;font-size:13px;color:var(--text-dim);margin-bottom:8px;">View generated code (preview)</summary>
+      <div class="code-block">${highlightPython(data.code_preview||'')}</div></details>`;
+    // Prepare inputs for step 3
+    wizBuildInputs(data.required_inputs||[]);
+  }catch(e){
+    document.getElementById('wizGenInfo').innerHTML=`<div style="color:var(--red);">Generation failed: ${esc(e.message)}</div>`;
+  }
+}
+
+function wizBuildInputs(groups){
+  let html='';
+  groups.forEach(g=>{
+    html+=`<div class="input-group"><h4>${esc(g.group)}</h4>`;
+    const fields=g.fields||[];
+    // Pair fields into rows of 2
+    for(let i=0;i<fields.length;i+=2){
+      html+='<div class="form-row">';
+      for(let j=i;j<Math.min(i+2,fields.length);j++){
+        const f=fields[j];
+        html+=`<div class="form-group"><label>${esc(f.label)}${f.required?' *':''}</label><input type="${f.type||'text'}" class="wiz-input" data-key="${f.key}" value="${esc(f.default||'')}" placeholder="${esc(f.label)}"></div>`;
+      }
+      html+='</div>';
+    }
+    html+='</div>';
+  });
+  document.getElementById('wizInputs').innerHTML=html;
+}
+
+// Step 4: Execute
+document.getElementById('btnWizExecute').addEventListener('click',async()=>{
+  const btn=document.getElementById('btnWizExecute');
+  btn.disabled=true;btn.innerHTML='<span class="spinner"></span> Starting...';
+  wizGoTo(4);
+  const timeline=document.getElementById('wizTimeline');
+  timeline.innerHTML='';
+  document.getElementById('wizProgress').innerHTML='<div style="text-align:center;padding:40px;"><div class="spinner" style="width:32px;height:32px;border-width:3px;"></div><p style="margin-top:12px;color:var(--text-dim);">Pipeline running...</p></div>';
+
+  // Collect user inputs
+  const userInputs={};
+  document.querySelectorAll('.wiz-input').forEach(inp=>{
+    if(inp.value.trim())userInputs[inp.dataset.key]=inp.value.trim();
+  });
+  const tcId=document.getElementById('wTcId').value.trim();
+  const maxRetries=parseInt(document.getElementById('wMaxRetries').value)||3;
+
+  try{
+    const resp=await fetch(API+'/api/pipeline/run',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({test_case_ids:[tcId],user_inputs:userInputs,max_retries:maxRetries})});
+    const data=await resp.json();
+    if(data.error)throw new Error(data.error);
+
+    // SSE stream
+    const es=new EventSource(API+'/api/pipeline/status/'+data.run_id);
+    es.onmessage=(e)=>{
+      const evt=JSON.parse(e.data);
+      if(evt.type==='heartbeat')return;
+      if(evt.type==='done'){es.close();btn.disabled=false;btn.innerHTML='&#9654; Execute Pipeline';return;}
+      // Timeline
+      const div=document.createElement('div');div.className='timeline-item fade-in';
+      const agentCls=(evt.agent||'').toLowerCase().replace('test','').replace('agent','');
+      div.innerHTML=`<span class="t-time">${fmtTime(evt.ts)}</span><span class="t-agent ${agentCls}">${esc(evt.agent||evt.type||'')}</span><span class="t-msg">${esc(evt.message||evt.event||evt.type||'')}</span>`;
+      timeline.appendChild(div);timeline.scrollTop=timeline.scrollHeight;
+
+      if(evt.type==='completed'){
+        wizData.analysis=evt.analysis;wizData.summary=evt.summary;wizData.report=evt.report_json;
+        const s=evt.summary||{};
+        document.getElementById('wizProgress').innerHTML=`
+          <div class="cards" style="grid-template-columns:1fr 1fr 1fr;"><div class="card"><div class="label">Total</div><div class="value blue">${s.total_test_cases||0}</div></div><div class="card"><div class="label">Passed</div><div class="value green">${s.passed||0}</div></div><div class="card"><div class="label">Failed</div><div class="value red">${s.failed||0}</div></div></div>
+          <div style="margin-top:12px;"><button class="btn btn-primary" onclick="wizGoTo(5)">View Analysis &#8594;</button></div>`;
+        wizBuildAnalysis(evt.analysis||[],evt.summary||{});
+      }
+      if(evt.type==='error'){
+        document.getElementById('wizProgress').innerHTML=`<div style="padding:16px;background:rgba(231,76,60,.1);border:1px solid var(--red);border-radius:8px;color:var(--red);">${esc(evt.message)}</div>`;
+      }
+    };
+    es.onerror=()=>{es.close();btn.disabled=false;btn.innerHTML='&#9654; Execute Pipeline';};
+  }catch(e){
+    btn.disabled=false;btn.innerHTML='&#9654; Execute Pipeline';
+    document.getElementById('wizProgress').innerHTML=`<div style="color:var(--red);">${esc(e.message)}</div>`;
+  }
+});
+
+function wizBuildAnalysis(analysis, summary){
+  let html=`<div class="cards" style="margin-bottom:20px;">
+    <div class="card"><div class="label">Total</div><div class="value blue">${summary.total_test_cases||0}</div></div>
+    <div class="card"><div class="label">Passed</div><div class="value green">${summary.passed||0}</div></div>
+    <div class="card"><div class="label">Failed</div><div class="value red">${summary.failed||0}</div></div>
+    <div class="card"><div class="label">Total Attempts</div><div class="value orange">${summary.total_attempts||0}</div></div>
+    <div class="card"><div class="label">Duration</div><div class="value">${summary.total_duration_s||0}s</div></div>
+  </div>`;
+
+  analysis.forEach(tc=>{
+    html+=`<div style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:20px;margin-bottom:16px;">
+      <div class="flex-between mb-12">
+        <div style="font-size:15px;font-weight:600;">${esc(tc.test_case_id)}</div>
+        <span class="status ${tc.final_status}">${tc.final_status}</span>
+      </div>
+      <div style="font-size:13px;color:var(--text-dim);margin-bottom:12px;">${tc.total_attempts} attempt(s)</div>`;
+
+    if(tc.final_status==='passed'&&tc.failures.length===0){
+      html+=`<div style="padding:16px;background:rgba(46,204,113,.08);border:1px solid var(--green);border-radius:8px;color:var(--green);font-weight:600;">All test steps passed successfully.</div>`;
+    }else{
+      tc.failures.forEach(f=>{
+        const cat=f.category||'unknown';
+        html+=`<div class="analysis-box ${cat}">
+          <div style="margin-bottom:8px;">
+            <span class="analysis-tag ${cat}">${cat.replace('_',' ')}</span>
+            ${f.auto_fixable?'<span class="analysis-tag auto-fix">Auto-fixable</span>':''}
+            <span style="font-size:12px;color:var(--text-dim);">Attempt #${f.attempt}</span>
+          </div>
+          <h4>${esc(f.sub_type||'').replace('_',' ')}</h4>
+          <p style="font-size:13px;margin-top:4px;">${esc(f.detail||'')}</p>`;
+
+        if(cat==='product_issue'){
+          html+=`<div class="exp-act">
+            <div><div class="ea-label">Expected Behaviour</div><div class="ea-val">${esc(f.expected||'(see assertion in logs)')}</div></div>
+            <div><div class="ea-label">Actual Behaviour</div><div class="ea-val">${esc(f.actual||'(see assertion in logs)')}</div></div>
+          </div>
+          <p style="font-size:12px;color:var(--red);margin-top:10px;font-weight:600;">This is a product behaviour change. The ShopEasy API returned unexpected results.</p>`;
+        }
+        if(cat==='script_issue'&&f.auto_fixable){
+          html+=`<p style="font-size:12px;color:var(--orange);margin-top:10px;">The system automatically attempted to fix this script issue and retried.</p>`;
+        }
+        if(cat==='environment_issue'){
+          html+=`<p style="font-size:12px;color:var(--blue);margin-top:10px;">Check your environment inputs (ShopEasy API URL, credentials, network connectivity) and retry.</p>`;
+        }
+        html+='</div>';
+      });
+    }
+    html+='</div>';
+  });
+
+  if(wizData.report){
+    html+=`<p style="font-size:13px;color:var(--text-dim);margin-top:8px;">Full report: ${esc(wizData.report)}</p>`;
+  }
+  document.getElementById('wizAnalysis').innerHTML=html;
+}
+
+// ===================== TEST CASES =====================
+document.getElementById('btnFetchTc').addEventListener('click',async()=>{
+  const limit=document.getElementById('tcLimit').value;
+  document.getElementById('tcResults').innerHTML='<div class="empty"><div class="spinner"></div><p style="margin-top:12px;">Fetching test cases...</p></div>';
+  try{
+    const data=await api('/api/testcases/fetch-empty?limit='+limit);
+    if(data.error)throw new Error(data.error);
+    renderTestCases(data.test_cases||[]);
+  }catch(e){document.getElementById('tcResults').innerHTML=`<div class="empty"><p style="color:var(--red);">Error: ${esc(e.message)}</p></div>`;}
+});
+document.getElementById('btnFetchSingle').addEventListener('click',async()=>{
+  const id=document.getElementById('tcSingleId').value.trim();if(!id)return;
+  document.getElementById('tcResults').innerHTML='<div class="empty"><div class="spinner"></div><p style="margin-top:12px;">Fetching...</p></div>';
+  try{
+    const data=await api('/api/testcases/'+id);if(data.error)throw new Error(data.error);
+    renderTestCases([data]);
+  }catch(e){document.getElementById('tcResults').innerHTML=`<div class="empty"><p style="color:var(--red);">Error: ${esc(e.message)}</p></div>`;}
+});
+
+function renderTestCases(tcs){
+  if(!tcs.length){document.getElementById('tcResults').innerHTML='<div class="empty"><p>No test cases found.</p></div>';return;}
+  let rows='';
+  tcs.forEach(tc=>{
+    const steps=tc.steps||[];
+    const stepsHtml=steps.map((s,i)=>`<div class="step-card"><strong>Step ${i+1}:</strong> ${esc(s.description||s.action||'').substring(0,200)}</div>`).join('');
+    rows+=`<tr><td><strong>${esc(tc.pid||tc.id||'')}</strong></td>
+      <td><div>${esc((tc.name||'').substring(0,80))}</div>
+        <details style="margin-top:6px;"><summary style="font-size:11px;color:var(--text-dim);cursor:pointer;">Show ${steps.length} steps</summary><div style="margin-top:6px;max-height:200px;overflow-y:auto;">${stepsHtml||'<em>No steps</em>'}</div></details></td>
+      <td>${tc.step_count||steps.length}</td>
+      <td><button class="btn btn-primary btn-sm" onclick="runFromBrowser('${esc(tc.pid||tc.id||'')}')">Run Pipeline</button></td></tr>`;
+  });
+  document.getElementById('tcResults').innerHTML=`<table class="tbl"><tr><th>ID</th><th>Name / Steps</th><th>Steps</th><th></th></tr>${rows}</table>`;
+}
+function runFromBrowser(tcId){
+  document.getElementById('wTcId').value=tcId;wizReset();
+  document.querySelector('[data-page="pipeline"]').click();
+}
+
+// ===================== REPORTS =====================
+async function loadReports(){
+  document.getElementById('reportDetail').style.display='none';
+  document.getElementById('reportsList').style.display='block';
+  const files=await api('/api/reports');
+  if(!files.length){document.getElementById('reportsList').innerHTML='<div class="empty"><p>No reports found.</p></div>';return;}
+  let rows='';files.forEach(f=>{
+    const ts=f.replace('report_','').replace('.json','').replace(/_/g,' ');
+    rows+=`<tr style="cursor:pointer" onclick="loadReportDetail('${f}')"><td><strong>${esc(f)}</strong></td><td>${ts}</td><td><button class="btn btn-secondary btn-sm">View</button></td></tr>`;
+  });
+  document.getElementById('reportsList').innerHTML=`<table class="tbl"><tr><th>Report File</th><th>Timestamp</th><th></th></tr>${rows}</table>`;
+}
+async function loadReportDetail(filename){
+  const data=await api('/api/reports/'+filename);const s=data.summary;
+  let html=`<button class="btn btn-secondary btn-sm mb-20" onclick="loadReports()">&larr; Back to Reports</button>
+    <h3 style="margin-bottom:16px;font-size:15px;">Report: ${esc(filename)}</h3>
+    <div class="cards"><div class="card"><div class="label">Total</div><div class="value blue">${s.total_test_cases}</div></div><div class="card"><div class="label">Passed</div><div class="value green">${s.passed}</div></div><div class="card"><div class="label">Failed</div><div class="value red">${s.failed}</div></div><div class="card"><div class="label">Attempts</div><div class="value orange">${s.total_attempts}</div></div><div class="card"><div class="label">Duration</div><div class="value">${s.total_duration_s}s</div></div></div>`;
+  // TC results
+  let rows='';(data.test_cases||[]).forEach(tc=>{
+    rows+=`<tr><td><strong>${esc(tc.test_case_id)}</strong></td><td>${esc(tc.test_case_name||'').substring(0,70)}</td><td><span class="status ${tc.final_status}">${tc.final_status}</span></td><td>${tc.total_attempts}</td><td>${tc.step_count}</td><td>${tc.duration_seconds}s</td></tr>`;
+  });
+  html+=`<h3 style="margin:20px 0 12px;font-size:14px;">Test Cases</h3><table class="tbl"><tr><th>ID</th><th>Name</th><th>Status</th><th>Attempts</th><th>Steps</th><th>Duration</th></tr>${rows}</table>`;
+
+  // Root-cause analysis for failed executions
+  let hasAnalysis=false;
+  (data.test_cases||[]).forEach(tc=>{
+    (tc.execution_results||[]).forEach(ex=>{
+      if(ex.root_cause_category && ex.root_cause_category!=='none'){
+        if(!hasAnalysis){html+=`<h3 style="margin:24px 0 12px;font-size:14px;">Failure Analysis</h3>`;hasAnalysis=true;}
+        const cat=ex.root_cause_category;const d=ex.root_cause_detail||{};
+        html+=`<div class="analysis-box ${cat}"><div style="margin-bottom:6px;"><span class="analysis-tag ${cat}">${cat.replace('_',' ')}</span>${d.auto_fixable?'<span class="analysis-tag auto-fix">Auto-fixed</span>':''}<span style="font-size:12px;color:var(--text-dim);">${esc(tc.test_case_id)} attempt #${ex.attempt}</span></div>
+          <h4>${esc(d.sub_type||'').replace('_',' ')}</h4><p style="font-size:13px;margin-top:4px;">${esc(d.detail||'')}</p>`;
+        if(cat==='product_issue'){
+          html+=`<div class="exp-act"><div><div class="ea-label">Expected</div><div class="ea-val">${esc(d.expected||'(see logs)')}</div></div><div><div class="ea-label">Actual</div><div class="ea-val">${esc(d.actual||'(see logs)')}</div></div></div>`;
+        }
+        html+='</div>';
+      }
+    });
+  });
+
+  // Agent timeline
+  const events=data.agent_events||{};let allEvents=[];
+  Object.entries(events).forEach(([agent,evts])=>{(evts||[]).forEach(e=>allEvents.push({...e,_agent:agent}));});
+  allEvents.sort((a,b)=>a.timestamp.localeCompare(b.timestamp));
+  if(allEvents.length){
+    html+=`<h3 style="margin:24px 0 12px;font-size:14px;">Agent Event Timeline</h3><div class="timeline" style="max-height:400px;">`;
+    allEvents.forEach(e=>{
+      const agentCls=e._agent.toLowerCase().replace('test','').replace('agent','');
+      html+=`<div class="timeline-item fade-in"><span class="t-time">${fmtTime(e.timestamp)}</span><span class="t-agent ${agentCls}">${esc(e.agent||e._agent)}</span><span class="t-msg">${esc(e.message)}</span></div>`;
+    });
+    html+='</div>';
+  }
+  document.getElementById('reportsList').style.display='none';
+  document.getElementById('reportDetail').innerHTML=html;document.getElementById('reportDetail').style.display='block';
+}
+document.getElementById('btnRefreshReports').addEventListener('click',loadReports);
+
+// ===================== GENERATED TESTS =====================
+async function loadGeneratedTests(){
+  document.getElementById('genDetail').style.display='none';
+  const files=await api('/api/generated-tests');
+  if(!files.length){document.getElementById('genList').innerHTML='<div class="empty"><p>No generated test files found.</p></div>';return;}
+  let rows='';files.forEach(f=>{
+    rows+=`<tr style="cursor:pointer" onclick="loadGenDetail('${f.name}')"><td><strong>${esc(f.name)}</strong></td><td>${(f.size_bytes/1024).toFixed(1)} KB</td><td>${f.modified.replace('T',' ').substring(0,19)}</td><td><button class="btn btn-secondary btn-sm">View Code</button></td></tr>`;
+  });
+  document.getElementById('genList').innerHTML=`<table class="tbl"><tr><th>File</th><th>Size</th><th>Modified</th><th></th></tr>${rows}</table>`;
+}
+async function loadGenDetail(filename){
+  const data=await api('/api/generated-tests/'+filename);
+  document.getElementById('genDetail').innerHTML=`<button class="btn btn-secondary btn-sm mb-20" onclick="document.getElementById('genDetail').style.display='none';document.getElementById('genList').style.display='block';">&larr; Back</button><h3 style="margin-bottom:12px;font-size:14px;">${esc(filename)}</h3><div class="code-block">${highlightPython(data.code)}</div>`;
+  document.getElementById('genDetail').style.display='block';
+}
+function highlightPython(code){
+  let h=esc(code);
+  h=h.replace(/(#.*?)$/gm,'<span class="cmt">$1</span>');
+  h=h.replace(/("""[\s\S]*?"""|\'\'\'[\s\S]*?\'\'\')/g,'<span class="str">$1</span>');
+  h=h.replace(/("(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*')/g,'<span class="str">$1</span>');
+  h=h.replace(/^(\s*)(@\w+)/gm,'$1<span class="dec">$2</span>');
+  ['import','from','class','def','return','if','elif','else','for','while','try','except','finally','with','as','assert','raise','pass','break','continue','yield','lambda','not','and','or','is','in','True','False','None','self','async','await','pytest'].forEach(k=>{h=h.replace(new RegExp('\\b('+k+')\\b','g'),'<span class="kw">$1</span>');});
+  h=h.replace(/\b(\d+\.?\d*)\b/g,'<span class="num">$1</span>');
+  return h;
+}
+document.getElementById('btnRefreshGen').addEventListener('click',loadGeneratedTests);
+
+// ===================== CONFIGURATION (editable) =====================
+let _cfgOriginal = {};  // snapshot to detect changes
+
+async function loadConfig(){
+  document.getElementById('cfgSaveMsg').innerHTML='';
+  document.getElementById('btnCfgCancel').style.display='none';
+  document.getElementById('btnCfgSave').style.display='none';
+
+  const cfg = await api('/api/config');
+  const groups = cfg.groups || {};
+  _cfgOriginal = {...(cfg.values || {})};
+
+  let html='';
+  Object.entries(groups).forEach(([groupName, fields])=>{
+    html+=`<div class="config-section"><h3>${esc(groupName)}</h3>`;
+    fields.forEach(f=>{
+      const val = f.value != null ? String(f.value) : '';
+      const isSecret = f.type==='password';
+      const displayVal = isSecret && val ? '********' : val;
+      const inputType = isSecret ? 'password' : (f.type==='number' ? 'number' : 'text');
+      const step = f.key==='LLM_TEMPERATURE' ? 'step="0.1"' : '';
+
+      html+=`<div class="config-row" style="flex-direction:column;gap:4px;padding:8px 0;">
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+          <span class="ck">${esc(f.label)}</span>
+          <span style="font-size:10px;color:var(--text-dim);font-family:var(--mono);">${esc(f.key)}</span>
+        </div>
+        <div style="display:flex;gap:8px;align-items:center;">
+          <input type="${inputType}" ${step}
+                 class="cfg-input" data-key="${f.key}" data-orig="${esc(val)}"
+                 value="${esc(val)}"
+                 placeholder="${isSecret ? '(hidden)' : '(empty)'}"
+                 style="flex:1;font-size:13px;padding:7px 10px;"
+                 oninput="cfgOnChange()">
+          ${isSecret && val ? `<button class="btn btn-secondary btn-sm" style="white-space:nowrap;font-size:11px;" onclick="cfgToggleShow(this)">Show</button>` : ''}
+        </div>
+      </div>`;
+    });
+    html+='</div>';
+  });
+
+  document.getElementById('configGrid').innerHTML=html;
+}
+
+function cfgToggleShow(btn){
+  const inp = btn.previousElementSibling;
+  if(inp.type==='password'){inp.type='text';btn.textContent='Hide';}
+  else{inp.type='password';btn.textContent='Show';}
+}
+
+function cfgOnChange(){
+  // Show save/cancel when any field differs from original
+  let dirty = false;
+  document.querySelectorAll('.cfg-input').forEach(inp=>{
+    if(inp.value !== inp.dataset.orig) dirty = true;
+  });
+  document.getElementById('btnCfgSave').style.display = dirty ? '' : 'none';
+  document.getElementById('btnCfgCancel').style.display = dirty ? '' : 'none';
+}
+
+document.getElementById('btnCfgSave').addEventListener('click', async ()=>{
+  const btn = document.getElementById('btnCfgSave');
+  btn.disabled=true; btn.innerHTML='<span class="spinner"></span> Saving...';
+  const msgEl = document.getElementById('cfgSaveMsg');
+  msgEl.innerHTML='';
+
+  // Collect changed values
+  const payload = {};
+  document.querySelectorAll('.cfg-input').forEach(inp=>{
+    if(inp.value !== inp.dataset.orig){
+      payload[inp.dataset.key] = inp.value;
+    }
+  });
+
+  try{
+    const resp = await fetch(API+'/api/config', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify(payload)
+    });
+    const data = await resp.json();
+    if(data.error) throw new Error(data.error);
+
+    const n = (data.changed||[]).length;
+    msgEl.innerHTML=`<div class="fade-in" style="padding:10px 16px;background:rgba(46,204,113,.1);border:1px solid var(--green);border-radius:8px;color:var(--green);font-size:13px;margin-bottom:16px;font-weight:600;">${n} setting(s) saved: ${(data.changed||[]).join(', ')}</div>`;
+    // Refresh to pick up new snapshot
+    await loadConfig();
+    // Keep the success message visible briefly
+    setTimeout(()=>{ msgEl.innerHTML=''; }, 5000);
+  }catch(e){
+    msgEl.innerHTML=`<div style="padding:10px 16px;background:rgba(231,76,60,.1);border:1px solid var(--red);border-radius:8px;color:var(--red);font-size:13px;margin-bottom:16px;">Save failed: ${esc(e.message)}</div>`;
+  }finally{
+    btn.disabled=false; btn.innerHTML='Save Changes';
+  }
+});
+
+// Init
+loadDashboard();
+</script>
+</body>
+</html>
