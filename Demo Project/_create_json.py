@@ -1,0 +1,154 @@
+"""Script to create demo_testcases.json"""
+import json, os
+
+data = [
+  {
+    "id": 90001, "pid": "TC-001",
+    "name": "Smoke: Create and Verify Product",
+    "description": "Verify that a new product can be created in the ShopEasy platform with all required attributes and is visible in the product catalog.",
+    "precondition": "ShopEasy API server is running and accessible. Valid admin credentials are available.",
+    "properties": {"Automation Status": "", "Priority": "High", "Type": "Functional"},
+    "steps": [
+      {"order": 1, "description": "Send a POST request to /api/products with a JSON body containing name 'Wireless Bluetooth Headphones', price 79.99, category 'Electronics', and SKU 'WBH-1001'. Include valid admin authorization headers.", "expected": "Product is created successfully with HTTP 201 response. The response body contains the generated product ID, the submitted name, price, category, and SKU. A 'created_at' timestamp is present in the response."},
+      {"order": 2, "description": "Send a GET request to /api/products/{product_id} using the product ID returned from the creation step. Verify all fields in the response match the original submission.", "expected": "HTTP 200 response is returned. The product name is 'Wireless Bluetooth Headphones', price is 79.99, category is 'Electronics', SKU is 'WBH-1001', and stock status defaults to 'in_stock'."},
+      {"order": 3, "description": "Send a GET request to /api/catalog?category=Electronics to retrieve the full product catalog filtered by the Electronics category. Search the results for the newly created product.", "expected": "HTTP 200 response with a JSON array of products. The newly created product appears in the catalog listing with correct name and price. The total count in the response metadata reflects the addition."},
+      {"order": 4, "description": "Send a PUT request to /api/products/{product_id} with an updated price of 69.99 and a new promotional tag 'Summer Sale'. Include valid admin authorization headers.", "expected": "HTTP 200 response confirming the update. The response body shows the new price of 69.99 and the promotional tag 'Summer Sale'. The 'updated_at' timestamp is more recent than 'created_at'."},
+      {"order": 5, "description": "Send a GET request to /api/products/{product_id} again to verify the price update persisted. Compare the price and promotional tag against the values sent in the PUT request.", "expected": "HTTP 200 response is returned. The product price is now 69.99 and the promotional tag reads 'Summer Sale'. All other fields remain unchanged from the original creation."}
+    ]
+  },
+  {
+    "id": 90002, "pid": "TC-002",
+    "name": "Regression: Product Search and Filtering",
+    "description": "Validate the product search and filtering functionality of the ShopEasy platform, ensuring users can find products by name, category, and price range.",
+    "precondition": "ShopEasy API server is running. At least 20 products exist across multiple categories with varying price points. Search index is up to date.",
+    "properties": {"Automation Status": "", "Priority": "High", "Type": "Functional"},
+    "steps": [
+      {"order": 1, "description": "Send a GET request to /api/products/search?q=Bluetooth to perform a keyword search. Verify the results contain products with 'Bluetooth' in the name or description.", "expected": "HTTP 200 response with a non-empty array of products. Each returned product contains the keyword 'Bluetooth' in either the name or description field. Results are sorted by relevance score in descending order."},
+      {"order": 2, "description": "Send a GET request to /api/products?category=Electronics&sort=price_asc to filter products by the Electronics category with ascending price sort order.", "expected": "HTTP 200 response with an array of products all belonging to the 'Electronics' category. Products are sorted by price from lowest to highest. No products from other categories appear in the results."},
+      {"order": 3, "description": "Send a GET request to /api/products?min_price=25.00&max_price=100.00 to filter products within a specific price range. Validate each returned product falls within the specified bounds.", "expected": "HTTP 200 response with a JSON array. Every product in the results has a price >= 25.00 and <= 100.00. The response metadata includes the total count of matching products."},
+      {"order": 4, "description": "Combine multiple filters by sending a GET request to /api/products?category=Electronics&min_price=25.00&max_price=100.00&q=Wireless. Verify that all filters are applied simultaneously.", "expected": "HTTP 200 response with results matching all three criteria: category is Electronics, price is between 25.00 and 100.00, and name/description contains 'Wireless'. The result count is less than or equal to the count from any individual filter."}
+    ]
+  },
+  {
+    "id": 90003, "pid": "TC-003",
+    "name": "Regression: Category Management",
+    "description": "Test the full lifecycle of product category management including creation, product association, renaming, and deletion on the ShopEasy platform.",
+    "precondition": "ShopEasy API server is running. Admin user is authenticated. At least 5 uncategorized products exist in the system.",
+    "properties": {"Automation Status": "", "Priority": "Medium", "Type": "Functional"},
+    "steps": [
+      {"order": 1, "description": "Send a POST request to /api/categories with a JSON body containing name 'Summer Collection', description 'Seasonal summer products and accessories', and display_order 5.", "expected": "HTTP 201 response with the created category object. The response includes a generated category_id, the name 'Summer Collection', the description, display_order of 5, and product_count initialized to 0."},
+      {"order": 2, "description": "Send a POST request to /api/categories/{category_id}/products with a JSON body containing an array of three product IDs to associate existing products with the new category.", "expected": "HTTP 200 response confirming all three products were added to the category. The response includes a summary showing 3 products added successfully and 0 failures."},
+      {"order": 3, "description": "Send a GET request to /api/categories/{category_id} to retrieve the category details and verify the product count reflects the newly added products.", "expected": "HTTP 200 response with the category object. The product_count field shows 3. The products array contains the three previously added product IDs with their names and prices."},
+      {"order": 4, "description": "Send a PUT request to /api/categories/{category_id} with an updated name 'Summer Deals 2025' and a new description 'Discounted summer products for the 2025 season'.", "expected": "HTTP 200 response with the updated category. The name is now 'Summer Deals 2025' and the description reflects the new text. The product_count remains 3 and associated products are unchanged."},
+      {"order": 5, "description": "Send a DELETE request to /api/categories/{category_id} with the query parameter reassign_to=uncategorized to remove the category and reassign its products.", "expected": "HTTP 204 response with no body. A subsequent GET request to /api/categories/{category_id} returns HTTP 404. The three previously associated products now belong to the 'uncategorized' default category."}
+    ]
+  },
+  {
+    "id": 90004, "pid": "TC-004",
+    "name": "Smoke: End-to-End Order Placement",
+    "description": "Validate the complete order placement flow from cart creation through payment processing and order confirmation on the ShopEasy platform.",
+    "precondition": "ShopEasy API server is running. A registered customer account exists with verified email. At least 3 products with available stock exist. Payment gateway sandbox is configured.",
+    "properties": {"Automation Status": "", "Priority": "Critical", "Type": "End-to-End"},
+    "steps": [
+      {"order": 1, "description": "Send a POST request to /api/carts with the authenticated customer's user_id to create a new shopping cart. Store the returned cart_id for subsequent operations.", "expected": "HTTP 201 response with a new cart object. The response includes a unique cart_id, the associated user_id, an empty items array, a subtotal of 0.00, and a status of 'active'."},
+      {"order": 2, "description": "Send two POST requests to /api/carts/{cart_id}/items to add two different products: Product A (quantity 2, unit price 29.99) and Product B (quantity 1, unit price 49.99).", "expected": "Each request returns HTTP 200. After both additions, a GET to /api/carts/{cart_id} shows 2 line items with correct quantities. The cart subtotal is 109.97 (29.99 * 2 + 49.99 * 1)."},
+      {"order": 3, "description": "Send a POST request to /api/carts/{cart_id}/discount with the code 'SAVE10' to apply a 10% discount to the cart. Verify the discount is reflected in the cart totals.", "expected": "HTTP 200 response confirming the discount code is valid and applied. The cart now shows a discount_amount of 11.00 and an updated total of 98.97. The discount_code field displays 'SAVE10'."},
+      {"order": 4, "description": "Send a POST request to /api/orders/checkout with the cart_id, shipping address, and payment method (credit card token from sandbox). This initiates payment processing and order creation.", "expected": "HTTP 201 response with a new order object. The order contains an order_id, status 'confirmed', payment_status 'paid', the correct total of 98.97, and the shipping address. A payment_transaction_id is included."},
+      {"order": 5, "description": "Send a GET request to /api/orders/{order_id} to retrieve the full order details. Verify all line items, pricing, discount, shipping information, and payment details are correct.", "expected": "HTTP 200 response with the complete order. Line items match the cart contents with correct quantities and prices. The discount of 11.00 is applied. Shipping address matches the submitted address. Order status is 'confirmed'."},
+      {"order": 6, "description": "Send a GET request to /api/notifications?user_id={user_id}&type=order_confirmation to check that an order confirmation email notification was queued for the customer.", "expected": "HTTP 200 response with at least one notification record. The notification type is 'order_confirmation', recipient matches the customer email, the order_id is referenced, and the sent_at timestamp is within the last 60 seconds."}
+    ]
+  },
+  {
+    "id": 90005, "pid": "TC-005",
+    "name": "Comprehensive: Order Lifecycle Management",
+    "description": "Test the complete order lifecycle from creation through processing, shipping, delivery, and historical record on the ShopEasy platform.",
+    "precondition": "ShopEasy API server is running. A confirmed order exists in 'processing' state. Shipping carrier integration is configured in sandbox mode.",
+    "properties": {"Automation Status": "", "Priority": "Critical", "Type": "End-to-End"},
+    "steps": [
+      {"order": 1, "description": "Send a POST request to /api/orders with line items, customer details, and payment information to create a new order. Capture the returned order_id and initial status.", "expected": "HTTP 201 response with order object. The order_id is a unique identifier, status is 'processing', payment_status is 'captured', and all line items with quantities and prices are present in the response."},
+      {"order": 2, "description": "Send a GET request to /api/orders/{order_id}/status to verify the initial order status. Check that the status timeline shows the 'processing' event with a timestamp.", "expected": "HTTP 200 response with the current status 'processing'. The status_history array contains one entry with status 'processing', a valid timestamp, and an actor of 'system'."},
+      {"order": 3, "description": "Send a PUT request to /api/orders/{order_id}/status with new status 'shipped' and carrier information including carrier_name 'FedEx' and tracking_number 'FX123456789'.", "expected": "HTTP 200 response confirming the status change. The order status is now 'shipped'. The status_history array now has two entries: 'processing' and 'shipped'. The shipping object contains carrier and tracking details."},
+      {"order": 4, "description": "Send a PUT request to /api/orders/{order_id}/tracking with updated tracking events including 'picked_up', 'in_transit', and 'out_for_delivery' with timestamps for each event.", "expected": "HTTP 200 response with the tracking object updated. Three tracking events are recorded in chronological order. Each event has a status, location, and timestamp. The latest event is 'out_for_delivery'."},
+      {"order": 5, "description": "Send a PUT request to /api/orders/{order_id}/status with new status 'delivered' and delivery confirmation including signed_by 'John Doe' and delivered_at timestamp.", "expected": "HTTP 200 response confirming delivery. The order status is 'delivered'. The delivery_confirmation object includes signed_by and delivered_at timestamp. Status history now has three entries."},
+      {"order": 6, "description": "Send a GET request to /api/orders/{order_id} to fetch the complete order record. Verify all lifecycle events, tracking data, and delivery confirmation are present.", "expected": "HTTP 200 response with the full order object. Status is 'delivered'. The status_history contains all transitions. Tracking events are complete. Delivery confirmation is present. Total amounts and line items remain unchanged."},
+      {"order": 7, "description": "Send a GET request to /api/customers/{customer_id}/orders?include_completed=true to verify the delivered order appears in the customer's order history with a summary.", "expected": "HTTP 200 response with an array of orders. The recently delivered order is present with status 'delivered', correct total amount, and delivery date."}
+    ]
+  },
+  {
+    "id": 90006, "pid": "TC-006",
+    "name": "Smoke: User Registration and Authentication",
+    "description": "Verify the complete user registration, email verification, login, and profile update flow on the ShopEasy platform.",
+    "precondition": "ShopEasy API server is running. Email service is configured in sandbox mode. No user exists with the test email address 'testuser@example.com'.",
+    "properties": {"Automation Status": "", "Priority": "Critical", "Type": "Functional"},
+    "steps": [
+      {"order": 1, "description": "Send a POST request to /api/auth/register with email 'testuser@example.com', password meeting complexity requirements, first_name 'Jane', and last_name 'Smith'.", "expected": "HTTP 201 response with the created user object. The response includes a user_id, email, first_name, last_name, account_status 'pending_verification', and created_at timestamp. No password is returned."},
+      {"order": 2, "description": "Send a GET request to /api/notifications/email?to=testuser@example.com&type=verification to verify that a verification email was sent. Extract the verification token.", "expected": "HTTP 200 response with at least one email notification. The email subject contains 'Verify your ShopEasy account'. The body includes a verification link with a valid token."},
+      {"order": 3, "description": "Send a POST request to /api/auth/login with email 'testuser@example.com' and the correct password. After receiving the token, include it in the Authorization header.", "expected": "HTTP 200 response with an authentication object containing access_token (JWT format), refresh_token, token_type 'Bearer', and expires_in value."},
+      {"order": 4, "description": "Send a PUT request to /api/users/{user_id}/profile with the bearer token to update the user profile. Set display_name to 'JaneS', phone to '+1-555-0123', and preferred_currency to 'USD'.", "expected": "HTTP 200 response with the updated profile. The display_name is 'JaneS', phone is '+1-555-0123', and preferred_currency is 'USD'. The updated_at timestamp is more recent than created_at."},
+      {"order": 5, "description": "Send a GET request to /api/users/{user_id}/profile with the bearer token to verify the profile changes persisted. Compare each field against the values submitted.", "expected": "HTTP 200 response with the full user profile. All updated fields match: display_name is 'JaneS', phone is '+1-555-0123', preferred_currency is 'USD'. Original fields remain unchanged."}
+    ]
+  },
+  {
+    "id": 90007, "pid": "TC-007",
+    "name": "Regression: Shopping Cart Operations",
+    "description": "Test comprehensive shopping cart operations including item addition, quantity updates, item removal, and total recalculation on the ShopEasy platform.",
+    "precondition": "ShopEasy API server is running. An authenticated customer session exists. Products P-101 (price 25.00), P-102 (price 45.50), and P-103 (price 15.99) are available with stock > 10.",
+    "properties": {"Automation Status": "", "Priority": "High", "Type": "Functional"},
+    "steps": [
+      {"order": 1, "description": "Send a POST request to /api/carts to create a new empty shopping cart for the authenticated customer. Store the returned cart_id.", "expected": "HTTP 201 response with a new cart object. The cart has a unique cart_id, status 'active', an empty items array (length 0), subtotal of 0.00, and the associated customer user_id."},
+      {"order": 2, "description": "Send a POST request to /api/carts/{cart_id}/items with product_id 'P-101' and quantity 3. Verify the item is added to the cart and the subtotal is recalculated.", "expected": "HTTP 200 response with the updated cart. The items array contains one entry for P-101 with quantity 3 and line_total of 75.00 (25.00 * 3). The cart subtotal is updated to 75.00."},
+      {"order": 3, "description": "Send a POST request to /api/carts/{cart_id}/items with product_id 'P-102' and quantity 1. Verify the second item is added alongside the first item.", "expected": "HTTP 200 response with the updated cart. The items array now contains two entries: P-101 (quantity 3, line_total 75.00) and P-102 (quantity 1, line_total 45.50). The cart subtotal is 120.50."},
+      {"order": 4, "description": "Send a PUT request to /api/carts/{cart_id}/items/P-101 with an updated quantity of 1. Verify the quantity change is applied and the cart subtotal is recalculated.", "expected": "HTTP 200 response with the updated cart. P-101 now shows quantity 1 and line_total of 25.00. P-102 remains at quantity 1 and line_total 45.50. Cart subtotal is recalculated to 70.50."},
+      {"order": 5, "description": "Send a DELETE request to /api/carts/{cart_id}/items/P-101 to remove the first product from the cart entirely. Verify the item is removed and only P-102 remains.", "expected": "HTTP 200 response with the updated cart. The items array now contains only one entry for P-102 with quantity 1 and line_total 45.50. Cart subtotal is recalculated to 45.50."},
+      {"order": 6, "description": "Send a GET request to /api/carts/{cart_id} to retrieve the final cart state. Verify the complete cart summary including items, subtotal, estimated tax, and estimated total.", "expected": "HTTP 200 response with the cart object. Only P-102 is present with quantity 1. Subtotal is 45.50, estimated_tax is calculated, and estimated_total reflects subtotal plus tax. The item_count is 1."}
+    ]
+  },
+  {
+    "id": 90008, "pid": "TC-008",
+    "name": "Comprehensive: Inventory Sync and Stock Management",
+    "description": "Test inventory management operations including stock checks, quantity adjustments, warehouse synchronization, and low-stock alert triggers on the ShopEasy platform.",
+    "precondition": "ShopEasy API server is running. Warehouse management system (WMS) is connected in sandbox mode. Product P-201 exists with initial stock quantity of 50 units. Low stock alert threshold is set to 10 units.",
+    "properties": {"Automation Status": "", "Priority": "High", "Type": "Integration"},
+    "steps": [
+      {"order": 1, "description": "Send a GET request to /api/inventory/P-201 to check the current stock level for product P-201. Record the initial quantity, last_updated timestamp, and warehouse_location.", "expected": "HTTP 200 response with the inventory record. The product_id is 'P-201', quantity_on_hand is 50, quantity_reserved is 0, quantity_available is 50, warehouse_location is populated."},
+      {"order": 2, "description": "Send a POST request to /api/inventory/P-201/adjust with adjustment_type 'add', quantity 25, and reason 'Restocking from supplier shipment #SH-4521'.", "expected": "HTTP 200 response confirming the adjustment. The new quantity_on_hand is 75 (50 + 25). An adjustment_record is created with type 'add', quantity 25, and reason text."},
+      {"order": 3, "description": "Send a GET request to /api/inventory/P-201 to verify the stock quantity was updated after the adjustment. Compare the quantity_on_hand against expected value of 75.", "expected": "HTTP 200 response showing quantity_on_hand of 75, quantity_reserved still at 0, and quantity_available of 75. The last_updated timestamp is more recent than the one recorded in step 1."},
+      {"order": 4, "description": "Send a POST request to /api/inventory/sync with warehouse_id and a list of product IDs including P-201. This triggers a synchronization job between ShopEasy and the external warehouse management system.", "expected": "HTTP 202 response indicating the sync job was accepted. The response includes a sync_job_id, status 'queued', submitted_at timestamp, and the count of products to sync."},
+      {"order": 5, "description": "Poll the GET endpoint /api/inventory/sync/{sync_job_id} every 2 seconds for up to 30 seconds to wait for the synchronization job to complete. Verify the final job status.", "expected": "HTTP 200 response with sync job status 'completed'. The results summary shows total_products_synced, any discrepancies_found count, and completed_at timestamp."},
+      {"order": 6, "description": "Send a POST request to /api/inventory/P-201/adjust with adjustment_type 'subtract', quantity 68, and reason 'Bulk order fulfillment' to reduce stock below the low-stock threshold. Then check /api/alerts for triggered alerts.", "expected": "HTTP 200 response confirming the stock reduction to 7 units (75 - 68). A subsequent GET to /api/alerts?product_id=P-201&type=low_stock returns a new alert with severity 'warning', current_quantity 7, and threshold 10."}
+    ]
+  },
+  {
+    "id": 90009, "pid": "TC-009",
+    "name": "Smoke: Payment Processing",
+    "description": "Validate the payment processing workflow including credit card authorization, payment capture, transaction history, and partial refund on the ShopEasy platform.",
+    "precondition": "ShopEasy API server is running. Payment gateway is configured in sandbox/test mode. A confirmed order with order_id exists and has a total of 149.97.",
+    "properties": {"Automation Status": "", "Priority": "Critical", "Type": "Integration"},
+    "steps": [
+      {"order": 1, "description": "Send a POST request to /api/orders with line items totaling 149.97, customer shipping address, and billing address. Verify the order is created in 'pending_payment' status.", "expected": "HTTP 201 response with order object. The order status is 'pending_payment', total is 149.97, line items are correct, and a payment_intent_id is generated."},
+      {"order": 2, "description": "Send a POST request to /api/payments/process with the order_id, payment_method 'credit_card', card_token from sandbox (tok_visa_success), amount 149.97, and currency 'USD'.", "expected": "HTTP 200 response with payment result. The payment_status is 'approved', authorization_code is present, transaction_id is generated, amount_charged is 149.97, and card_last_four shows '4242'."},
+      {"order": 3, "description": "Send a GET request to /api/payments/{transaction_id} to retrieve the full payment transaction details. Verify the authorization, capture amounts, and payment method information.", "expected": "HTTP 200 response with complete transaction record. The status is 'captured', amount is 149.97, currency is 'USD', payment_method shows 'credit_card', card_brand is 'Visa'."},
+      {"order": 4, "description": "Send a GET request to /api/orders/{order_id}/payments to retrieve the payment history for the order. Verify the successful payment transaction appears.", "expected": "HTTP 200 response with a payments array containing at least one entry. The payment shows transaction_id, type 'charge', amount 149.97, status 'completed', and processed_at timestamp."},
+      {"order": 5, "description": "Send a POST request to /api/payments/{transaction_id}/refund with amount 50.00 and reason 'Partial refund - item damaged during shipping'. Verify the partial refund is processed.", "expected": "HTTP 200 response with refund details. The refund_id is generated, refund_amount is 50.00, refund_status is 'processed', and the original transaction now shows net_amount of 99.97 (149.97 - 50.00)."}
+    ]
+  },
+  {
+    "id": 90010, "pid": "TC-010",
+    "name": "Comprehensive: Notification Rules and Alerts",
+    "description": "Test the notification rule engine including rule creation, event-driven triggering, rule modification, and cleanup on the ShopEasy platform.",
+    "precondition": "ShopEasy API server is running. Admin credentials are available. Notification service is enabled. At least one webhook endpoint is configured.",
+    "properties": {"Automation Status": "", "Priority": "Medium", "Type": "Integration"},
+    "steps": [
+      {"order": 1, "description": "Send a POST request to /api/notifications/rules with a rule definition: event_type 'order.placed', channel 'email', recipients ['ops-team@shopeasy.com'], severity 'info'.", "expected": "HTTP 201 response with the created rule object. The rule_id is generated, event_type is 'order.placed', channel is 'email', recipients list contains 'ops-team@shopeasy.com', severity is 'info', and status is 'active'."},
+      {"order": 2, "description": "Trigger the notification rule by sending a POST request to /api/orders to create a test order with minimal required fields. This should cause the notification engine to evaluate the 'order.placed' rule.", "expected": "HTTP 201 response for the order creation. Within 5 seconds, a GET to /api/notifications/log?rule_id={rule_id} shows at least one notification entry with status 'sent' and a triggered_at timestamp."},
+      {"order": 3, "description": "Send a GET request to /api/notifications/log?rule_id={rule_id}&limit=5 to verify the notification was triggered and sent. Check the delivery status, recipient, and event payload.", "expected": "HTTP 200 response with a log array containing the triggered notification. The entry shows delivery_status 'delivered', recipient 'ops-team@shopeasy.com', event_type 'order.placed'."},
+      {"order": 4, "description": "Send a PUT request to /api/notifications/rules/{rule_id} to modify the rule. Change severity from 'info' to 'warning' and add a second channel 'webhook'.", "expected": "HTTP 200 response with the updated rule. Severity is now 'warning', channels array contains both 'email' and 'webhook'. The updated_at timestamp is more recent than created_at."},
+      {"order": 5, "description": "Send a DELETE request to /api/notifications/rules/{rule_id} to remove the test notification rule. Verify the rule is deleted and no longer triggers.", "expected": "HTTP 204 response with no body. A subsequent GET to /api/notifications/rules/{rule_id} returns HTTP 404. Creating a new test order does not produce any notification log entries referencing the deleted rule_id."}
+    ]
+  }
+]
+
+path = os.path.join(os.path.dirname(__file__), "demo_testcases.json")
+with open(path, "w", encoding="utf-8") as f:
+    json.dump(data, f, indent=2, ensure_ascii=False)
+print(f"Created {path} with {len(data)} test cases")

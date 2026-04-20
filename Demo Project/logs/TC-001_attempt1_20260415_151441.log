@@ -1,0 +1,114 @@
+DEBUG    atlas_telemetry.resource_check:resource_check.py:146 Kafka port 9093 (ssl) is available
+VERSION  atlas_telemetry.telemetry:__init__.py:301 Execution_id: 5c00fbcf-bc99-4705-be8c-d57863664064
+VERSION  pytest_atlas.pytest_atlas:__init__.py:301 Package version info:
+	pytest: 8.1.2
+	atlas-framework: 7.0.400
+	atlas-ome: 1.0.940
+	atlas-ome-test-results: 1.0.940
+	atlas-poweredge: 1.0.1143
+	anyio: 4.12.1
+	pytest-atlas: 7.0.400
+	pytest-atlas-vasa-api: 7.0.400
+	pytest-check: 2.2.2
+	pytest-html: 4.2.0
+	pytest-html: 4.2.0
+	pytest-metadata: 3.1.1
+	automatos-tool-library: 41.222
+VERSION  pytest_atlas.pytest_atlas:__init__.py:301 Command line arguments: 
+ C:\Users\Administrator\Documents\MTech\Demo Project\generated_tests\test_TC_001.py -v --tb=long --log-file=C:\Users\Administrator\Documents\MTech\Demo Project\logs\TC-001_attempt1_20260415_151441.log --log-file-level=DEBUG --log-cli-level=INFO --junitxml=C:\Users\Administrator\Documents\MTech\Demo Project\logs\TC-001_attempt1_20260415_151441_junit.xml -s
+INFO     atlas_framework.execution_context.execution_context:execution_context.py:590 Overriding exec param logging_level with option value DEBUG...
+INFO     atlas_framework.execution_context.execution_context:execution_context.py:590 Overriding exec param kafka_brokers with option value None...
+INFO     atlas_framework.execution_context.execution_context:execution_context.py:590 Overriding exec param data_collection_timeout with option value 5400...
+INFO     atlas_framework.execution_context.execution_context:execution_context.py:590 Overriding exec param test_result_publish_address with option value kafkabroker01.cec.lab.emc.com:9093,kafkabroker02.cec.lab.emc.com:9093,kafkabroker03.cec.lab.emc.com:9093...
+INFO     atlas_framework.execution_context.execution_context:execution_context.py:590 Overriding exec param drp_secret_mount_path with option value /etc/secrets/...
+INFO     atlas_framework.execution_context.execution_context:execution_context.py:590 Overriding exec param cyberark_api_host with option value api.myvault.dell.com...
+INFO     atlas_framework.execution_context.execution_context:execution_context.py:590 Overriding exec param hashicorp_api_host with option value https://hcvault-nonprod.dell.com/...
+
+
+============================================================
+EXECUTION METADATA
+============================================================
+{
+  "test_case_id": "TC-001",
+  "file_path": "C:\\Users\\Administrator\\Documents\\MTech\\Demo Project\\generated_tests\\test_TC_001.py",
+  "attempt": 1,
+  "return_code": 4,
+  "status": "failed",
+  "duration_seconds": 4.67,
+  "error_type": "UnknownError",
+  "error_message": "Test failed - see logs for details",
+  "traceback": "",
+  "timestamp": "2026-04-15T15:14:41.643983",
+  "log_file": "C:\\Users\\Administrator\\Documents\\MTech\\Demo Project\\logs\\TC-001_attempt1_20260415_151441.log",
+  "stdout_tail": "tc/secrets/...    (execution_context.py:590)\nINFO     atlas_framework.execution_context.execution_context:execution_context.py:590 Overriding exec param drp_secret_mount_path with option value /etc/secrets/...\n2026/04/15 09:44:45,995 UTC INFO <MainThread> [atlas_framework.execution_context.execution_context]: Overriding exec param cyberark_api_host with option value api.myvault.dell.com...    (execution_context.py:590)\nINFO     atlas_framework.execution_context.execution_context:execution_context.py:590 Overriding exec param cyberark_api_host with option value api.myvault.dell.com...\n2026/04/15 09:44:45,996 UTC INFO <MainThread> [atlas_framework.execution_context.execution_context]: Overriding exec param hashicorp_api_host with option value https://hcvault-nonprod.dell.com/...    (execution_context.py:590)\nINFO     atlas_framework.execution_context.execution_context:execution_context.py:590 Overriding exec param hashicorp_api_host with option value https://hcvault-nonprod.dell.com/...\n",
+  "stderr_tail": "latest/advanced-usage.html#tls-warnings\n  warnings.warn(\nC:\\Users\\Administrator\\AppData\\Local\\Programs\\Python\\Python314\\Lib\\site-packages\\urllib3\\connectionpool.py:1097: InsecureRequestWarning: Unverified HTTPS request is being made to host 'durjpd.artifactory.cec.lab.emc.com'. Adding certificate verification is strongly advised. See: https://urllib3.readthedocs.io/en/latest/advanced-usage.html#tls-warnings\n  warnings.warn(\nC:\\Users\\Administrator\\AppData\\Local\\Programs\\Python\\Python314\\Lib\\site-packages\\urllib3\\connectionpool.py:1097: InsecureRequestWarning: Unverified HTTPS request is being made to host 'durjpd.artifactory.cec.lab.emc.com'. Adding certificate verification is strongly advised. See: https://urllib3.readthedocs.io/en/latest/advanced-usage.html#tls-warnings\n  warnings.warn(\nERROR: Data collection is enabled, but log_directory is not configured.\nPlease check the pytest command line options of '--no-dc or --disable-data-collection' and '--log_directory or --log-directory'\n\n"
+}
+
+--- STDOUT ---
+
+
+2026/04/15 09:44:45,966 UTC DEBUG <MainThread> [atlas_telemetry.resource_check]: Kafka port 9093 (ssl) is available    (resource_check.py:146)
+2026/04/15 09:44:45,966 UTC VERSION <MainThread> [atlas_telemetry.telemetry]: Execution_id: 5c00fbcf-bc99-4705-be8c-d57863664064    (__init__.py:301)
+
+---------------------------- live log sessionstart ----------------------------
+VERSION  atlas_telemetry.telemetry:__init__.py:301 Execution_id: 5c00fbcf-bc99-4705-be8c-d57863664064
+2026/04/15 09:44:45,989 UTC VERSION <MainThread> [pytest_atlas.pytest_atlas]: Package version info:
+	pytest: 8.1.2
+	atlas-framework: 7.0.400
+	atlas-ome: 1.0.940
+	atlas-ome-test-results: 1.0.940
+	atlas-poweredge: 1.0.1143
+	anyio: 4.12.1
+	pytest-atlas: 7.0.400
+	pytest-atlas-vasa-api: 7.0.400
+	pytest-check: 2.2.2
+	pytest-html: 4.2.0
+	pytest-html: 4.2.0
+	pytest-metadata: 3.1.1
+	automatos-tool-library: 41.222    (__init__.py:301)
+VERSION  pytest_atlas.pytest_atlas:__init__.py:301 Package version info:
+	pytest: 8.1.2
+	atlas-framework: 7.0.400
+	atlas-ome: 1.0.940
+	atlas-ome-test-results: 1.0.940
+	atlas-poweredge: 1.0.1143
+	anyio: 4.12.1
+	pytest-atlas: 7.0.400
+	pytest-atlas-vasa-api: 7.0.400
+	pytest-check: 2.2.2
+	pytest-html: 4.2.0
+	pytest-html: 4.2.0
+	pytest-metadata: 3.1.1
+	automatos-tool-library: 41.222
+2026/04/15 09:44:45,990 UTC VERSION <MainThread> [pytest_atlas.pytest_atlas]: Command line arguments: 
+ C:\Users\Administrator\Documents\MTech\Demo Project\generated_tests\test_TC_001.py -v --tb=long --log-file=C:\Users\Administrator\Documents\MTech\Demo Project\logs\TC-001_attempt1_20260415_151441.log --log-file-level=DEBUG --log-cli-level=INFO --junitxml=C:\Users\Administrator\Documents\MTech\Demo Project\logs\TC-001_attempt1_20260415_151441_junit.xml -s    (__init__.py:301)
+VERSION  pytest_atlas.pytest_atlas:__init__.py:301 Command line arguments: 
+ C:\Users\Administrator\Documents\MTech\Demo Project\generated_tests\test_TC_001.py -v --tb=long --log-file=C:\Users\Administrator\Documents\MTech\Demo Project\logs\TC-001_attempt1_20260415_151441.log --log-file-level=DEBUG --log-cli-level=INFO --junitxml=C:\Users\Administrator\Documents\MTech\Demo Project\logs\TC-001_attempt1_20260415_151441_junit.xml -s
+2026/04/15 09:44:45,991 UTC INFO <MainThread> [atlas_framework.execution_context.execution_context]: Overriding exec param logging_level with option value DEBUG...    (execution_context.py:590)
+INFO     atlas_framework.execution_context.execution_context:execution_context.py:590 Overriding exec param logging_level with option value DEBUG...
+2026/04/15 09:44:45,992 UTC INFO <MainThread> [atlas_framework.execution_context.execution_context]: Overriding exec param kafka_brokers with option value None...    (execution_context.py:590)
+INFO     atlas_framework.execution_context.execution_context:execution_context.py:590 Overriding exec param kafka_brokers with option value None...
+2026/04/15 09:44:45,992 UTC INFO <MainThread> [atlas_framework.execution_context.execution_context]: Overriding exec param data_collection_timeout with option value 5400...    (execution_context.py:590)
+INFO     atlas_framework.execution_context.execution_context:execution_context.py:590 Overriding exec param data_collection_timeout with option value 5400...
+2026/04/15 09:44:45,994 UTC INFO <MainThread> [atlas_framework.execution_context.execution_context]: Overriding exec param test_result_publish_address with option value kafkabroker01.cec.lab.emc.com:9093,kafkabroker02.cec.lab.emc.com:9093,kafkabroker03.cec.lab.emc.com:9093...    (execution_context.py:590)
+INFO     atlas_framework.execution_context.execution_context:execution_context.py:590 Overriding exec param test_result_publish_address with option value kafkabroker01.cec.lab.emc.com:9093,kafkabroker02.cec.lab.emc.com:9093,kafkabroker03.cec.lab.emc.com:9093...
+2026/04/15 09:44:45,995 UTC INFO <MainThread> [atlas_framework.execution_context.execution_context]: Overriding exec param drp_secret_mount_path with option value /etc/secrets/...    (execution_context.py:590)
+INFO     atlas_framework.execution_context.execution_context:execution_context.py:590 Overriding exec param drp_secret_mount_path with option value /etc/secrets/...
+2026/04/15 09:44:45,995 UTC INFO <MainThread> [atlas_framework.execution_context.execution_context]: Overriding exec param cyberark_api_host with option value api.myvault.dell.com...    (execution_context.py:590)
+INFO     atlas_framework.execution_context.execution_context:execution_context.py:590 Overriding exec param cyberark_api_host with option value api.myvault.dell.com...
+2026/04/15 09:44:45,996 UTC INFO <MainThread> [atlas_framework.execution_context.execution_context]: Overriding exec param hashicorp_api_host with option value https://hcvault-nonprod.dell.com/...    (execution_context.py:590)
+INFO     atlas_framework.execution_context.execution_context:execution_context.py:590 Overriding exec param hashicorp_api_host with option value https://hcvault-nonprod.dell.com/...
+
+
+--- STDERR ---
+C:\Users\Administrator\AppData\Local\Programs\Python\Python314\Lib\site-packages\pytest_atlas\pytest_atlas.py:38: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  import pkg_resources
+C:\Users\Administrator\AppData\Local\Programs\Python\Python314\Lib\site-packages\urllib3\connectionpool.py:1097: InsecureRequestWarning: Unverified HTTPS request is being made to host 'durjpd.artifactory.cec.lab.emc.com'. Adding certificate verification is strongly advised. See: https://urllib3.readthedocs.io/en/latest/advanced-usage.html#tls-warnings
+  warnings.warn(
+C:\Users\Administrator\AppData\Local\Programs\Python\Python314\Lib\site-packages\urllib3\connectionpool.py:1097: InsecureRequestWarning: Unverified HTTPS request is being made to host 'durjpd.artifactory.cec.lab.emc.com'. Adding certificate verification is strongly advised. See: https://urllib3.readthedocs.io/en/latest/advanced-usage.html#tls-warnings
+  warnings.warn(
+C:\Users\Administrator\AppData\Local\Programs\Python\Python314\Lib\site-packages\urllib3\connectionpool.py:1097: InsecureRequestWarning: Unverified HTTPS request is being made to host 'durjpd.artifactory.cec.lab.emc.com'. Adding certificate verification is strongly advised. See: https://urllib3.readthedocs.io/en/latest/advanced-usage.html#tls-warnings
+  warnings.warn(
+ERROR: Data collection is enabled, but log_directory is not configured.
+Please check the pytest command line options of '--no-dc or --disable-data-collection' and '--log_directory or --log-directory'
+

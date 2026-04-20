@@ -1,0 +1,25 @@
+DEBUG    atlas_telemetry.resource_check:resource_check.py:146 Kafka port 9093 (ssl) is available
+VERSION  atlas_telemetry.telemetry:__init__.py:301 Execution_id: e8cf2e77-d6a0-41fb-b83e-41f672307973
+VERSION  pytest_atlas.pytest_atlas:__init__.py:301 Package version info:
+	pytest: 8.1.2
+	atlas-framework: 7.0.400
+	atlas-ome: 1.0.940
+	atlas-ome-test-results: 1.0.940
+	atlas-poweredge: 1.0.1143
+	anyio: 4.12.1
+	pytest-atlas: 7.0.400
+	pytest-atlas-vasa-api: 7.0.400
+	pytest-check: 2.2.2
+	pytest-html: 4.2.0
+	pytest-html: 4.2.0
+	pytest-metadata: 3.1.1
+	automatos-tool-library: 41.222
+VERSION  pytest_atlas.pytest_atlas:__init__.py:301 Command line arguments: 
+ C:\Users\Administrator\Documents\MTech\Demo Project\generated_tests\test_TC_001.py -v --tb=long --log-file=C:\Users\Administrator\Documents\MTech\Demo Project\logs\TC-001_attempt1_20260415_151101.log --log-file-level=DEBUG --log-cli-level=INFO --junitxml=C:\Users\Administrator\Documents\MTech\Demo Project\logs\TC-001_attempt1_20260415_151101_junit.xml -s
+INFO     atlas_framework.execution_context.execution_context:execution_context.py:590 Overriding exec param logging_level with option value DEBUG...
+INFO     atlas_framework.execution_context.execution_context:execution_context.py:590 Overriding exec param kafka_brokers with option value None...
+INFO     atlas_framework.execution_context.execution_context:execution_context.py:590 Overriding exec param data_collection_timeout with option value 5400...
+INFO     atlas_framework.execution_context.execution_context:execution_context.py:590 Overriding exec param test_result_publish_address with option value kafkabroker01.cec.lab.emc.com:9093,kafkabroker02.cec.lab.emc.com:9093,kafkabroker03.cec.lab.emc.com:9093...
+INFO     atlas_framework.execution_context.execution_context:execution_context.py:590 Overriding exec param drp_secret_mount_path with option value /etc/secrets/...
+INFO     atlas_framework.execution_context.execution_context:execution_context.py:590 Overriding exec param cyberark_api_host with option value api.myvault.dell.com...
+INFO     atlas_framework.execution_context.execution_context:execution_context.py:590 Overriding exec param hashicorp_api_host with option value https://hcvault-nonprod.dell.com/...
