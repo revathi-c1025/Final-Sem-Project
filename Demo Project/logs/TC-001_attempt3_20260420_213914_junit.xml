@@ -1,0 +1,1 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites><testsuite name="pytest" errors="0" failures="0" skipped="0" tests="1" time="0.068" timestamp="2026-04-20T21:39:16.418221" hostname="WIN-ST9D2MHS7HO"><testcase classname="generated_tests.test_TC_001.TestTC_001" name="test_tc_001" time="0.013" /></testsuite></testsuites>

@@ -1,0 +1,1255 @@
+{
+  "report_generated": "2026-04-20T21:37:34.295144",
+  "summary": {
+    "total_test_cases": 2,
+    "passed": 0,
+    "failed": 2,
+    "other": 0,
+    "total_attempts": 6,
+    "total_duration_s": 35.9
+  },
+  "test_cases": [
+    {
+      "test_case_id": "TC-001",
+      "test_case_name": "Smoke: Create and Verify Product",
+      "final_status": "failed",
+      "total_attempts": 3,
+      "start_time": "2026-04-20T21:36:58.399416",
+      "end_time": "2026-04-20T21:37:16.545739",
+      "duration_seconds": 18.15,
+      "step_count": 5,
+      "generated_tests": [
+        {
+          "file": "C:\\Users\\Administrator\\Documents\\MTech\\Final-Sem-Project-Demo\\Demo Project\\generated_tests\\test_TC_001.py",
+          "method": "template"
+        },
+        {
+          "file": "C:\\Users\\Administrator\\Documents\\MTech\\Final-Sem-Project-Demo\\Demo Project\\generated_tests\\test_TC_001.py",
+          "method": "template_fix"
+        },
+        {
+          "file": "C:\\Users\\Administrator\\Documents\\MTech\\Final-Sem-Project-Demo\\Demo Project\\generated_tests\\test_TC_001.py",
+          "method": "template_fix"
+        }
+      ],
+      "execution_results": [
+        {
+          "test_case_id": "TC-001",
+          "file_path": "C:\\Users\\Administrator\\Documents\\MTech\\Final-Sem-Project-Demo\\Demo Project\\generated_tests\\test_TC_001.py",
+          "attempt": 1,
+          "return_code": 2,
+          "status": "failed",
+          "duration_seconds": 2.75,
+          "error_type": "ModuleNotFoundError",
+          "error_message": "No module named 'shopease_framework'",
+          "traceback": "",
+          "timestamp": "2026-04-20T21:36:58.421210",
+          "log_file": "C:\\Users\\Administrator\\Documents\\MTech\\Final-Sem-Project-Demo\\Demo Project\\logs\\TC-001_attempt1_20260420_213658.log",
+          "stdout_tail": "py _______________\nImportError while importing test module 'C:\\Users\\Administrator\\Documents\\MTech\\Final-Sem-Project-Demo\\Demo Project\\generated_tests\\test_TC_001.py'.\nHint: make sure your test modules/packages have valid Python names.\nTraceback:\n..\\..\\..\\..\\..\\AppData\\Local\\Programs\\Python\\Python314\\Lib\\importlib\\__init__.py:88: in import_module\n    return _bootstrap._gcd_import(name[level:], package, level)\ntest_TC_001.py:16: in <module>\n    from shopease_framework.base.base_test_case import ShopEaseBaseTestCase, Parameter\nE   ModuleNotFoundError: No module named 'shopease_framework'\n- generated xml file: C:\\Users\\Administrator\\Documents\\MTech\\Final-Sem-Project-Demo\\Demo Project\\logs\\TC-001_attempt1_20260420_213658_junit.xml -\n=========================== short test summary info ===========================\nERROR test_TC_001.py\n!!!!!!!!!!!!!!!!!!! Interrupted: 1 error during collection !!!!!!!!!!!!!!!!!!!!\n============================== 1 error in 0.31s ===============================\n",
+          "stderr_tail": ""
+        },
+        {
+          "test_case_id": "TC-001",
+          "file_path": "C:\\Users\\Administrator\\Documents\\MTech\\Final-Sem-Project-Demo\\Demo Project\\generated_tests\\test_TC_001.py",
+          "attempt": 2,
+          "return_code": 2,
+          "status": "failed",
+          "duration_seconds": 2.77,
+          "error_type": "ModuleNotFoundError",
+          "error_message": "No module named 'shopease_framework'",
+          "traceback": "",
+          "timestamp": "2026-04-20T21:37:06.194291",
+          "log_file": "C:\\Users\\Administrator\\Documents\\MTech\\Final-Sem-Project-Demo\\Demo Project\\logs\\TC-001_attempt2_20260420_213706.log",
+          "stdout_tail": "py _______________\nImportError while importing test module 'C:\\Users\\Administrator\\Documents\\MTech\\Final-Sem-Project-Demo\\Demo Project\\generated_tests\\test_TC_001.py'.\nHint: make sure your test modules/packages have valid Python names.\nTraceback:\n..\\..\\..\\..\\..\\AppData\\Local\\Programs\\Python\\Python314\\Lib\\importlib\\__init__.py:88: in import_module\n    return _bootstrap._gcd_import(name[level:], package, level)\ntest_TC_001.py:16: in <module>\n    from shopease_framework.base.base_test_case import ShopEaseBaseTestCase, Parameter\nE   ModuleNotFoundError: No module named 'shopease_framework'\n- generated xml file: C:\\Users\\Administrator\\Documents\\MTech\\Final-Sem-Project-Demo\\Demo Project\\logs\\TC-001_attempt2_20260420_213706_junit.xml -\n=========================== short test summary info ===========================\nERROR test_TC_001.py\n!!!!!!!!!!!!!!!!!!! Interrupted: 1 error during collection !!!!!!!!!!!!!!!!!!!!\n============================== 1 error in 0.33s ===============================\n",
+          "stderr_tail": ""
+        },
+        {
+          "test_case_id": "TC-001",
+          "file_path": "C:\\Users\\Administrator\\Documents\\MTech\\Final-Sem-Project-Demo\\Demo Project\\generated_tests\\test_TC_001.py",
+          "attempt": 3,
+          "return_code": 2,
+          "status": "failed",
+          "duration_seconds": 2.55,
+          "error_type": "ModuleNotFoundError",
+          "error_message": "No module named 'shopease_framework'",
+          "traceback": "",
+          "timestamp": "2026-04-20T21:37:13.988233",
+          "log_file": "C:\\Users\\Administrator\\Documents\\MTech\\Final-Sem-Project-Demo\\Demo Project\\logs\\TC-001_attempt3_20260420_213713.log",
+          "stdout_tail": "py _______________\nImportError while importing test module 'C:\\Users\\Administrator\\Documents\\MTech\\Final-Sem-Project-Demo\\Demo Project\\generated_tests\\test_TC_001.py'.\nHint: make sure your test modules/packages have valid Python names.\nTraceback:\n..\\..\\..\\..\\..\\AppData\\Local\\Programs\\Python\\Python314\\Lib\\importlib\\__init__.py:88: in import_module\n    return _bootstrap._gcd_import(name[level:], package, level)\ntest_TC_001.py:16: in <module>\n    from shopease_framework.base.base_test_case import ShopEaseBaseTestCase, Parameter\nE   ModuleNotFoundError: No module named 'shopease_framework'\n- generated xml file: C:\\Users\\Administrator\\Documents\\MTech\\Final-Sem-Project-Demo\\Demo Project\\logs\\TC-001_attempt3_20260420_213713_junit.xml -\n=========================== short test summary info ===========================\nERROR test_TC_001.py\n!!!!!!!!!!!!!!!!!!! Interrupted: 1 error during collection !!!!!!!!!!!!!!!!!!!!\n============================== 1 error in 0.27s ===============================\n",
+          "stderr_tail": ""
+        }
+      ],
+      "fix_strategies": [
+        {
+          "strategy": "add_missing_import",
+          "description": "Add missing import statement",
+          "confidence": 0.9,
+          "details": {}
+        },
+        {
+          "strategy": "regenerate_full",
+          "description": "Full regeneration as fallback",
+          "confidence": 0.3,
+          "details": {}
+        },
+        {
+          "strategy": "add_missing_import",
+          "description": "Add missing import statement",
+          "confidence": 0.9,
+          "details": {}
+        },
+        {
+          "strategy": "regenerate_full",
+          "description": "Full regeneration as fallback",
+          "confidence": 0.3,
+          "details": {}
+        }
+      ]
+    },
+    {
+      "test_case_id": "TC-002",
+      "test_case_name": "Regression: Product Search and Filtering",
+      "final_status": "failed",
+      "total_attempts": 3,
+      "start_time": "2026-04-20T21:37:16.545986",
+      "end_time": "2026-04-20T21:37:34.294455",
+      "duration_seconds": 17.75,
+      "step_count": 4,
+      "generated_tests": [
+        {
+          "file": "C:\\Users\\Administrator\\Documents\\MTech\\Final-Sem-Project-Demo\\Demo Project\\generated_tests\\test_TC_002.py",
+          "method": "template"
+        },
+        {
+          "file": "C:\\Users\\Administrator\\Documents\\MTech\\Final-Sem-Project-Demo\\Demo Project\\generated_tests\\test_TC_002.py",
+          "method": "template_fix"
+        },
+        {
+          "file": "C:\\Users\\Administrator\\Documents\\MTech\\Final-Sem-Project-Demo\\Demo Project\\generated_tests\\test_TC_002.py",
+          "method": "template_fix"
+        }
+      ],
+      "execution_results": [
+        {
+          "test_case_id": "TC-002",
+          "file_path": "C:\\Users\\Administrator\\Documents\\MTech\\Final-Sem-Project-Demo\\Demo Project\\generated_tests\\test_TC_002.py",
+          "attempt": 1,
+          "return_code": 2,
+          "status": "failed",
+          "duration_seconds": 2.49,
+          "error_type": "ModuleNotFoundError",
+          "error_message": "No module named 'shopease_framework'",
+          "traceback": "",
+          "timestamp": "2026-04-20T21:37:16.565223",
+          "log_file": "C:\\Users\\Administrator\\Documents\\MTech\\Final-Sem-Project-Demo\\Demo Project\\logs\\TC-002_attempt1_20260420_213716.log",
+          "stdout_tail": "py _______________\nImportError while importing test module 'C:\\Users\\Administrator\\Documents\\MTech\\Final-Sem-Project-Demo\\Demo Project\\generated_tests\\test_TC_002.py'.\nHint: make sure your test modules/packages have valid Python names.\nTraceback:\n..\\..\\..\\..\\..\\AppData\\Local\\Programs\\Python\\Python314\\Lib\\importlib\\__init__.py:88: in import_module\n    return _bootstrap._gcd_import(name[level:], package, level)\ntest_TC_002.py:16: in <module>\n    from shopease_framework.base.base_test_case import ShopEaseBaseTestCase, Parameter\nE   ModuleNotFoundError: No module named 'shopease_framework'\n- generated xml file: C:\\Users\\Administrator\\Documents\\MTech\\Final-Sem-Project-Demo\\Demo Project\\logs\\TC-002_attempt1_20260420_213716_junit.xml -\n=========================== short test summary info ===========================\nERROR test_TC_002.py\n!!!!!!!!!!!!!!!!!!! Interrupted: 1 error during collection !!!!!!!!!!!!!!!!!!!!\n============================== 1 error in 0.26s ===============================\n",
+          "stderr_tail": ""
+        },
+        {
+          "test_case_id": "TC-002",
+          "file_path": "C:\\Users\\Administrator\\Documents\\MTech\\Final-Sem-Project-Demo\\Demo Project\\generated_tests\\test_TC_002.py",
+          "attempt": 2,
+          "return_code": 2,
+          "status": "failed",
+          "duration_seconds": 2.58,
+          "error_type": "ModuleNotFoundError",
+          "error_message": "No module named 'shopease_framework'",
+          "traceback": "",
+          "timestamp": "2026-04-20T21:37:24.073979",
+          "log_file": "C:\\Users\\Administrator\\Documents\\MTech\\Final-Sem-Project-Demo\\Demo Project\\logs\\TC-002_attempt2_20260420_213724.log",
+          "stdout_tail": "py _______________\nImportError while importing test module 'C:\\Users\\Administrator\\Documents\\MTech\\Final-Sem-Project-Demo\\Demo Project\\generated_tests\\test_TC_002.py'.\nHint: make sure your test modules/packages have valid Python names.\nTraceback:\n..\\..\\..\\..\\..\\AppData\\Local\\Programs\\Python\\Python314\\Lib\\importlib\\__init__.py:88: in import_module\n    return _bootstrap._gcd_import(name[level:], package, level)\ntest_TC_002.py:16: in <module>\n    from shopease_framework.base.base_test_case import ShopEaseBaseTestCase, Parameter\nE   ModuleNotFoundError: No module named 'shopease_framework'\n- generated xml file: C:\\Users\\Administrator\\Documents\\MTech\\Final-Sem-Project-Demo\\Demo Project\\logs\\TC-002_attempt2_20260420_213724_junit.xml -\n=========================== short test summary info ===========================\nERROR test_TC_002.py\n!!!!!!!!!!!!!!!!!!! Interrupted: 1 error during collection !!!!!!!!!!!!!!!!!!!!\n============================== 1 error in 0.29s ===============================\n",
+          "stderr_tail": ""
+        },
+        {
+          "test_case_id": "TC-002",
+          "file_path": "C:\\Users\\Administrator\\Documents\\MTech\\Final-Sem-Project-Demo\\Demo Project\\generated_tests\\test_TC_002.py",
+          "attempt": 3,
+          "return_code": 2,
+          "status": "failed",
+          "duration_seconds": 2.62,
+          "error_type": "ModuleNotFoundError",
+          "error_message": "No module named 'shopease_framework'",
+          "traceback": "",
+          "timestamp": "2026-04-20T21:37:31.676109",
+          "log_file": "C:\\Users\\Administrator\\Documents\\MTech\\Final-Sem-Project-Demo\\Demo Project\\logs\\TC-002_attempt3_20260420_213731.log",
+          "stdout_tail": "py _______________\nImportError while importing test module 'C:\\Users\\Administrator\\Documents\\MTech\\Final-Sem-Project-Demo\\Demo Project\\generated_tests\\test_TC_002.py'.\nHint: make sure your test modules/packages have valid Python names.\nTraceback:\n..\\..\\..\\..\\..\\AppData\\Local\\Programs\\Python\\Python314\\Lib\\importlib\\__init__.py:88: in import_module\n    return _bootstrap._gcd_import(name[level:], package, level)\ntest_TC_002.py:16: in <module>\n    from shopease_framework.base.base_test_case import ShopEaseBaseTestCase, Parameter\nE   ModuleNotFoundError: No module named 'shopease_framework'\n- generated xml file: C:\\Users\\Administrator\\Documents\\MTech\\Final-Sem-Project-Demo\\Demo Project\\logs\\TC-002_attempt3_20260420_213731_junit.xml -\n=========================== short test summary info ===========================\nERROR test_TC_002.py\n!!!!!!!!!!!!!!!!!!! Interrupted: 1 error during collection !!!!!!!!!!!!!!!!!!!!\n============================== 1 error in 0.27s ===============================\n",
+          "stderr_tail": ""
+        }
+      ],
+      "fix_strategies": [
+        {
+          "strategy": "add_missing_import",
+          "description": "Add missing import statement",
+          "confidence": 0.9,
+          "details": {}
+        },
+        {
+          "strategy": "regenerate_full",
+          "description": "Full regeneration as fallback",
+          "confidence": 0.3,
+          "details": {}
+        },
+        {
+          "strategy": "add_missing_import",
+          "description": "Add missing import statement",
+          "confidence": 0.9,
+          "details": {}
+        },
+        {
+          "strategy": "regenerate_full",
+          "description": "Full regeneration as fallback",
+          "confidence": 0.3,
+          "details": {}
+        }
+      ]
+    }
+  ],
+  "agent_events": {
+    "orchestrator": [
+      {
+        "timestamp": "2026-04-20T21:36:58.398544",
+        "agent": "OrchestratorAgent",
+        "type": "init",
+        "message": "OrchestratorAgent initialized with all sub-agents.",
+        "data": {}
+      },
+      {
+        "timestamp": "2026-04-20T21:36:58.398876",
+        "agent": "OrchestratorAgent",
+        "type": "batch_start",
+        "message": "Starting batch of 2 test cases",
+        "data": {}
+      },
+      {
+        "timestamp": "2026-04-20T21:36:58.399220",
+        "agent": "OrchestratorAgent",
+        "type": "batch_progress",
+        "message": "Processing 1/2: TC-001",
+        "data": {}
+      },
+      {
+        "timestamp": "2026-04-20T21:36:58.399426",
+        "agent": "OrchestratorAgent",
+        "type": "pipeline_start",
+        "message": "Starting pipeline for TC-001",
+        "data": {}
+      },
+      {
+        "timestamp": "2026-04-20T21:36:58.399530",
+        "agent": "OrchestratorAgent",
+        "type": "phase",
+        "message": "Phase 1: Fetching test case",
+        "data": {}
+      },
+      {
+        "timestamp": "2026-04-20T21:36:58.400601",
+        "agent": "OrchestratorAgent",
+        "type": "fetch_ok",
+        "message": "Fetched TC-001: Smoke: Create and Verify Product (5 steps)",
+        "data": {}
+      },
+      {
+        "timestamp": "2026-04-20T21:36:58.400679",
+        "agent": "OrchestratorAgent",
+        "type": "phase",
+        "message": "Phase 2: Generating test code",
+        "data": {}
+      },
+      {
+        "timestamp": "2026-04-20T21:36:58.421017",
+        "agent": "OrchestratorAgent",
+        "type": "generate_ok",
+        "message": "Generated template test: test_TC_001.py",
+        "data": {}
+      },
+      {
+        "timestamp": "2026-04-20T21:36:58.421132",
+        "agent": "OrchestratorAgent",
+        "type": "phase",
+        "message": "Phase 3: Execution attempt 1/3",
+        "data": {}
+      },
+      {
+        "timestamp": "2026-04-20T21:37:01.177988",
+        "agent": "OrchestratorAgent",
+        "type": "test_failed",
+        "message": "TC-001 FAILED on attempt 1: ModuleNotFoundError: No module named 'shopease_framework'",
+        "data": {}
+      },
+      {
+        "timestamp": "2026-04-20T21:37:01.178506",
+        "agent": "OrchestratorAgent",
+        "type": "phase",
+        "message": "Phase 4: Regenerating test (fix attempt 1)",
+        "data": {}
+      },
+      {
+        "timestamp": "2026-04-20T21:37:06.193914",
+        "agent": "OrchestratorAgent",
+        "type": "regenerate_ok",
+        "message": "Regenerated test: test_TC_001.py",
+        "data": {}
+      },
+      {
+        "timestamp": "2026-04-20T21:37:06.194161",
+        "agent": "OrchestratorAgent",
+        "type": "phase",
+        "message": "Phase 3: Execution attempt 2/3",
+        "data": {}
+      },
+      {
+        "timestamp": "2026-04-20T21:37:08.971445",
+        "agent": "OrchestratorAgent",
+        "type": "test_failed",
+        "message": "TC-001 FAILED on attempt 2: ModuleNotFoundError: No module named 'shopease_framework'",
+        "data": {}
+      },
+      {
+        "timestamp": "2026-04-20T21:37:08.972313",
+        "agent": "OrchestratorAgent",
+        "type": "phase",
+        "message": "Phase 4: Regenerating test (fix attempt 2)",
+        "data": {}
+      },
+      {
+        "timestamp": "2026-04-20T21:37:13.987788",
+        "agent": "OrchestratorAgent",
+        "type": "regenerate_ok",
+        "message": "Regenerated test: test_TC_001.py",
+        "data": {}
+      },
+      {
+        "timestamp": "2026-04-20T21:37:13.988023",
+        "agent": "OrchestratorAgent",
+        "type": "phase",
+        "message": "Phase 3: Execution attempt 3/3",
+        "data": {}
+      },
+      {
+        "timestamp": "2026-04-20T21:37:16.545294",
+        "agent": "OrchestratorAgent",
+        "type": "test_failed",
+        "message": "TC-001 FAILED on attempt 3: ModuleNotFoundError: No module named 'shopease_framework'",
+        "data": {}
+      },
+      {
+        "timestamp": "2026-04-20T21:37:16.545563",
+        "agent": "OrchestratorAgent",
+        "type": "no_retry",
+        "message": "Fixer determined no retry needed",
+        "data": {}
+      },
+      {
+        "timestamp": "2026-04-20T21:37:16.545758",
+        "agent": "OrchestratorAgent",
+        "type": "pipeline_complete",
+        "message": "Pipeline for TC-001: failed (3 attempts, 18.15s)",
+        "data": {}
+      },
+      {
+        "timestamp": "2026-04-20T21:37:16.545867",
+        "agent": "OrchestratorAgent",
+        "type": "batch_progress",
+        "message": "Processing 2/2: TC-002",
+        "data": {}
+      },
+      {
+        "timestamp": "2026-04-20T21:37:16.545991",
+        "agent": "OrchestratorAgent",
+        "type": "pipeline_start",
+        "message": "Starting pipeline for TC-002",
+        "data": {}
+      },
+      {
+        "timestamp": "2026-04-20T21:37:16.546088",
+        "agent": "OrchestratorAgent",
+        "type": "phase",
+        "message": "Phase 1: Fetching test case",
+        "data": {}
+      },
+      {
+        "timestamp": "2026-04-20T21:37:16.546894",
+        "agent": "OrchestratorAgent",
+        "type": "fetch_ok",
+        "message": "Fetched TC-002: Regression: Product Search and Filtering (4 steps)",
+        "data": {}
+      },
+      {
+        "timestamp": "2026-04-20T21:37:16.547119",
+        "agent": "OrchestratorAgent",
+        "type": "phase",
+        "message": "Phase 2: Generating test code",
+        "data": {}
+      },
+      {
+        "timestamp": "2026-04-20T21:37:16.565037",
+        "agent": "OrchestratorAgent",
+        "type": "generate_ok",
+        "message": "Generated template test: test_TC_002.py",
+        "data": {}
+      },
+      {
+        "timestamp": "2026-04-20T21:37:16.565136",
+        "agent": "OrchestratorAgent",
+        "type": "phase",
+        "message": "Phase 3: Execution attempt 1/3",
+        "data": {}
+      },
+      {
+        "timestamp": "2026-04-20T21:37:19.058573",
+        "agent": "OrchestratorAgent",
+        "type": "test_failed",
+        "message": "TC-002 FAILED on attempt 1: ModuleNotFoundError: No module named 'shopease_framework'",
+        "data": {}
+      },
+      {
+        "timestamp": "2026-04-20T21:37:19.060103",
+        "agent": "OrchestratorAgent",
+        "type": "phase",
+        "message": "Phase 4: Regenerating test (fix attempt 1)",
+        "data": {}
+      },
+      {
+        "timestamp": "2026-04-20T21:37:24.073439",
+        "agent": "OrchestratorAgent",
+        "type": "regenerate_ok",
+        "message": "Regenerated test: test_TC_002.py",
+        "data": {}
+      },
+      {
+        "timestamp": "2026-04-20T21:37:24.073687",
+        "agent": "OrchestratorAgent",
+        "type": "phase",
+        "message": "Phase 3: Execution attempt 2/3",
+        "data": {}
+      },
+      {
+        "timestamp": "2026-04-20T21:37:26.658553",
+        "agent": "OrchestratorAgent",
+        "type": "test_failed",
+        "message": "TC-002 FAILED on attempt 2: ModuleNotFoundError: No module named 'shopease_framework'",
+        "data": {}
+      },
+      {
+        "timestamp": "2026-04-20T21:37:26.659371",
+        "agent": "OrchestratorAgent",
+        "type": "phase",
+        "message": "Phase 4: Regenerating test (fix attempt 2)",
+        "data": {}
+      },
+      {
+        "timestamp": "2026-04-20T21:37:31.675896",
+        "agent": "OrchestratorAgent",
+        "type": "regenerate_ok",
+        "message": "Regenerated test: test_TC_002.py",
+        "data": {}
+      },
+      {
+        "timestamp": "2026-04-20T21:37:31.676013",
+        "agent": "OrchestratorAgent",
+        "type": "phase",
+        "message": "Phase 3: Execution attempt 3/3",
+        "data": {}
+      },
+      {
+        "timestamp": "2026-04-20T21:37:34.293967",
+        "agent": "OrchestratorAgent",
+        "type": "test_failed",
+        "message": "TC-002 FAILED on attempt 3: ModuleNotFoundError: No module named 'shopease_framework'",
+        "data": {}
+      },
+      {
+        "timestamp": "2026-04-20T21:37:34.294365",
+        "agent": "OrchestratorAgent",
+        "type": "no_retry",
+        "message": "Fixer determined no retry needed",
+        "data": {}
+      },
+      {
+        "timestamp": "2026-04-20T21:37:34.294471",
+        "agent": "OrchestratorAgent",
+        "type": "pipeline_complete",
+        "message": "Pipeline for TC-002: failed (3 attempts, 17.75s)",
+        "data": {}
+      },
+      {
+        "timestamp": "2026-04-20T21:37:34.294590",
+        "agent": "OrchestratorAgent",
+        "type": "batch_complete",
+        "message": "Batch complete: 2 test cases processed",
+        "data": {}
+      }
+    ],
+    "qtest": [
+      {
+        "timestamp": "2026-04-20T21:36:58.387832",
+        "agent": "QTestAgent",
+        "type": "init",
+        "message": "QTestAgent initialized with 10 test cases from local data.",
+        "data": {}
+      },
+      {
+        "timestamp": "2026-04-20T21:36:58.399599",
+        "agent": "QTestAgent",
+        "type": "fetch_start",
+        "message": "Fetching test case TC-001",
+        "data": {}
+      },
+      {
+        "timestamp": "2026-04-20T21:36:58.400403",
+        "agent": "QTestAgent",
+        "type": "fetch_complete",
+        "message": "Fetched TC-001: 'Smoke: Create and Verify Product' with 5 steps",
+        "data": {
+          "pid": "TC-001",
+          "step_count": 5,
+          "elapsed_s": 0.0
+        }
+      },
+      {
+        "timestamp": "2026-04-20T21:37:16.546190",
+        "agent": "QTestAgent",
+        "type": "fetch_start",
+        "message": "Fetching test case TC-002",
+        "data": {}
+      },
+      {
+        "timestamp": "2026-04-20T21:37:16.546631",
+        "agent": "QTestAgent",
+        "type": "fetch_complete",
+        "message": "Fetched TC-002: 'Regression: Product Search and Filtering' with 4 steps",
+        "data": {
+          "pid": "TC-002",
+          "step_count": 4,
+          "elapsed_s": 0.0
+        }
+      }
+    ],
+    "generator": [
+      {
+        "timestamp": "2026-04-20T21:36:58.397819",
+        "agent": "TestGeneratorAgent",
+        "type": "init",
+        "message": "Reference repo loaded: 10 test files, 20 library modules",
+        "data": {}
+      },
+      {
+        "timestamp": "2026-04-20T21:36:58.398115",
+        "agent": "TestGeneratorAgent",
+        "type": "init",
+        "message": "TestGeneratorAgent initialized (template mode - no LLM_API_KEY set)",
+        "data": {}
+      },
+      {
+        "timestamp": "2026-04-20T21:36:58.400815",
+        "agent": "TestGeneratorAgent",
+        "type": "generate_start",
+        "message": "Generating test for TC-001",
+        "data": {}
+      },
+      {
+        "timestamp": "2026-04-20T21:36:58.418239",
+        "agent": "TestGeneratorAgent",
+        "type": "repo_context",
+        "message": "Found 3 similar test(s) in reference repo",
+        "data": {}
+      },
+      {
+        "timestamp": "2026-04-20T21:36:58.420645",
+        "agent": "TestGeneratorAgent",
+        "type": "generate_complete",
+        "message": "Generated test for TC-001 via template: test_TC_001.py",
+        "data": {
+          "file_path": "C:\\Users\\Administrator\\Documents\\MTech\\Final-Sem-Project-Demo\\Demo Project\\generated_tests\\test_TC_001.py",
+          "method": "template",
+          "lines": 130,
+          "repo_context_used": true,
+          "elapsed_s": 0.02
+        }
+      },
+      {
+        "timestamp": "2026-04-20T21:37:06.181506",
+        "agent": "TestGeneratorAgent",
+        "type": "regenerate_start",
+        "message": "Regenerating test for TC-001 after failure",
+        "data": {}
+      },
+      {
+        "timestamp": "2026-04-20T21:37:06.182085",
+        "agent": "TestGeneratorAgent",
+        "type": "regenerate_fallback",
+        "message": "No specific fix found, regenerating from template",
+        "data": {}
+      },
+      {
+        "timestamp": "2026-04-20T21:37:06.193545",
+        "agent": "TestGeneratorAgent",
+        "type": "regenerate_complete",
+        "message": "Regenerated test for TC-001 via template_fix: test_TC_001.py",
+        "data": {
+          "file_path": "C:\\Users\\Administrator\\Documents\\MTech\\Final-Sem-Project-Demo\\Demo Project\\generated_tests\\test_TC_001.py",
+          "method": "template_fix",
+          "elapsed_s": 0.01
+        }
+      },
+      {
+        "timestamp": "2026-04-20T21:37:13.973157",
+        "agent": "TestGeneratorAgent",
+        "type": "regenerate_start",
+        "message": "Regenerating test for TC-001 after failure",
+        "data": {}
+      },
+      {
+        "timestamp": "2026-04-20T21:37:13.973802",
+        "agent": "TestGeneratorAgent",
+        "type": "regenerate_fallback",
+        "message": "No specific fix found, regenerating from template",
+        "data": {}
+      },
+      {
+        "timestamp": "2026-04-20T21:37:13.987404",
+        "agent": "TestGeneratorAgent",
+        "type": "regenerate_complete",
+        "message": "Regenerated test for TC-001 via template_fix: test_TC_001.py",
+        "data": {
+          "file_path": "C:\\Users\\Administrator\\Documents\\MTech\\Final-Sem-Project-Demo\\Demo Project\\generated_tests\\test_TC_001.py",
+          "method": "template_fix",
+          "elapsed_s": 0.01
+        }
+      },
+      {
+        "timestamp": "2026-04-20T21:37:16.547280",
+        "agent": "TestGeneratorAgent",
+        "type": "generate_start",
+        "message": "Generating test for TC-002",
+        "data": {}
+      },
+      {
+        "timestamp": "2026-04-20T21:37:16.563536",
+        "agent": "TestGeneratorAgent",
+        "type": "repo_context",
+        "message": "Found 3 similar test(s) in reference repo",
+        "data": {}
+      },
+      {
+        "timestamp": "2026-04-20T21:37:16.564814",
+        "agent": "TestGeneratorAgent",
+        "type": "generate_complete",
+        "message": "Generated test for TC-002 via template: test_TC_002.py",
+        "data": {
+          "file_path": "C:\\Users\\Administrator\\Documents\\MTech\\Final-Sem-Project-Demo\\Demo Project\\generated_tests\\test_TC_002.py",
+          "method": "template",
+          "lines": 117,
+          "repo_context_used": true,
+          "elapsed_s": 0.02
+        }
+      },
+      {
+        "timestamp": "2026-04-20T21:37:24.060947",
+        "agent": "TestGeneratorAgent",
+        "type": "regenerate_start",
+        "message": "Regenerating test for TC-002 after failure",
+        "data": {}
+      },
+      {
+        "timestamp": "2026-04-20T21:37:24.061709",
+        "agent": "TestGeneratorAgent",
+        "type": "regenerate_fallback",
+        "message": "No specific fix found, regenerating from template",
+        "data": {}
+      },
+      {
+        "timestamp": "2026-04-20T21:37:24.073083",
+        "agent": "TestGeneratorAgent",
+        "type": "regenerate_complete",
+        "message": "Regenerated test for TC-002 via template_fix: test_TC_002.py",
+        "data": {
+          "file_path": "C:\\Users\\Administrator\\Documents\\MTech\\Final-Sem-Project-Demo\\Demo Project\\generated_tests\\test_TC_002.py",
+          "method": "template_fix",
+          "elapsed_s": 0.01
+        }
+      },
+      {
+        "timestamp": "2026-04-20T21:37:31.660462",
+        "agent": "TestGeneratorAgent",
+        "type": "regenerate_start",
+        "message": "Regenerating test for TC-002 after failure",
+        "data": {}
+      },
+      {
+        "timestamp": "2026-04-20T21:37:31.661036",
+        "agent": "TestGeneratorAgent",
+        "type": "regenerate_fallback",
+        "message": "No specific fix found, regenerating from template",
+        "data": {}
+      },
+      {
+        "timestamp": "2026-04-20T21:37:31.675552",
+        "agent": "TestGeneratorAgent",
+        "type": "regenerate_complete",
+        "message": "Regenerated test for TC-002 via template_fix: test_TC_002.py",
+        "data": {
+          "file_path": "C:\\Users\\Administrator\\Documents\\MTech\\Final-Sem-Project-Demo\\Demo Project\\generated_tests\\test_TC_002.py",
+          "method": "template_fix",
+          "elapsed_s": 0.02
+        }
+      }
+    ],
+    "executor": [
+      {
+        "timestamp": "2026-04-20T21:36:58.398298",
+        "agent": "TestExecutorAgent",
+        "type": "init",
+        "message": "TestExecutorAgent initialized.",
+        "data": {}
+      },
+      {
+        "timestamp": "2026-04-20T21:36:58.421219",
+        "agent": "TestExecutorAgent",
+        "type": "execute_start",
+        "message": "Executing TC-001 (attempt 1): test_TC_001.py",
+        "data": {}
+      },
+      {
+        "timestamp": "2026-04-20T21:37:01.177635",
+        "agent": "TestExecutorAgent",
+        "type": "execute_complete",
+        "message": "TC-001 attempt 1: failed (rc=2, 2.75s)",
+        "data": {
+          "test_case_id": "TC-001",
+          "file_path": "C:\\Users\\Administrator\\Documents\\MTech\\Final-Sem-Project-Demo\\Demo Project\\generated_tests\\test_TC_001.py",
+          "attempt": 1,
+          "return_code": 2,
+          "status": "failed",
+          "duration_seconds": 2.75,
+          "error_type": "ModuleNotFoundError",
+          "error_message": "No module named 'shopease_framework'",
+          "traceback": "",
+          "timestamp": "2026-04-20T21:36:58.421210",
+          "log_file": "C:\\Users\\Administrator\\Documents\\MTech\\Final-Sem-Project-Demo\\Demo Project\\logs\\TC-001_attempt1_20260420_213658.log",
+          "stdout_tail": "py _______________\nImportError while importing test module 'C:\\Users\\Administrator\\Documents\\MTech\\Final-Sem-Project-Demo\\Demo Project\\generated_tests\\test_TC_001.py'.\nHint: make sure your test modules/packages have valid Python names.\nTraceback:\n..\\..\\..\\..\\..\\AppData\\Local\\Programs\\Python\\Python314\\Lib\\importlib\\__init__.py:88: in import_module\n    return _bootstrap._gcd_import(name[level:], package, level)\ntest_TC_001.py:16: in <module>\n    from shopease_framework.base.base_test_case import ShopEaseBaseTestCase, Parameter\nE   ModuleNotFoundError: No module named 'shopease_framework'\n- generated xml file: C:\\Users\\Administrator\\Documents\\MTech\\Final-Sem-Project-Demo\\Demo Project\\logs\\TC-001_attempt1_20260420_213658_junit.xml -\n=========================== short test summary info ===========================\nERROR test_TC_001.py\n!!!!!!!!!!!!!!!!!!! Interrupted: 1 error during collection !!!!!!!!!!!!!!!!!!!!\n============================== 1 error in 0.31s ===============================\n",
+          "stderr_tail": ""
+        }
+      },
+      {
+        "timestamp": "2026-04-20T21:37:06.194304",
+        "agent": "TestExecutorAgent",
+        "type": "execute_start",
+        "message": "Executing TC-001 (attempt 2): test_TC_001.py",
+        "data": {}
+      },
+      {
+        "timestamp": "2026-04-20T21:37:08.971059",
+        "agent": "TestExecutorAgent",
+        "type": "execute_complete",
+        "message": "TC-001 attempt 2: failed (rc=2, 2.77s)",
+        "data": {
+          "test_case_id": "TC-001",
+          "file_path": "C:\\Users\\Administrator\\Documents\\MTech\\Final-Sem-Project-Demo\\Demo Project\\generated_tests\\test_TC_001.py",
+          "attempt": 2,
+          "return_code": 2,
+          "status": "failed",
+          "duration_seconds": 2.77,
+          "error_type": "ModuleNotFoundError",
+          "error_message": "No module named 'shopease_framework'",
+          "traceback": "",
+          "timestamp": "2026-04-20T21:37:06.194291",
+          "log_file": "C:\\Users\\Administrator\\Documents\\MTech\\Final-Sem-Project-Demo\\Demo Project\\logs\\TC-001_attempt2_20260420_213706.log",
+          "stdout_tail": "py _______________\nImportError while importing test module 'C:\\Users\\Administrator\\Documents\\MTech\\Final-Sem-Project-Demo\\Demo Project\\generated_tests\\test_TC_001.py'.\nHint: make sure your test modules/packages have valid Python names.\nTraceback:\n..\\..\\..\\..\\..\\AppData\\Local\\Programs\\Python\\Python314\\Lib\\importlib\\__init__.py:88: in import_module\n    return _bootstrap._gcd_import(name[level:], package, level)\ntest_TC_001.py:16: in <module>\n    from shopease_framework.base.base_test_case import ShopEaseBaseTestCase, Parameter\nE   ModuleNotFoundError: No module named 'shopease_framework'\n- generated xml file: C:\\Users\\Administrator\\Documents\\MTech\\Final-Sem-Project-Demo\\Demo Project\\logs\\TC-001_attempt2_20260420_213706_junit.xml -\n=========================== short test summary info ===========================\nERROR test_TC_001.py\n!!!!!!!!!!!!!!!!!!! Interrupted: 1 error during collection !!!!!!!!!!!!!!!!!!!!\n============================== 1 error in 0.33s ===============================\n",
+          "stderr_tail": ""
+        }
+      },
+      {
+        "timestamp": "2026-04-20T21:37:13.988253",
+        "agent": "TestExecutorAgent",
+        "type": "execute_start",
+        "message": "Executing TC-001 (attempt 3): test_TC_001.py",
+        "data": {}
+      },
+      {
+        "timestamp": "2026-04-20T21:37:16.544934",
+        "agent": "TestExecutorAgent",
+        "type": "execute_complete",
+        "message": "TC-001 attempt 3: failed (rc=2, 2.55s)",
+        "data": {
+          "test_case_id": "TC-001",
+          "file_path": "C:\\Users\\Administrator\\Documents\\MTech\\Final-Sem-Project-Demo\\Demo Project\\generated_tests\\test_TC_001.py",
+          "attempt": 3,
+          "return_code": 2,
+          "status": "failed",
+          "duration_seconds": 2.55,
+          "error_type": "ModuleNotFoundError",
+          "error_message": "No module named 'shopease_framework'",
+          "traceback": "",
+          "timestamp": "2026-04-20T21:37:13.988233",
+          "log_file": "C:\\Users\\Administrator\\Documents\\MTech\\Final-Sem-Project-Demo\\Demo Project\\logs\\TC-001_attempt3_20260420_213713.log",
+          "stdout_tail": "py _______________\nImportError while importing test module 'C:\\Users\\Administrator\\Documents\\MTech\\Final-Sem-Project-Demo\\Demo Project\\generated_tests\\test_TC_001.py'.\nHint: make sure your test modules/packages have valid Python names.\nTraceback:\n..\\..\\..\\..\\..\\AppData\\Local\\Programs\\Python\\Python314\\Lib\\importlib\\__init__.py:88: in import_module\n    return _bootstrap._gcd_import(name[level:], package, level)\ntest_TC_001.py:16: in <module>\n    from shopease_framework.base.base_test_case import ShopEaseBaseTestCase, Parameter\nE   ModuleNotFoundError: No module named 'shopease_framework'\n- generated xml file: C:\\Users\\Administrator\\Documents\\MTech\\Final-Sem-Project-Demo\\Demo Project\\logs\\TC-001_attempt3_20260420_213713_junit.xml -\n=========================== short test summary info ===========================\nERROR test_TC_001.py\n!!!!!!!!!!!!!!!!!!! Interrupted: 1 error during collection !!!!!!!!!!!!!!!!!!!!\n============================== 1 error in 0.27s ===============================\n",
+          "stderr_tail": ""
+        }
+      },
+      {
+        "timestamp": "2026-04-20T21:37:16.565232",
+        "agent": "TestExecutorAgent",
+        "type": "execute_start",
+        "message": "Executing TC-002 (attempt 1): test_TC_002.py",
+        "data": {}
+      },
+      {
+        "timestamp": "2026-04-20T21:37:19.058159",
+        "agent": "TestExecutorAgent",
+        "type": "execute_complete",
+        "message": "TC-002 attempt 1: failed (rc=2, 2.49s)",
+        "data": {
+          "test_case_id": "TC-002",
+          "file_path": "C:\\Users\\Administrator\\Documents\\MTech\\Final-Sem-Project-Demo\\Demo Project\\generated_tests\\test_TC_002.py",
+          "attempt": 1,
+          "return_code": 2,
+          "status": "failed",
+          "duration_seconds": 2.49,
+          "error_type": "ModuleNotFoundError",
+          "error_message": "No module named 'shopease_framework'",
+          "traceback": "",
+          "timestamp": "2026-04-20T21:37:16.565223",
+          "log_file": "C:\\Users\\Administrator\\Documents\\MTech\\Final-Sem-Project-Demo\\Demo Project\\logs\\TC-002_attempt1_20260420_213716.log",
+          "stdout_tail": "py _______________\nImportError while importing test module 'C:\\Users\\Administrator\\Documents\\MTech\\Final-Sem-Project-Demo\\Demo Project\\generated_tests\\test_TC_002.py'.\nHint: make sure your test modules/packages have valid Python names.\nTraceback:\n..\\..\\..\\..\\..\\AppData\\Local\\Programs\\Python\\Python314\\Lib\\importlib\\__init__.py:88: in import_module\n    return _bootstrap._gcd_import(name[level:], package, level)\ntest_TC_002.py:16: in <module>\n    from shopease_framework.base.base_test_case import ShopEaseBaseTestCase, Parameter\nE   ModuleNotFoundError: No module named 'shopease_framework'\n- generated xml file: C:\\Users\\Administrator\\Documents\\MTech\\Final-Sem-Project-Demo\\Demo Project\\logs\\TC-002_attempt1_20260420_213716_junit.xml -\n=========================== short test summary info ===========================\nERROR test_TC_002.py\n!!!!!!!!!!!!!!!!!!! Interrupted: 1 error during collection !!!!!!!!!!!!!!!!!!!!\n============================== 1 error in 0.26s ===============================\n",
+          "stderr_tail": ""
+        }
+      },
+      {
+        "timestamp": "2026-04-20T21:37:24.074007",
+        "agent": "TestExecutorAgent",
+        "type": "execute_start",
+        "message": "Executing TC-002 (attempt 2): test_TC_002.py",
+        "data": {}
+      },
+      {
+        "timestamp": "2026-04-20T21:37:26.658192",
+        "agent": "TestExecutorAgent",
+        "type": "execute_complete",
+        "message": "TC-002 attempt 2: failed (rc=2, 2.58s)",
+        "data": {
+          "test_case_id": "TC-002",
+          "file_path": "C:\\Users\\Administrator\\Documents\\MTech\\Final-Sem-Project-Demo\\Demo Project\\generated_tests\\test_TC_002.py",
+          "attempt": 2,
+          "return_code": 2,
+          "status": "failed",
+          "duration_seconds": 2.58,
+          "error_type": "ModuleNotFoundError",
+          "error_message": "No module named 'shopease_framework'",
+          "traceback": "",
+          "timestamp": "2026-04-20T21:37:24.073979",
+          "log_file": "C:\\Users\\Administrator\\Documents\\MTech\\Final-Sem-Project-Demo\\Demo Project\\logs\\TC-002_attempt2_20260420_213724.log",
+          "stdout_tail": "py _______________\nImportError while importing test module 'C:\\Users\\Administrator\\Documents\\MTech\\Final-Sem-Project-Demo\\Demo Project\\generated_tests\\test_TC_002.py'.\nHint: make sure your test modules/packages have valid Python names.\nTraceback:\n..\\..\\..\\..\\..\\AppData\\Local\\Programs\\Python\\Python314\\Lib\\importlib\\__init__.py:88: in import_module\n    return _bootstrap._gcd_import(name[level:], package, level)\ntest_TC_002.py:16: in <module>\n    from shopease_framework.base.base_test_case import ShopEaseBaseTestCase, Parameter\nE   ModuleNotFoundError: No module named 'shopease_framework'\n- generated xml file: C:\\Users\\Administrator\\Documents\\MTech\\Final-Sem-Project-Demo\\Demo Project\\logs\\TC-002_attempt2_20260420_213724_junit.xml -\n=========================== short test summary info ===========================\nERROR test_TC_002.py\n!!!!!!!!!!!!!!!!!!! Interrupted: 1 error during collection !!!!!!!!!!!!!!!!!!!!\n============================== 1 error in 0.29s ===============================\n",
+          "stderr_tail": ""
+        }
+      },
+      {
+        "timestamp": "2026-04-20T21:37:31.676120",
+        "agent": "TestExecutorAgent",
+        "type": "execute_start",
+        "message": "Executing TC-002 (attempt 3): test_TC_002.py",
+        "data": {}
+      },
+      {
+        "timestamp": "2026-04-20T21:37:34.293642",
+        "agent": "TestExecutorAgent",
+        "type": "execute_complete",
+        "message": "TC-002 attempt 3: failed (rc=2, 2.62s)",
+        "data": {
+          "test_case_id": "TC-002",
+          "file_path": "C:\\Users\\Administrator\\Documents\\MTech\\Final-Sem-Project-Demo\\Demo Project\\generated_tests\\test_TC_002.py",
+          "attempt": 3,
+          "return_code": 2,
+          "status": "failed",
+          "duration_seconds": 2.62,
+          "error_type": "ModuleNotFoundError",
+          "error_message": "No module named 'shopease_framework'",
+          "traceback": "",
+          "timestamp": "2026-04-20T21:37:31.676109",
+          "log_file": "C:\\Users\\Administrator\\Documents\\MTech\\Final-Sem-Project-Demo\\Demo Project\\logs\\TC-002_attempt3_20260420_213731.log",
+          "stdout_tail": "py _______________\nImportError while importing test module 'C:\\Users\\Administrator\\Documents\\MTech\\Final-Sem-Project-Demo\\Demo Project\\generated_tests\\test_TC_002.py'.\nHint: make sure your test modules/packages have valid Python names.\nTraceback:\n..\\..\\..\\..\\..\\AppData\\Local\\Programs\\Python\\Python314\\Lib\\importlib\\__init__.py:88: in import_module\n    return _bootstrap._gcd_import(name[level:], package, level)\ntest_TC_002.py:16: in <module>\n    from shopease_framework.base.base_test_case import ShopEaseBaseTestCase, Parameter\nE   ModuleNotFoundError: No module named 'shopease_framework'\n- generated xml file: C:\\Users\\Administrator\\Documents\\MTech\\Final-Sem-Project-Demo\\Demo Project\\logs\\TC-002_attempt3_20260420_213731_junit.xml -\n=========================== short test summary info ===========================\nERROR test_TC_002.py\n!!!!!!!!!!!!!!!!!!! Interrupted: 1 error during collection !!!!!!!!!!!!!!!!!!!!\n============================== 1 error in 0.27s ===============================\n",
+          "stderr_tail": ""
+        }
+      }
+    ],
+    "fixer": [
+      {
+        "timestamp": "2026-04-20T21:36:58.398451",
+        "agent": "FixerAgent",
+        "type": "init",
+        "message": "FixerAgent initialized.",
+        "data": {}
+      },
+      {
+        "timestamp": "2026-04-20T21:37:01.178124",
+        "agent": "FixerAgent",
+        "type": "analyze_start",
+        "message": "Analyzing failure for TC-001 (attempt 1)",
+        "data": {}
+      },
+      {
+        "timestamp": "2026-04-20T21:37:01.178224",
+        "agent": "FixerAgent",
+        "type": "error_classified",
+        "message": "Error class: import_error",
+        "data": {
+          "error_type": "ModuleNotFoundError",
+          "error_class": "import_error"
+        }
+      },
+      {
+        "timestamp": "2026-04-20T21:37:01.178396",
+        "agent": "FixerAgent",
+        "type": "analyze_complete",
+        "message": "Found 2 fix strategies for import_error",
+        "data": {
+          "test_case_id": "TC-001",
+          "attempt": 1,
+          "error_class": "import_error",
+          "strategies": [
+            {
+              "strategy": "add_missing_import",
+              "description": "Add missing import statement",
+              "confidence": 0.9,
+              "details": {}
+            },
+            {
+              "strategy": "regenerate_full",
+              "description": "Full regeneration as fallback",
+              "confidence": 0.3,
+              "details": {}
+            }
+          ],
+          "elapsed_s": 0.0
+        }
+      },
+      {
+        "timestamp": "2026-04-20T21:37:08.971736",
+        "agent": "FixerAgent",
+        "type": "analyze_start",
+        "message": "Analyzing failure for TC-001 (attempt 2)",
+        "data": {}
+      },
+      {
+        "timestamp": "2026-04-20T21:37:08.971977",
+        "agent": "FixerAgent",
+        "type": "error_classified",
+        "message": "Error class: import_error",
+        "data": {
+          "error_type": "ModuleNotFoundError",
+          "error_class": "import_error"
+        }
+      },
+      {
+        "timestamp": "2026-04-20T21:37:08.972200",
+        "agent": "FixerAgent",
+        "type": "analyze_complete",
+        "message": "Found 2 fix strategies for import_error",
+        "data": {
+          "test_case_id": "TC-001",
+          "attempt": 2,
+          "error_class": "import_error",
+          "strategies": [
+            {
+              "strategy": "add_missing_import",
+              "description": "Add missing import statement",
+              "confidence": 0.9,
+              "details": {}
+            },
+            {
+              "strategy": "regenerate_full",
+              "description": "Full regeneration as fallback",
+              "confidence": 0.3,
+              "details": {}
+            }
+          ],
+          "elapsed_s": 0.0
+        }
+      },
+      {
+        "timestamp": "2026-04-20T21:37:16.545445",
+        "agent": "FixerAgent",
+        "type": "retry_limit",
+        "message": "Max retries (3) reached",
+        "data": {}
+      },
+      {
+        "timestamp": "2026-04-20T21:37:19.058914",
+        "agent": "FixerAgent",
+        "type": "analyze_start",
+        "message": "Analyzing failure for TC-002 (attempt 1)",
+        "data": {}
+      },
+      {
+        "timestamp": "2026-04-20T21:37:19.059446",
+        "agent": "FixerAgent",
+        "type": "error_classified",
+        "message": "Error class: import_error",
+        "data": {
+          "error_type": "ModuleNotFoundError",
+          "error_class": "import_error"
+        }
+      },
+      {
+        "timestamp": "2026-04-20T21:37:19.059730",
+        "agent": "FixerAgent",
+        "type": "analyze_complete",
+        "message": "Found 2 fix strategies for import_error",
+        "data": {
+          "test_case_id": "TC-002",
+          "attempt": 1,
+          "error_class": "import_error",
+          "strategies": [
+            {
+              "strategy": "add_missing_import",
+              "description": "Add missing import statement",
+              "confidence": 0.9,
+              "details": {}
+            },
+            {
+              "strategy": "regenerate_full",
+              "description": "Full regeneration as fallback",
+              "confidence": 0.3,
+              "details": {}
+            }
+          ],
+          "elapsed_s": 0.0
+        }
+      },
+      {
+        "timestamp": "2026-04-20T21:37:26.658753",
+        "agent": "FixerAgent",
+        "type": "analyze_start",
+        "message": "Analyzing failure for TC-002 (attempt 2)",
+        "data": {}
+      },
+      {
+        "timestamp": "2026-04-20T21:37:26.659080",
+        "agent": "FixerAgent",
+        "type": "error_classified",
+        "message": "Error class: import_error",
+        "data": {
+          "error_type": "ModuleNotFoundError",
+          "error_class": "import_error"
+        }
+      },
+      {
+        "timestamp": "2026-04-20T21:37:26.659270",
+        "agent": "FixerAgent",
+        "type": "analyze_complete",
+        "message": "Found 2 fix strategies for import_error",
+        "data": {
+          "test_case_id": "TC-002",
+          "attempt": 2,
+          "error_class": "import_error",
+          "strategies": [
+            {
+              "strategy": "add_missing_import",
+              "description": "Add missing import statement",
+              "confidence": 0.9,
+              "details": {}
+            },
+            {
+              "strategy": "regenerate_full",
+              "description": "Full regeneration as fallback",
+              "confidence": 0.3,
+              "details": {}
+            }
+          ],
+          "elapsed_s": 0.0
+        }
+      },
+      {
+        "timestamp": "2026-04-20T21:37:34.294209",
+        "agent": "FixerAgent",
+        "type": "retry_limit",
+        "message": "Max retries (3) reached",
+        "data": {}
+      }
+    ]
+  },
+  "execution_summary": {
+    "total_executions": 6,
+    "passed": 0,
+    "failed": 6,
+    "errors": 0,
+    "timeouts": 0,
+    "executions": [
+      {
+        "test_case_id": "TC-001",
+        "file_path": "C:\\Users\\Administrator\\Documents\\MTech\\Final-Sem-Project-Demo\\Demo Project\\generated_tests\\test_TC_001.py",
+        "attempt": 1,
+        "return_code": 2,
+        "status": "failed",
+        "duration_seconds": 2.75,
+        "error_type": "ModuleNotFoundError",
+        "error_message": "No module named 'shopease_framework'",
+        "traceback": "",
+        "timestamp": "2026-04-20T21:36:58.421210",
+        "log_file": "C:\\Users\\Administrator\\Documents\\MTech\\Final-Sem-Project-Demo\\Demo Project\\logs\\TC-001_attempt1_20260420_213658.log",
+        "stdout_tail": "py _______________\nImportError while importing test module 'C:\\Users\\Administrator\\Documents\\MTech\\Final-Sem-Project-Demo\\Demo Project\\generated_tests\\test_TC_001.py'.\nHint: make sure your test modules/packages have valid Python names.\nTraceback:\n..\\..\\..\\..\\..\\AppData\\Local\\Programs\\Python\\Python314\\Lib\\importlib\\__init__.py:88: in import_module\n    return _bootstrap._gcd_import(name[level:], package, level)\ntest_TC_001.py:16: in <module>\n    from shopease_framework.base.base_test_case import ShopEaseBaseTestCase, Parameter\nE   ModuleNotFoundError: No module named 'shopease_framework'\n- generated xml file: C:\\Users\\Administrator\\Documents\\MTech\\Final-Sem-Project-Demo\\Demo Project\\logs\\TC-001_attempt1_20260420_213658_junit.xml -\n=========================== short test summary info ===========================\nERROR test_TC_001.py\n!!!!!!!!!!!!!!!!!!! Interrupted: 1 error during collection !!!!!!!!!!!!!!!!!!!!\n============================== 1 error in 0.31s ===============================\n",
+        "stderr_tail": ""
+      },
+      {
+        "test_case_id": "TC-001",
+        "file_path": "C:\\Users\\Administrator\\Documents\\MTech\\Final-Sem-Project-Demo\\Demo Project\\generated_tests\\test_TC_001.py",
+        "attempt": 2,
+        "return_code": 2,
+        "status": "failed",
+        "duration_seconds": 2.77,
+        "error_type": "ModuleNotFoundError",
+        "error_message": "No module named 'shopease_framework'",
+        "traceback": "",
+        "timestamp": "2026-04-20T21:37:06.194291",
+        "log_file": "C:\\Users\\Administrator\\Documents\\MTech\\Final-Sem-Project-Demo\\Demo Project\\logs\\TC-001_attempt2_20260420_213706.log",
+        "stdout_tail": "py _______________\nImportError while importing test module 'C:\\Users\\Administrator\\Documents\\MTech\\Final-Sem-Project-Demo\\Demo Project\\generated_tests\\test_TC_001.py'.\nHint: make sure your test modules/packages have valid Python names.\nTraceback:\n..\\..\\..\\..\\..\\AppData\\Local\\Programs\\Python\\Python314\\Lib\\importlib\\__init__.py:88: in import_module\n    return _bootstrap._gcd_import(name[level:], package, level)\ntest_TC_001.py:16: in <module>\n    from shopease_framework.base.base_test_case import ShopEaseBaseTestCase, Parameter\nE   ModuleNotFoundError: No module named 'shopease_framework'\n- generated xml file: C:\\Users\\Administrator\\Documents\\MTech\\Final-Sem-Project-Demo\\Demo Project\\logs\\TC-001_attempt2_20260420_213706_junit.xml -\n=========================== short test summary info ===========================\nERROR test_TC_001.py\n!!!!!!!!!!!!!!!!!!! Interrupted: 1 error during collection !!!!!!!!!!!!!!!!!!!!\n============================== 1 error in 0.33s ===============================\n",
+        "stderr_tail": ""
+      },
+      {
+        "test_case_id": "TC-001",
+        "file_path": "C:\\Users\\Administrator\\Documents\\MTech\\Final-Sem-Project-Demo\\Demo Project\\generated_tests\\test_TC_001.py",
+        "attempt": 3,
+        "return_code": 2,
+        "status": "failed",
+        "duration_seconds": 2.55,
+        "error_type": "ModuleNotFoundError",
+        "error_message": "No module named 'shopease_framework'",
+        "traceback": "",
+        "timestamp": "2026-04-20T21:37:13.988233",
+        "log_file": "C:\\Users\\Administrator\\Documents\\MTech\\Final-Sem-Project-Demo\\Demo Project\\logs\\TC-001_attempt3_20260420_213713.log",
+        "stdout_tail": "py _______________\nImportError while importing test module 'C:\\Users\\Administrator\\Documents\\MTech\\Final-Sem-Project-Demo\\Demo Project\\generated_tests\\test_TC_001.py'.\nHint: make sure your test modules/packages have valid Python names.\nTraceback:\n..\\..\\..\\..\\..\\AppData\\Local\\Programs\\Python\\Python314\\Lib\\importlib\\__init__.py:88: in import_module\n    return _bootstrap._gcd_import(name[level:], package, level)\ntest_TC_001.py:16: in <module>\n    from shopease_framework.base.base_test_case import ShopEaseBaseTestCase, Parameter\nE   ModuleNotFoundError: No module named 'shopease_framework'\n- generated xml file: C:\\Users\\Administrator\\Documents\\MTech\\Final-Sem-Project-Demo\\Demo Project\\logs\\TC-001_attempt3_20260420_213713_junit.xml -\n=========================== short test summary info ===========================\nERROR test_TC_001.py\n!!!!!!!!!!!!!!!!!!! Interrupted: 1 error during collection !!!!!!!!!!!!!!!!!!!!\n============================== 1 error in 0.27s ===============================\n",
+        "stderr_tail": ""
+      },
+      {
+        "test_case_id": "TC-002",
+        "file_path": "C:\\Users\\Administrator\\Documents\\MTech\\Final-Sem-Project-Demo\\Demo Project\\generated_tests\\test_TC_002.py",
+        "attempt": 1,
+        "return_code": 2,
+        "status": "failed",
+        "duration_seconds": 2.49,
+        "error_type": "ModuleNotFoundError",
+        "error_message": "No module named 'shopease_framework'",
+        "traceback": "",
+        "timestamp": "2026-04-20T21:37:16.565223",
+        "log_file": "C:\\Users\\Administrator\\Documents\\MTech\\Final-Sem-Project-Demo\\Demo Project\\logs\\TC-002_attempt1_20260420_213716.log",
+        "stdout_tail": "py _______________\nImportError while importing test module 'C:\\Users\\Administrator\\Documents\\MTech\\Final-Sem-Project-Demo\\Demo Project\\generated_tests\\test_TC_002.py'.\nHint: make sure your test modules/packages have valid Python names.\nTraceback:\n..\\..\\..\\..\\..\\AppData\\Local\\Programs\\Python\\Python314\\Lib\\importlib\\__init__.py:88: in import_module\n    return _bootstrap._gcd_import(name[level:], package, level)\ntest_TC_002.py:16: in <module>\n    from shopease_framework.base.base_test_case import ShopEaseBaseTestCase, Parameter\nE   ModuleNotFoundError: No module named 'shopease_framework'\n- generated xml file: C:\\Users\\Administrator\\Documents\\MTech\\Final-Sem-Project-Demo\\Demo Project\\logs\\TC-002_attempt1_20260420_213716_junit.xml -\n=========================== short test summary info ===========================\nERROR test_TC_002.py\n!!!!!!!!!!!!!!!!!!! Interrupted: 1 error during collection !!!!!!!!!!!!!!!!!!!!\n============================== 1 error in 0.26s ===============================\n",
+        "stderr_tail": ""
+      },
+      {
+        "test_case_id": "TC-002",
+        "file_path": "C:\\Users\\Administrator\\Documents\\MTech\\Final-Sem-Project-Demo\\Demo Project\\generated_tests\\test_TC_002.py",
+        "attempt": 2,
+        "return_code": 2,
+        "status": "failed",
+        "duration_seconds": 2.58,
+        "error_type": "ModuleNotFoundError",
+        "error_message": "No module named 'shopease_framework'",
+        "traceback": "",
+        "timestamp": "2026-04-20T21:37:24.073979",
+        "log_file": "C:\\Users\\Administrator\\Documents\\MTech\\Final-Sem-Project-Demo\\Demo Project\\logs\\TC-002_attempt2_20260420_213724.log",
+        "stdout_tail": "py _______________\nImportError while importing test module 'C:\\Users\\Administrator\\Documents\\MTech\\Final-Sem-Project-Demo\\Demo Project\\generated_tests\\test_TC_002.py'.\nHint: make sure your test modules/packages have valid Python names.\nTraceback:\n..\\..\\..\\..\\..\\AppData\\Local\\Programs\\Python\\Python314\\Lib\\importlib\\__init__.py:88: in import_module\n    return _bootstrap._gcd_import(name[level:], package, level)\ntest_TC_002.py:16: in <module>\n    from shopease_framework.base.base_test_case import ShopEaseBaseTestCase, Parameter\nE   ModuleNotFoundError: No module named 'shopease_framework'\n- generated xml file: C:\\Users\\Administrator\\Documents\\MTech\\Final-Sem-Project-Demo\\Demo Project\\logs\\TC-002_attempt2_20260420_213724_junit.xml -\n=========================== short test summary info ===========================\nERROR test_TC_002.py\n!!!!!!!!!!!!!!!!!!! Interrupted: 1 error during collection !!!!!!!!!!!!!!!!!!!!\n============================== 1 error in 0.29s ===============================\n",
+        "stderr_tail": ""
+      },
+      {
+        "test_case_id": "TC-002",
+        "file_path": "C:\\Users\\Administrator\\Documents\\MTech\\Final-Sem-Project-Demo\\Demo Project\\generated_tests\\test_TC_002.py",
+        "attempt": 3,
+        "return_code": 2,
+        "status": "failed",
+        "duration_seconds": 2.62,
+        "error_type": "ModuleNotFoundError",
+        "error_message": "No module named 'shopease_framework'",
+        "traceback": "",
+        "timestamp": "2026-04-20T21:37:31.676109",
+        "log_file": "C:\\Users\\Administrator\\Documents\\MTech\\Final-Sem-Project-Demo\\Demo Project\\logs\\TC-002_attempt3_20260420_213731.log",
+        "stdout_tail": "py _______________\nImportError while importing test module 'C:\\Users\\Administrator\\Documents\\MTech\\Final-Sem-Project-Demo\\Demo Project\\generated_tests\\test_TC_002.py'.\nHint: make sure your test modules/packages have valid Python names.\nTraceback:\n..\\..\\..\\..\\..\\AppData\\Local\\Programs\\Python\\Python314\\Lib\\importlib\\__init__.py:88: in import_module\n    return _bootstrap._gcd_import(name[level:], package, level)\ntest_TC_002.py:16: in <module>\n    from shopease_framework.base.base_test_case import ShopEaseBaseTestCase, Parameter\nE   ModuleNotFoundError: No module named 'shopease_framework'\n- generated xml file: C:\\Users\\Administrator\\Documents\\MTech\\Final-Sem-Project-Demo\\Demo Project\\logs\\TC-002_attempt3_20260420_213731_junit.xml -\n=========================== short test summary info ===========================\nERROR test_TC_002.py\n!!!!!!!!!!!!!!!!!!! Interrupted: 1 error during collection !!!!!!!!!!!!!!!!!!!!\n============================== 1 error in 0.27s ===============================\n",
+        "stderr_tail": ""
+      }
+    ]
+  },
+  "fix_summary": {
+    "total_analyses": 4,
+    "analyses": [
+      {
+        "test_case_id": "TC-001",
+        "attempt": 1,
+        "error_class": "import_error",
+        "strategies": [
+          {
+            "strategy": "add_missing_import",
+            "description": "Add missing import statement",
+            "confidence": 0.9,
+            "details": {}
+          },
+          {
+            "strategy": "regenerate_full",
+            "description": "Full regeneration as fallback",
+            "confidence": 0.3,
+            "details": {}
+          }
+        ],
+        "elapsed_s": 0.0
+      },
+      {
+        "test_case_id": "TC-001",
+        "attempt": 2,
+        "error_class": "import_error",
+        "strategies": [
+          {
+            "strategy": "add_missing_import",
+            "description": "Add missing import statement",
+            "confidence": 0.9,
+            "details": {}
+          },
+          {
+            "strategy": "regenerate_full",
+            "description": "Full regeneration as fallback",
+            "confidence": 0.3,
+            "details": {}
+          }
+        ],
+        "elapsed_s": 0.0
+      },
+      {
+        "test_case_id": "TC-002",
+        "attempt": 1,
+        "error_class": "import_error",
+        "strategies": [
+          {
+            "strategy": "add_missing_import",
+            "description": "Add missing import statement",
+            "confidence": 0.9,
+            "details": {}
+          },
+          {
+            "strategy": "regenerate_full",
+            "description": "Full regeneration as fallback",
+            "confidence": 0.3,
+            "details": {}
+          }
+        ],
+        "elapsed_s": 0.0
+      },
+      {
+        "test_case_id": "TC-002",
+        "attempt": 2,
+        "error_class": "import_error",
+        "strategies": [
+          {
+            "strategy": "add_missing_import",
+            "description": "Add missing import statement",
+            "confidence": 0.9,
+            "details": {}
+          },
+          {
+            "strategy": "regenerate_full",
+            "description": "Full regeneration as fallback",
+            "confidence": 0.3,
+            "details": {}
+          }
+        ],
+        "elapsed_s": 0.0
+      }
+    ]
+  }
+}

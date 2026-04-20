@@ -10,7 +10,8 @@ from datetime import datetime
 
 from agents.base_agent import BaseAgent
 from agents.qtest_agent import QTestAgent
-from agents.test_generator_agent import TestGeneratorAgent
+# from agents.test_generator_agent import TestGeneratorAgent  # Temporarily disabled
+from simple_test_generator import SimpleTestGenerator  # Using simple generator
 from agents.test_executor_agent import TestExecutorAgent
 from agents.fixer_agent import FixerAgent
 from config import MAX_RETRIES, RETRY_DELAY_SECONDS, REPORTS_DIR, LOGS_DIR
@@ -61,10 +62,24 @@ class OrchestratorAgent(BaseAgent):
     6. Produce comprehensive report
     """
 
-    def __init__(self):
+    def __init__(self, enable_rag=True):
         super().__init__("OrchestratorAgent")
         self.qtest_agent = QTestAgent()
-        self.generator_agent = TestGeneratorAgent()
+
+        # Initialize RAG system if enabled
+        self.rag_system = None
+        if enable_rag:
+            try:
+                from rag_system import get_rag_system, initialize_rag_with_sample_data
+                self.rag_system = get_rag_system()
+                initialize_rag_with_sample_data()
+                self.log_event("rag_init", "RAG system initialized successfully")
+            except Exception as e:
+                self.log_event("rag_init_fail", f"RAG system initialization failed: {e}")
+                self.rag_system = None
+
+        # Initialize generator with RAG system
+        self.generator_agent = SimpleTestGenerator(rag_system=self.rag_system)
         self.executor_agent = TestExecutorAgent()
         self.fixer_agent = FixerAgent()
         self.cycle_results = []

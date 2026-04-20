@@ -1,0 +1,50 @@
+
+
+============================================================
+EXECUTION METADATA
+============================================================
+{
+  "test_case_id": "TC-001",
+  "file_path": "C:\\Users\\Administrator\\Documents\\MTech\\Final-Sem-Project-Demo\\Demo Project\\generated_tests\\test_TC_001.py",
+  "attempt": 2,
+  "return_code": 2,
+  "status": "failed",
+  "duration_seconds": 1.96,
+  "error_type": "ModuleNotFoundError",
+  "error_message": "No module named 'shopease_framework'",
+  "traceback": "",
+  "timestamp": "2026-04-20T21:30:46.443752",
+  "log_file": "C:\\Users\\Administrator\\Documents\\MTech\\Final-Sem-Project-Demo\\Demo Project\\logs\\TC-001_attempt2_20260420_213046.log",
+  "stdout_tail": "py _______________\nImportError while importing test module 'C:\\Users\\Administrator\\Documents\\MTech\\Final-Sem-Project-Demo\\Demo Project\\generated_tests\\test_TC_001.py'.\nHint: make sure your test modules/packages have valid Python names.\nTraceback:\n..\\..\\..\\..\\..\\AppData\\Local\\Programs\\Python\\Python314\\Lib\\importlib\\__init__.py:88: in import_module\n    return _bootstrap._gcd_import(name[level:], package, level)\ntest_TC_001.py:16: in <module>\n    from shopease_framework.base.base_test_case import ShopEaseBaseTestCase, Parameter\nE   ModuleNotFoundError: No module named 'shopease_framework'\n- generated xml file: C:\\Users\\Administrator\\Documents\\MTech\\Final-Sem-Project-Demo\\Demo Project\\logs\\TC-001_attempt2_20260420_213046_junit.xml -\n=========================== short test summary info ===========================\nERROR test_TC_001.py\n!!!!!!!!!!!!!!!!!!! Interrupted: 1 error during collection !!!!!!!!!!!!!!!!!!!!\n============================== 1 error in 0.26s ===============================\n",
+  "stderr_tail": ""
+}
+
+--- STDOUT ---
+============================= test session starts =============================
+platform win32 -- Python 3.14.0, pytest-7.4.3, pluggy-1.6.0 -- C:\Users\Administrator\AppData\Local\Programs\Python\Python314\python.exe
+cachedir: .pytest_cache
+metadata: {'Python': '3.14.0', 'Platform': 'Windows-2022Server-10.0.20348-SP0', 'Packages': {'pytest': '7.4.3', 'pluggy': '1.6.0'}, 'Plugins': {'anyio': '4.12.1', 'atlas-vasa-api': '7.0.400', 'check': '2.2.2', 'html': '3.2.0', 'metadata': '3.1.1'}}
+rootdir: C:\Users\Administrator\Documents\MTech\Final-Sem-Project-Demo\Demo Project
+configfile: pytest.ini
+plugins: anyio-4.12.1, atlas-vasa-api-7.0.400, check-2.2.2, html-3.2.0, metadata-3.1.1
+collecting ... collected 0 items / 1 error
+
+=================================== ERRORS ====================================
+_______________ ERROR collecting generated_tests/test_TC_001.py _______________
+ImportError while importing test module 'C:\Users\Administrator\Documents\MTech\Final-Sem-Project-Demo\Demo Project\generated_tests\test_TC_001.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+..\..\..\..\..\AppData\Local\Programs\Python\Python314\Lib\importlib\__init__.py:88: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+test_TC_001.py:16: in <module>
+    from shopease_framework.base.base_test_case import ShopEaseBaseTestCase, Parameter
+E   ModuleNotFoundError: No module named 'shopease_framework'
+- generated xml file: C:\Users\Administrator\Documents\MTech\Final-Sem-Project-Demo\Demo Project\logs\TC-001_attempt2_20260420_213046_junit.xml -
+=========================== short test summary info ===========================
+ERROR test_TC_001.py
+!!!!!!!!!!!!!!!!!!! Interrupted: 1 error during collection !!!!!!!!!!!!!!!!!!!!
+============================== 1 error in 0.26s ===============================
+
+
+--- STDERR ---
+(empty)

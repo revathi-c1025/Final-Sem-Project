@@ -1,0 +1,281 @@
+ShopEasy API Documentation - Category Management
+
+Overview
+The ShopEasy Category Management API provides endpoints for managing product categories in the e-commerce platform. Categories organize products into hierarchical structures for better navigation and filtering.
+
+Base URL
+https://api.shopeasy.com/v1
+
+Authentication
+All API requests require authentication using Bearer tokens. Include the token in the Authorization header:
+Authorization: Bearer YOUR_ACCESS_TOKEN
+
+Endpoints
+
+1. Create Category
+POST /api/categories
+Description: Creates a new product category.
+
+Request Body:
+{
+  "name": "Category Name",
+  "description": "Category description",
+  "parent_id": "PARENT-12345",
+  "display_order": 1,
+  "is_active": true,
+  "metadata": {
+    "icon": "category-icon.png",
+    "banner": "category-banner.jpg"
+  }
+}
+
+Response:
+{
+  "id": "CAT-12345",
+  "name": "Category Name",
+  "description": "Category description",
+  "parent_id": "PARENT-12345",
+  "display_order": 1,
+  "is_active": true,
+  "product_count": 0,
+  "created_at": "2024-01-01T00:00:00Z"
+}
+
+Status Codes:
+- 201: Category created successfully
+- 400: Invalid request data
+- 401: Unauthorized
+- 409: Category name already exists
+
+2. Get Category
+GET /api/categories/{category_id}
+Description: Retrieves a single category by ID.
+
+Path Parameters:
+- category_id: The unique identifier of the category
+
+Response:
+{
+  "id": "CAT-12345",
+  "name": "Category Name",
+  "description": "Category description",
+  "parent_id": "PARENT-12345",
+  "display_order": 1,
+  "is_active": true,
+  "product_count": 150,
+  "subcategories": [
+    {
+      "id": "SUB-12345",
+      "name": "Subcategory Name",
+      "product_count": 75
+    }
+  ],
+  "created_at": "2024-01-01T00:00:00Z",
+  "updated_at": "2024-01-01T00:00:00Z"
+}
+
+Status Codes:
+- 200: Category retrieved successfully
+- 404: Category not found
+
+3. Update Category
+PUT /api/categories/{category_id}
+Description: Updates an existing category.
+
+Path Parameters:
+- category_id: The unique identifier of the category
+
+Request Body:
+{
+  "name": "Updated Category Name",
+  "description": "Updated description",
+  "display_order": 2,
+  "is_active": false
+}
+
+Response:
+{
+  "id": "CAT-12345",
+  "name": "Updated Category Name",
+  "description": "Updated description",
+  "display_order": 2,
+  "is_active": false,
+  "updated_at": "2024-01-02T00:00:00Z"
+}
+
+Status Codes:
+- 200: Category updated successfully
+- 400: Invalid request data
+- 404: Category not found
+
+4. List Categories
+GET /api/categories
+Description: Retrieves a list of categories with optional filtering.
+
+Query Parameters:
+- parent_id: Filter by parent category
+- is_active: Filter by active status (true/false)
+- sort: Sort order (name_asc, name_desc, display_order)
+- limit: Maximum number of results (default: 50)
+- offset: Offset for pagination (default: 0)
+
+Response:
+{
+  "categories": [
+    {
+      "id": "CAT-12345",
+      "name": "Category Name",
+      "description": "Category description",
+      "product_count": 150,
+      "is_active": true
+    }
+  ],
+  "total": 100,
+  "page": 1,
+  "per_page": 50
+}
+
+5. Delete Category
+DELETE /api/categories/{category_id}
+Description: Deletes a category from the system.
+
+Path Parameters:
+- category_id: The unique identifier of the category
+
+Query Parameters:
+- reassign_to: ID of category to reassign products to (required if category has products)
+
+Response:
+Status Codes:
+- 204: Category deleted successfully
+- 400: Cannot delete category with products without reassign_to parameter
+- 404: Category not found
+- 409: Cannot delete category with subcategories
+
+6. Add Products to Category
+POST /api/categories/{category_id}/products
+Description: Adds multiple products to a category.
+
+Path Parameters:
+- category_id: The unique identifier of the category
+
+Request Body:
+{
+  "product_ids": ["PROD-12345", "PROD-67890"],
+  "operation": "add"
+}
+
+Response:
+{
+  "category_id": "CAT-12345",
+  "added_products": 2,
+  "failed_products": [],
+  "updated_at": "2024-01-02T00:00:00Z"
+}
+
+Status Codes:
+- 200: Products added successfully
+- 400: Invalid request data
+- 404: Category not found
+- 409: Some products not found or already in category
+
+7. Remove Products from Category
+DELETE /api/categories/{category_id}/products
+Description: Removes products from a category.
+
+Path Parameters:
+- category_id: The unique identifier of the category
+
+Request Body:
+{
+  "product_ids": ["PROD-12345", "PROD-67890"],
+  "reassign_to": "CAT-67890"
+}
+
+Response:
+{
+  "category_id": "CAT-12345",
+  "removed_products": 2,
+  "reassigned_to": "CAT-67890",
+  "updated_at": "2024-01-02T00:00:00Z"
+}
+
+Status Codes:
+- 200: Products removed successfully
+- 400: Invalid request data
+- 404: Category not found
+
+Category Hierarchy
+
+Categories support hierarchical structure:
+- Root categories have no parent_id
+- Subcategories reference a parent_id
+- Maximum depth: 3 levels
+- Circular references are prevented
+
+Category Metadata
+
+Categories support custom metadata:
+- icon: Category icon filename
+- banner: Category banner image
+- seo_title: SEO-optimized title
+- seo_description: SEO description
+- attributes: Custom key-value pairs
+
+Product Count Tracking
+
+The system automatically tracks:
+- Total products in category
+- Products in subcategories (inherited)
+- Active vs inactive products
+- Real-time updates on product changes
+
+Bulk Operations
+
+For bulk category operations:
+- Use batch endpoints for efficiency
+- Maximum 100 products per batch request
+- Operations are atomic (all succeed or all fail)
+- Progress tracking for long-running operations
+
+Category Search
+
+Advanced category search:
+GET /api/categories/search?q=electronics&is_active=true
+
+Supports:
+- Full-text search on name and description
+- Filter by attributes
+- Faceted search
+- Auto-suggest for category names
+
+Category Validation
+
+Validation rules:
+- Name required (3-100 characters)
+- Description optional (max 500 characters)
+- Display order must be positive integer
+- Parent must exist if specified
+- No circular references in hierarchy
+
+Error Handling
+
+Category-specific errors:
+- CATEGORY_NOT_FOUND: Category does not exist
+- CATEGORY_ALREADY_EXISTS: Category name already in use
+- INVALID_HIERARCHY: Circular reference or depth exceeded
+- CATEGORY_HAS_PRODUCTS: Cannot delete without reassigning
+- CATEGORY_HAS_SUBCATEGORIES: Cannot delete with subcategories
+
+Rate Limiting
+Category API requests are rate-limited to 500 requests per minute per API key.
+
+Testing Considerations
+
+When testing category operations:
+1. Use test category names prefixed with "TEST-"
+2. Clean up test categories after testing
+3. Test hierarchy operations (create, move, delete)
+4. Verify product count updates
+5. Test bulk operations with various scenarios
+6. Validate metadata handling

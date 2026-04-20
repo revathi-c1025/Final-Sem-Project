@@ -1,0 +1,65 @@
+INFO     TestTC_001:standalone_framework.py:41 Step 1: Send a POST request to /api/products with a JSON body containing name 'Wireless Bluetooth Headphones
+INFO     test_TC_001:test_TC_001.py:71 Product created with ID: 1005
+INFO     TestTC_001:standalone_framework.py:41 Step 2: Send a GET request to /api/products/{product_id} using the product ID returned from the creation ste
+INFO     test_TC_001:test_TC_001.py:78 Product verified: Wireless Bluetooth Headphones
+INFO     TestTC_001:standalone_framework.py:41 Step 3: Send a GET request to /api/catalog?category=Electronics to retrieve the full product catalog filtere
+INFO     test_TC_001:test_TC_001.py:85 Found 4 products in category
+INFO     TestTC_001:standalone_framework.py:41 Step 4: Send a PUT request to /api/products/{product_id} with an updated price of 69.99 and a new promotiona
+INFO     test_TC_001:test_TC_001.py:92 Product updated successfully
+INFO     TestTC_001:standalone_framework.py:41 Step 5: Send a GET request to /api/products/{product_id} again to verify the price update persisted. Compare
+INFO     test_TC_001:test_TC_001.py:99 Product verified: Wireless Bluetooth Headphones
+INFO     TestTC_001:standalone_framework.py:26 Completed test: TestTC_001
+
+
+============================================================
+EXECUTION METADATA
+============================================================
+{
+  "test_case_id": "TC-001",
+  "file_path": "C:\\Users\\Administrator\\Documents\\MTech\\Final-Sem-Project-Demo\\Demo Project\\generated_tests\\test_TC_001.py",
+  "attempt": 3,
+  "return_code": 0,
+  "status": "passed",
+  "duration_seconds": 1.8,
+  "error_type": "",
+  "error_message": "",
+  "traceback": "",
+  "timestamp": "2026-04-20T21:39:14.852842",
+  "log_file": "C:\\Users\\Administrator\\Documents\\MTech\\Final-Sem-Project-Demo\\Demo Project\\logs\\TC-001_attempt3_20260420_213914.log",
+  "stdout_tail": "i/catalog?category=Electronics to retrieve the full product catalog filtere\nINFO     test_TC_001:test_TC_001.py:85 Found 4 products in category\nINFO     TestTC_001:standalone_framework.py:41 Step 4: Send a PUT request to /api/products/{product_id} with an updated price of 69.99 and a new promotiona\nINFO     test_TC_001:test_TC_001.py:92 Product updated successfully\nINFO     TestTC_001:standalone_framework.py:41 Step 5: Send a GET request to /api/products/{product_id} again to verify the price update persisted. Compare\nINFO     test_TC_001:test_TC_001.py:99 Product verified: Wireless Bluetooth Headphones\nPASSED\n------------------------------ live log teardown ------------------------------\nINFO     TestTC_001:standalone_framework.py:26 Completed test: TestTC_001\n\n\n- generated xml file: C:\\Users\\Administrator\\Documents\\MTech\\Final-Sem-Project-Demo\\Demo Project\\logs\\TC-001_attempt3_20260420_213914_junit.xml -\n============================== 1 passed in 0.06s ==============================\n",
+  "stderr_tail": ""
+}
+
+--- STDOUT ---
+============================= test session starts =============================
+platform win32 -- Python 3.14.0, pytest-7.4.3, pluggy-1.6.0 -- C:\Users\Administrator\AppData\Local\Programs\Python\Python314\python.exe
+cachedir: .pytest_cache
+metadata: {'Python': '3.14.0', 'Platform': 'Windows-2022Server-10.0.20348-SP0', 'Packages': {'pytest': '7.4.3', 'pluggy': '1.6.0'}, 'Plugins': {'anyio': '4.12.1', 'atlas-vasa-api': '7.0.400', 'check': '2.2.2', 'html': '3.2.0', 'metadata': '3.1.1'}}
+rootdir: C:\Users\Administrator\Documents\MTech\Final-Sem-Project-Demo\Demo Project
+configfile: pytest.ini
+plugins: anyio-4.12.1, atlas-vasa-api-7.0.400, check-2.2.2, html-3.2.0, metadata-3.1.1
+collecting ... collected 1 item
+
+test_TC_001.py::TestTC_001::test_tc_001 
+-------------------------------- live log call --------------------------------
+INFO     TestTC_001:standalone_framework.py:41 Step 1: Send a POST request to /api/products with a JSON body containing name 'Wireless Bluetooth Headphones
+INFO     test_TC_001:test_TC_001.py:71 Product created with ID: 1005
+INFO     TestTC_001:standalone_framework.py:41 Step 2: Send a GET request to /api/products/{product_id} using the product ID returned from the creation ste
+INFO     test_TC_001:test_TC_001.py:78 Product verified: Wireless Bluetooth Headphones
+INFO     TestTC_001:standalone_framework.py:41 Step 3: Send a GET request to /api/catalog?category=Electronics to retrieve the full product catalog filtere
+INFO     test_TC_001:test_TC_001.py:85 Found 4 products in category
+INFO     TestTC_001:standalone_framework.py:41 Step 4: Send a PUT request to /api/products/{product_id} with an updated price of 69.99 and a new promotiona
+INFO     test_TC_001:test_TC_001.py:92 Product updated successfully
+INFO     TestTC_001:standalone_framework.py:41 Step 5: Send a GET request to /api/products/{product_id} again to verify the price update persisted. Compare
+INFO     test_TC_001:test_TC_001.py:99 Product verified: Wireless Bluetooth Headphones
+PASSED
+------------------------------ live log teardown ------------------------------
+INFO     TestTC_001:standalone_framework.py:26 Completed test: TestTC_001
+
+
+- generated xml file: C:\Users\Administrator\Documents\MTech\Final-Sem-Project-Demo\Demo Project\logs\TC-001_attempt3_20260420_213914_junit.xml -
+============================== 1 passed in 0.06s ==============================
+
+
+--- STDERR ---
+(empty)

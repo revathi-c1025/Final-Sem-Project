@@ -1,0 +1,37 @@
+
+
+============================================================
+EXECUTION METADATA
+============================================================
+{
+  "test_case_id": "TC-001",
+  "file_path": "generated_tests\\test_TC_001.py",
+  "attempt": 3,
+  "return_code": 4,
+  "status": "failed",
+  "duration_seconds": 1.86,
+  "error_type": "UnknownError",
+  "error_message": "Test failed - see logs for details",
+  "traceback": "",
+  "timestamp": "2026-04-20T21:15:42.764499",
+  "log_file": "C:\\Users\\Administrator\\Documents\\MTech\\Final-Sem-Project-Demo\\Demo Project\\logs\\TC-001_attempt3_20260420_211542.log",
+  "stdout_tail": "============================= test session starts =============================\nplatform win32 -- Python 3.14.0, pytest-7.4.3, pluggy-1.6.0 -- C:\\Users\\Administrator\\AppData\\Local\\Programs\\Python\\Python314\\python.exe\ncachedir: .pytest_cache\nmetadata: {'Python': '3.14.0', 'Platform': 'Windows-2022Server-10.0.20348-SP0', 'Packages': {'pytest': '7.4.3', 'pluggy': '1.6.0'}, 'Plugins': {'anyio': '4.12.1', 'atlas-vasa-api': '7.0.400', 'check': '2.2.2', 'html': '3.2.0', 'metadata': '3.1.1'}}\nrootdir: C:\\Users\\Administrator\\Documents\\MTech\\Final-Sem-Project-Demo\\Demo Project\nconfigfile: pytest.ini\nplugins: anyio-4.12.1, atlas-vasa-api-7.0.400, check-2.2.2, html-3.2.0, metadata-3.1.1\ncollecting ... collected 0 items\n\n============================ no tests ran in 0.01s ============================\n",
+  "stderr_tail": "ERROR: file or directory not found: generated_tests\\test_TC_001.py\n\n"
+}
+
+--- STDOUT ---
+============================= test session starts =============================
+platform win32 -- Python 3.14.0, pytest-7.4.3, pluggy-1.6.0 -- C:\Users\Administrator\AppData\Local\Programs\Python\Python314\python.exe
+cachedir: .pytest_cache
+metadata: {'Python': '3.14.0', 'Platform': 'Windows-2022Server-10.0.20348-SP0', 'Packages': {'pytest': '7.4.3', 'pluggy': '1.6.0'}, 'Plugins': {'anyio': '4.12.1', 'atlas-vasa-api': '7.0.400', 'check': '2.2.2', 'html': '3.2.0', 'metadata': '3.1.1'}}
+rootdir: C:\Users\Administrator\Documents\MTech\Final-Sem-Project-Demo\Demo Project
+configfile: pytest.ini
+plugins: anyio-4.12.1, atlas-vasa-api-7.0.400, check-2.2.2, html-3.2.0, metadata-3.1.1
+collecting ... collected 0 items
+
+============================ no tests ran in 0.01s ============================
+
+
+--- STDERR ---
+ERROR: file or directory not found: generated_tests\test_TC_001.py
+

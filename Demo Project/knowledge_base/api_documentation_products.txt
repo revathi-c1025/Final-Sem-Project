@@ -1,0 +1,162 @@
+ShopEasy API Documentation - Product Management
+
+Overview
+The ShopEasy Product Management API provides endpoints for creating, reading, updating, and deleting products in the e-commerce platform. This API is RESTful and uses JSON for data exchange.
+
+Base URL
+https://api.shopeasy.com/v1
+
+Authentication
+All API requests require authentication using Bearer tokens. Include the token in the Authorization header:
+Authorization: Bearer YOUR_ACCESS_TOKEN
+
+Endpoints
+
+1. Create Product
+POST /api/products
+Description: Creates a new product in the catalog.
+
+Request Body:
+{
+  "name": "Product Name",
+  "description": "Product description",
+  "price": 99.99,
+  "category": "Electronics",
+  "sku": "SKU-123",
+  "stock_quantity": 100,
+  "attributes": {
+    "color": "Black",
+    "size": "Medium"
+  }
+}
+
+Response:
+{
+  "id": "PROD-12345",
+  "name": "Product Name",
+  "price": 99.99,
+  "status": "active",
+  "created_at": "2024-01-01T00:00:00Z"
+}
+
+Status Codes:
+- 201: Product created successfully
+- 400: Invalid request data
+- 401: Unauthorized
+- 409: Product with SKU already exists
+
+2. Get Product
+GET /api/products/{product_id}
+Description: Retrieves a single product by ID.
+
+Path Parameters:
+- product_id: The unique identifier of the product
+
+Response:
+{
+  "id": "PROD-12345",
+  "name": "Product Name",
+  "description": "Product description",
+  "price": 99.99,
+  "category": "Electronics",
+  "sku": "SKU-123",
+  "stock_quantity": 100,
+  "status": "active",
+  "created_at": "2024-01-01T00:00:00Z",
+  "updated_at": "2024-01-01T00:00:00Z"
+}
+
+Status Codes:
+- 200: Product retrieved successfully
+- 404: Product not found
+
+3. Update Product
+PUT /api/products/{product_id}
+Description: Updates an existing product.
+
+Path Parameters:
+- product_id: The unique identifier of the product
+
+Request Body:
+{
+  "name": "Updated Product Name",
+  "price": 89.99,
+  "description": "Updated description"
+}
+
+Response:
+{
+  "id": "PROD-12345",
+  "name": "Updated Product Name",
+  "price": 89.99,
+  "updated_at": "2024-01-02T00:00:00Z"
+}
+
+Status Codes:
+- 200: Product updated successfully
+- 400: Invalid request data
+- 404: Product not found
+
+4. Search Products
+GET /api/products/search
+Description: Searches for products based on query parameters.
+
+Query Parameters:
+- q: Search query string
+- category: Filter by category
+- min_price: Minimum price filter
+- max_price: Maximum price filter
+- sort: Sort order (price_asc, price_desc, name_asc, name_desc)
+- limit: Maximum number of results (default: 20)
+
+Response:
+{
+  "results": [
+    {
+      "id": "PROD-12345",
+      "name": "Product Name",
+      "price": 99.99,
+      "category": "Electronics"
+    }
+  ],
+  "total": 100,
+  "page": 1,
+  "per_page": 20
+}
+
+5. Delete Product
+DELETE /api/products/{product_id}
+Description: Deletes a product from the catalog.
+
+Path Parameters:
+- product_id: The unique identifier of the product
+
+Status Codes:
+- 204: Product deleted successfully
+- 404: Product not found
+- 409: Product cannot be deleted (has active orders)
+
+Error Handling
+All error responses follow this format:
+{
+  "error": {
+    "code": "ERROR_CODE",
+    "message": "Human-readable error message",
+    "details": {}
+  }
+}
+
+Rate Limiting
+API requests are rate-limited to 1000 requests per minute per API key. The rate limit headers are included in all responses:
+X-RateLimit-Limit: 1000
+X-RateLimit-Remaining: 999
+X-RateLimit-Reset: 1609459200
+
+Testing Guidelines
+When testing the Product API:
+1. Always use test SKUs prefixed with "TEST-"
+2. Clean up test products after testing
+3. Use category IDs from the Category API
+4. Validate all required fields before creating products
+5. Test error scenarios (invalid data, missing fields)
+6. Verify stock quantity updates after order placement
