@@ -1,0 +1,20 @@
+# AI-Powered Agentic Test Automation System - Demo Project
+# Essential requirements for demo execution
+# Install with: pip install -r requirements.txt
+
+# Web Framework (for web UI - optional for demo)
+Flask==3.0.0
+
+# Testing Framework (REQUIRED for demo)
+pytest==7.4.3
+pytest-html==3.2.0
+
+# HTTP Requests (REQUIRED for mock API)
+requests==2.31.0
+
+# Data Processing (REQUIRED for date handling)
+python-dateutil==2.8.2
+
+# Note: RAG system dependencies (faiss-cpu, sentence-transformers) 
+# are intentionally excluded for demo to avoid memory issues.
+# They can be added later for full AI-powered features.

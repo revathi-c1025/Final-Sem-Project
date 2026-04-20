@@ -105,16 +105,14 @@ class TestExecutorAgent(BaseAgent):
         result.log_file = log_file
         result.junit_xml = junit_xml
 
-        # Build pytest command
+        # Build pytest command (STANDARD PYTEST - NO Atlas options)
         cmd = [
             sys.executable, "-m", "pytest",
             file_path,
             "-v",
-            "--tb=long",
+            "--tb=short",
             f"--log-file={log_file}",
-            "--log-file-level=DEBUG",
-            "--log-cli-level=INFO",
-            f"--junitxml={junit_xml}",
+            "--log-file-level=INFO",
             "-s",  # capture output
         ]
 

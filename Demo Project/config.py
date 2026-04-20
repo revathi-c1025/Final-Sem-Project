@@ -1,6 +1,18 @@
 """
 Configuration for the AI-Powered Agentic Test Automation System (Demo).
 Uses ShopEasy E-Commerce Platform as the demo target.
+
+DEMO MODE:
+- This configuration is set up for demo mode by default
+- No external AI/LLM dependencies required
+- Uses local test case data from JSON file
+- Template-based test generation (no API keys needed)
+- Works entirely offline for demonstration
+
+TO ENABLE AI FEATURES:
+- Set LLM_API_KEY to your OpenAI or Azure API key
+- Configure LLM_PROVIDER as "openai" or "azure"
+- Set LLM_MODEL to your preferred model
 """
 import os
 
@@ -25,11 +37,13 @@ SHOPEASE_ADMIN_USER = os.environ.get("SHOPEASE_ADMIN_USER", "admin")
 SHOPEASE_ADMIN_PASS = os.environ.get("SHOPEASE_ADMIN_PASS", "")
 
 # =============================================================================
-# AI / LLM Configuration (for test generation and auto-fix agents)
+# AI / LLM Configuration (OPTIONAL - for AI-powered test generation)
 # =============================================================================
+# NOTE: Leave LLM_API_KEY empty to use template-based generation (demo mode)
+# Template mode works offline and requires no external dependencies
 LLM_PROVIDER = os.environ.get("LLM_PROVIDER", "openai")  # openai, azure, local
-LLM_API_KEY = os.environ.get("LLM_API_KEY", "")
-LLM_MODEL = os.environ.get("LLM_MODEL", "gpt-4")
+LLM_API_KEY = os.environ.get("LLM_API_KEY", "")  # Leave empty for demo mode
+LLM_MODEL = os.environ.get("LLM_MODEL", "gpt-4")  # Used only if LLM_API_KEY is set
 LLM_BASE_URL = os.environ.get("LLM_BASE_URL", "")  # For Azure or local LLM
 LLM_TEMPERATURE = float(os.environ.get("LLM_TEMPERATURE", "0.2"))
 LLM_MAX_TOKENS = int(os.environ.get("LLM_MAX_TOKENS", "4096"))

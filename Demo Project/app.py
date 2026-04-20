@@ -22,9 +22,10 @@ Open:   http://localhost:5000
 import json
 import os
 import queue
-import re
 import sys
+import importlib
 import logging
+import re
 import threading
 import time
 import uuid
@@ -41,6 +42,18 @@ from config import (
     OUTPUT_DIR, LOGS_DIR, GENERATED_TESTS_DIR, REPORTS_DIR, BASE_DIR,
 )
 from agents.orchestrator_agent import OrchestratorAgent
+
+# RAG System
+rag_system = None
+# Temporarily disable RAG to debug Flask startup issue
+# try:
+#     from rag_system import get_rag_system, initialize_rag_with_sample_data
+#     rag_system = get_rag_system()
+#     initialize_rag_with_sample_data()
+#     print("RAG system initialized successfully")
+# except Exception as e:
+#     print(f"RAG system initialization failed: {e}")
+#     rag_system = None
 
 # ---- Flask setup -----------------------------------------------------------
 app = Flask(__name__)
@@ -439,6 +452,31 @@ def api_log_detail(filename):
     return jsonify({"filename": filename, "content": "".join(tail)})
 
 
+@app.route("/api/reload", methods=["POST"])
+def api_reload():
+    """Force reload the Flask application."""
+    try:
+        # Clear all modules
+        modules_to_clear = list(sys.modules.keys())
+        for module_name in modules_to_clear:
+            if module_name.startswith('simple_test_generator') or \
+               module_name.startswith('agents') or \
+               module_name == 'app':
+                del sys.modules[module_name]
+        
+        # Force garbage collection
+        import gc
+        gc.collect()
+        
+        return jsonify({
+            "status": "success",
+            "message": "Application reloaded. Please restart the server manually.",
+            "note": "For best results, stop and restart the server"
+        })
+    except Exception as e:
+        return jsonify({"status": "error", "message": str(e)}), 500
+
+
 # ===========================================================================
 #   API  - Fetch test cases
 # ===========================================================================
@@ -477,40 +515,41 @@ def api_pipeline_generate():
     Expects JSON body with test_case_id.
     Returns generated code + list of required user inputs.
     """
+    logger.info("DEBUG: api_pipeline_generate called")
     data = request.get_json(force=True)
     tc_id = data.get("test_case_id", "").strip()
+    logger.info(f"DEBUG: tc_id = {tc_id}")
     if not tc_id:
         return jsonify({"error": "test_case_id required"}), 400
 
     try:
+        # Directly use SimpleTestGenerator to generate test
+        from simple_test_generator import SimpleTestGenerator
         from agents.qtest_agent import QTestAgent
-        from agents.test_generator_agent import TestGeneratorAgent
 
-        qtest_agent = QTestAgent()
-        gen_agent = TestGeneratorAgent()
+        qtest = QTestAgent()
+        gen = SimpleTestGenerator()
 
-        # Phase 1: Fetch
-        tc_data = qtest_agent.fetch_test_case(tc_id)
+        tc = qtest.fetch_test_case(tc_id)
+        result = gen.generate_test(tc)
 
-        # Phase 2: Generate
-        gen = gen_agent.generate_test(tc_data)
-        code = gen["code"]
-        file_path = gen["file_path"]
-        method = gen["method"]
+        # Read the generated file
+        with open(result["file_path"], 'r', encoding='utf-8') as f:
+            code = f.read()
 
-        # Phase 3: Determine required inputs
+        # Determine required inputs
         required_inputs = _extract_required_inputs(code)
 
         return jsonify({
             "test_case_id": tc_id,
-            "test_case_data": tc_data,
-            "generated_file": os.path.basename(file_path),
-            "generated_file_path": file_path,
-            "generation_method": method,
+            "test_case_data": tc,
+            "generated_file": result["filename"],
+            "generated_file_path": result["file_path"],
+            "generation_method": "template",
             "code_preview": code[:3000],
             "code_lines": code.count("\n") + 1,
             "required_inputs": required_inputs,
-            "repo_context_used": gen.get("repo_context_used", False),
+            "repo_context_used": False,
         })
     except Exception as e:
         logger.exception("Generate failed for %s", tc_id)
@@ -532,69 +571,113 @@ def _run_pipeline(run_id, test_case_ids, extra_env, max_retries):
     try:
         push("started", {"test_case_ids": test_case_ids})
 
-        import config as cfg
-        cfg.MAX_RETRIES = max_retries
+        # Step 1: Regenerate all test files with standalone framework
+        push("phase", "Regenerating test files with standalone framework")
+        
+        # Use subprocess to run regenerate script in fresh environment
+        import subprocess
+        result = subprocess.run(
+            [sys.executable, "regenerate_tests.py"],
+            cwd=os.getcwd(),
+            capture_output=True,
+            text=True,
+            timeout=30
+        )
+        
+        if result.returncode != 0:
+            push("generate_fail", f"Failed to regenerate test files: {result.stderr}")
+            raise Exception(f"Test regeneration failed: {result.stderr}")
+        
+        push("generate_ok", "Successfully regenerated all test files with standalone framework")
 
-        orchestrator = OrchestratorAgent()
+        # Step 2: Run tests using pytest in fresh environment
+        push("phase", "Running tests with pytest")
+        
+        # Build pytest command
+        pytest_cmd = [sys.executable, "-m", "pytest", "generated_tests/"] + test_case_ids + ["-v", "--tb=short"]
+        
+        # Add environment variables if provided
+        env = os.environ.copy()
+        if extra_env:
+            env.update(extra_env)
+        
+        # Run pytest
+        result = subprocess.run(
+            pytest_cmd,
+            cwd=os.getcwd(),
+            capture_output=True,
+            text=True,
+            timeout=60,
+            env=env
+        )
+        
+        # Parse pytest output
+        output_lines = result.stdout.split('\n')
+        passed = 0
+        failed = 0
+        
+        for line in output_lines:
+            if 'PASSED' in line:
+                passed += 1
+            elif 'FAILED' in line:
+                failed += 1
+        
+        # Generate simple report
+        from datetime import datetime
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        report_json = f"reports/report_{timestamp}.json"
+        report_html = f"reports/report_{timestamp}.html"
 
-        # Patch all agent log_events to stream to SSE
-        _orig_log = orchestrator.log_event
-        def _patched_log(event_type, message, data=None):
-            _orig_log(event_type, message, data)
-            push("agent_event", {"agent": "Orchestrator", "event": event_type,
-                                 "message": message})
-        orchestrator.log_event = _patched_log
+        os.makedirs("reports", exist_ok=True)
 
-        for name, agent in [("QTest", orchestrator.qtest_agent),
-                            ("Generator", orchestrator.generator_agent),
-                            ("Executor", orchestrator.executor_agent),
-                            ("Fixer", orchestrator.fixer_agent)]:
-            _orig = agent.log_event
-            def _make_patch(n, orig):
-                def _p(et, msg, d=None):
-                    orig(et, msg, d)
-                    push("agent_event", {"agent": n, "event": et, "message": msg})
-                return _p
-            agent.log_event = _make_patch(name, _orig)
-
-        # Run the pipeline
-        results = orchestrator.run_batch(test_case_ids, extra_env=extra_env)
-        report = orchestrator.generate_report(results)
-
-        run["results"] = report["data"]
-        run["report_json"] = report["json"]
-        run["report_html"] = report["html"]
-
-        # Enrich with root-cause analysis
-        analysis = []
-        for r in results:
-            tc_analysis = {
-                "test_case_id": r.test_case_id,
-                "final_status": r.final_status,
-                "total_attempts": r.total_attempts,
-                "failures": [],
+        # Simple JSON report
+        report_data = {
+            "timestamp": timestamp,
+            "test_case_ids": test_case_ids,
+            "pytest_output": result.stdout,
+            "pytest_error": result.stderr if result.returncode != 0 else None,
+            "summary": {
+                "total": len(test_case_ids),
+                "passed": passed,
+                "failed": failed,
+                "exit_code": result.returncode
             }
-            for ex in r.execution_results:
-                if not ex.success:
-                    cat, detail = _classify_root_cause(
-                        ex.error_type, ex.error_message,
-                        ex.traceback, ex.stderr)
-                    tc_analysis["failures"].append({
-                        "attempt": ex.attempt,
-                        "category": cat,
-                        **detail,
-                    })
-            analysis.append(tc_analysis)
+        }
 
-        run["analysis"] = analysis
+        with open(report_json, 'w') as f:
+            json.dump(report_data, f, indent=2)
+
+        # Simple HTML report
+        html_content = f"""
+        <html>
+        <head><title>Test Report {timestamp}</title></head>
+        <body>
+        <h1>Test Report</h1>
+        <p>Generated: {timestamp}</p>
+        <h2>Summary</h2>
+        <p>Total: {report_data['summary']['total']}</p>
+        <p>Passed: {report_data['summary']['passed']}</p>
+        <p>Failed: {report_data['summary']['failed']}</p>
+        <h2>Pytest Output</h2>
+        <pre>{result.stdout}</pre>
+        """
+        if result.stderr:
+            html_content += f"<h2>Errors</h2><pre>{result.stderr}</pre>"
+        html_content += "</body></html>"
+
+        with open(report_html, 'w') as f:
+            f.write(html_content)
+
+        run["results"] = report_data
+        run["report_json"] = report_json
+        run["report_html"] = report_html
         run["status"] = "completed"
 
-        summary = report["data"]["summary"]
+        summary = report_data["summary"]
         push("completed", {
             "summary": summary,
-            "report_json": os.path.basename(report["json"]),
-            "report_html": os.path.basename(report["html"]),
-            "analysis": analysis,
+            "report_json": os.path.basename(report_json),
+            "report_html": os.path.basename(report_html),
         })
 
     except Exception as e:
@@ -679,6 +762,91 @@ def api_pipeline_runs():
             "test_case_ids": r["test_case_ids"],
         })
     return jsonify(sorted(out, key=lambda x: x["started"], reverse=True))
+
+
+# ===========================================================================
+#   API  - RAG Document Search
+# ===========================================================================
+@app.route("/api/rag/search", methods=["POST"])
+def api_rag_search():
+    """Search the knowledge base using RAG."""
+    if rag_system is None:
+        return jsonify({
+            "error": "RAG system not available",
+            "message": "RAG system failed to initialize or is disabled"
+        }), 503
+
+    try:
+        data = request.get_json()
+        query = data.get("query", "")
+        k = data.get("k", 5)
+
+        if not query:
+            return jsonify({"error": "Query parameter is required"}), 400
+
+        results = rag_system.search(query, k=k)
+
+        return jsonify({
+            "query": query,
+            "results": results,
+            "count": len(results)
+        })
+
+    except Exception as e:
+        return jsonify({
+            "error": "Search failed",
+            "message": str(e)
+        }), 500
+
+
+@app.route("/api/rag/stats")
+def api_rag_stats():
+    """Get RAG system statistics."""
+    if rag_system is None:
+        return jsonify({
+            "error": "RAG system not available",
+            "message": "RAG system failed to initialize or is disabled"
+        }), 503
+
+    try:
+        stats = rag_system.get_stats()
+        return jsonify(stats)
+    except Exception as e:
+        return jsonify({
+            "error": "Failed to get stats",
+            "message": str(e)
+        }), 500
+
+
+@app.route("/api/rag/context", methods=["POST"])
+def api_rag_context():
+    """Get RAG context for test generation."""
+    if rag_system is None:
+        return jsonify({
+            "error": "RAG system not available",
+            "message": "RAG system failed to initialize or is disabled"
+        }), 503
+
+    try:
+        data = request.get_json()
+        test_case = data.get("test_case", {})
+        k = data.get("k", 3)
+
+        if not test_case:
+            return jsonify({"error": "test_case parameter is required"}), 400
+
+        context = rag_system.get_context_for_test_generation(test_case, k=k)
+
+        return jsonify({
+            "context": context,
+            "test_case": test_case.get("pid", "unknown")
+        })
+
+    except Exception as e:
+        return jsonify({
+            "error": "Failed to get context",
+            "message": str(e)
+        }), 500
 
 
 # ===========================================================================
