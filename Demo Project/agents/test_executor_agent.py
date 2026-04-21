@@ -121,6 +121,17 @@ class TestExecutorAgent(BaseAgent):
         if extra_env:
             env.update(extra_env)
 
+        # Clear stale __pycache__ for this test file to avoid cached bytecode issues
+        cache_dir = os.path.join(os.path.dirname(os.path.abspath(file_path)), '__pycache__')
+        if os.path.isdir(cache_dir):
+            base = os.path.splitext(os.path.basename(file_path))[0]
+            for cached in os.listdir(cache_dir):
+                if cached.startswith(base + '.'):
+                    try:
+                        os.remove(os.path.join(cache_dir, cached))
+                    except Exception:
+                        pass
+
         # Execute
         start_time = time.time()
         try:
@@ -173,17 +184,19 @@ class TestExecutorAgent(BaseAgent):
         """Parse error details from pytest output."""
         output = result.stdout + "\n" + result.stderr
 
-        # Extract traceback
+        # Extract traceback — handles both standard Python format and pytest's
+        # import-error format ("Traceback:" without "most recent call last")
         tb_lines = []
         in_traceback = False
         for line in output.split('\n'):
-            if 'Traceback (most recent call last)' in line or 'FAILED' in line:
+            if ('Traceback (most recent call last)' in line
+                    or 'Traceback:' in line
+                    or 'FAILED' in line
+                    or 'ImportError while importing' in line
+                    or line.strip().startswith('ERROR')):
                 in_traceback = True
             if in_traceback:
                 tb_lines.append(line)
-            if in_traceback and (line.strip().startswith('E ') or
-                                  line.strip().startswith('>')):
-                pass  # continue collecting
 
         result.traceback = '\n'.join(tb_lines[-50:])  # Last 50 lines
 
@@ -207,6 +220,10 @@ class TestExecutorAgent(BaseAgent):
         if not result.error_type:
             result.error_type = "UnknownError"
             result.error_message = "Test failed - see logs for details"
+
+        # Ensure traceback captures the stdout error text so FixerAgent can act on it
+        if result.traceback and result.error_type and result.error_type not in result.traceback:
+            result.traceback = f"{result.error_type}: {result.error_message}\n" + result.traceback
 
     def _save_execution_log(self, result, log_file):
         """Append execution metadata to the log file."""

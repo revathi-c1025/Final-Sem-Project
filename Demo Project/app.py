@@ -571,113 +571,72 @@ def _run_pipeline(run_id, test_case_ids, extra_env, max_retries):
     try:
         push("started", {"test_case_ids": test_case_ids})
 
-        # Step 1: Regenerate all test files with standalone framework
-        push("phase", "Regenerating test files with standalone framework")
-        
-        # Use subprocess to run regenerate script in fresh environment
-        import subprocess
-        result = subprocess.run(
-            [sys.executable, "regenerate_tests.py"],
-            cwd=os.getcwd(),
-            capture_output=True,
-            text=True,
-            timeout=30
-        )
-        
-        if result.returncode != 0:
-            push("generate_fail", f"Failed to regenerate test files: {result.stderr}")
-            raise Exception(f"Test regeneration failed: {result.stderr}")
-        
-        push("generate_ok", "Successfully regenerated all test files with standalone framework")
+        # Create orchestrator (disable RAG for speed in pipeline runs)
+        orchestrator = OrchestratorAgent(enable_rag=False)
 
-        # Step 2: Run tests using pytest in fresh environment
-        push("phase", "Running tests with pytest")
-        
-        # Build pytest command
-        pytest_cmd = [sys.executable, "-m", "pytest", "generated_tests/"] + test_case_ids + ["-v", "--tb=short"]
-        
-        # Add environment variables if provided
-        env = os.environ.copy()
-        if extra_env:
-            env.update(extra_env)
-        
-        # Run pytest
-        result = subprocess.run(
-            pytest_cmd,
-            cwd=os.getcwd(),
-            capture_output=True,
-            text=True,
-            timeout=60,
-            env=env
-        )
-        
-        # Parse pytest output
-        output_lines = result.stdout.split('\n')
-        passed = 0
-        failed = 0
-        
-        for line in output_lines:
-            if 'PASSED' in line:
-                passed += 1
-            elif 'FAILED' in line:
-                failed += 1
-        
-        # Generate simple report
-        from datetime import datetime
-        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        report_json = f"reports/report_{timestamp}.json"
-        report_html = f"reports/report_{timestamp}.html"
+        # Forward orchestrator log events to SSE stream
+        def _flush_agent_events():
+            for ev in orchestrator.get_events():
+                push("agent_event", {
+                    "agent": ev.get("agent", "Orchestrator"),
+                    "event": ev.get("type", ""),
+                    "message": ev.get("message", ""),
+                })
 
-        os.makedirs("reports", exist_ok=True)
+        all_cycles = []
+        for tc_id in test_case_ids:
+            push("phase", f"Running test case: {tc_id}")
+            cycle = orchestrator.run_test_case(tc_id, extra_env=extra_env)
+            all_cycles.append(cycle)
+            _flush_agent_events()
+            push("tc_complete", {
+                "test_case_id": tc_id,
+                "status": cycle.final_status,
+                "attempts": cycle.total_attempts,
+            })
 
-        # Simple JSON report
-        report_data = {
-            "timestamp": timestamp,
-            "test_case_ids": test_case_ids,
-            "pytest_output": result.stdout,
-            "pytest_error": result.stderr if result.returncode != 0 else None,
-            "summary": {
-                "total": len(test_case_ids),
-                "passed": passed,
-                "failed": failed,
-                "exit_code": result.returncode
-            }
-        }
+        # Generate report via orchestrator (produces proper JSON + HTML)
+        report = orchestrator.generate_report(all_cycles)
+        report_data = report["data"]
 
-        with open(report_json, 'w') as f:
-            json.dump(report_data, f, indent=2)
-
-        # Simple HTML report
-        html_content = f"""
-        <html>
-        <head><title>Test Report {timestamp}</title></head>
-        <body>
-        <h1>Test Report</h1>
-        <p>Generated: {timestamp}</p>
-        <h2>Summary</h2>
-        <p>Total: {report_data['summary']['total']}</p>
-        <p>Passed: {report_data['summary']['passed']}</p>
-        <p>Failed: {report_data['summary']['failed']}</p>
-        <h2>Pytest Output</h2>
-        <pre>{result.stdout}</pre>
-        """
-        if result.stderr:
-            html_content += f"<h2>Errors</h2><pre>{result.stderr}</pre>"
-        html_content += "</body></html>"
-
-        with open(report_html, 'w') as f:
-            f.write(html_content)
+        # Build per-test-case failure analysis for the UI wizard
+        analysis = []
+        for cycle in all_cycles:
+            failures = []
+            for exec_result in cycle.execution_results:
+                if exec_result.status != "passed":
+                    cat, detail = _classify_root_cause(
+                        exec_result.error_type,
+                        exec_result.error_message,
+                        exec_result.traceback,
+                        exec_result.stderr,
+                    )
+                    failures.append({
+                        "attempt": exec_result.attempt,
+                        "category": cat,
+                        "sub_type": detail.get("sub_type", ""),
+                        "detail": detail.get("detail", ""),
+                        "auto_fixable": detail.get("auto_fixable", False),
+                        "expected": detail.get("expected", ""),
+                        "actual": detail.get("actual", ""),
+                    })
+            analysis.append({
+                "test_case_id": cycle.test_case_id,
+                "final_status": cycle.final_status,
+                "total_attempts": cycle.total_attempts,
+                "failures": failures,
+            })
 
         run["results"] = report_data
-        run["report_json"] = report_json
-        run["report_html"] = report_html
+        run["report_json"] = os.path.basename(report["json"])
+        run["report_html"] = os.path.basename(report["html"])
         run["status"] = "completed"
 
-        summary = report_data["summary"]
         push("completed", {
-            "summary": summary,
-            "report_json": os.path.basename(report_json),
-            "report_html": os.path.basename(report_html),
+            "summary": report_data.get("summary", {}),
+            "analysis": analysis,
+            "report_json": os.path.basename(report["json"]),
+            "report_html": os.path.basename(report["html"]),
         })
 
     except Exception as e:

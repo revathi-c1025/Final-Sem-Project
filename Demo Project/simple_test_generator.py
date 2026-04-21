@@ -9,6 +9,8 @@ import logging
 from datetime import datetime
 from string import Template
 
+from config import GENERATED_TESTS_DIR
+
 LOGGER = logging.getLogger(__name__)
 
 
@@ -152,9 +154,9 @@ $run_test_body
         )
 
         # Write to file
-        os.makedirs("generated_tests", exist_ok=True)
+        os.makedirs(GENERATED_TESTS_DIR, exist_ok=True)
         filename = f"test_{safe_pid}.py"
-        file_path = os.path.join("generated_tests", filename)
+        file_path = os.path.join(GENERATED_TESTS_DIR, filename)
 
         with open(file_path, "w", encoding="utf-8") as f:
             f.write(code)
