@@ -150,6 +150,25 @@ git push
 
 When your PR is approved, merge it into `main` using GitHub or the command line.
 
+### Git Operations via Web UI
+
+The web interface now includes a **Git Operations** page that provides easy access to common Git commands:
+
+- **Git Status**: View current repository status (modified, staged, untracked files)
+- **Git Add**: Stage all changes for commit
+- **Git Pull**: Pull latest changes from a specified branch
+- **Git Commit**: Commit staged changes with a custom message
+- **Git Push**: Push committed changes to a specified branch
+
+**Usage:**
+1. Navigate to the "Git Operations" page in the sidebar
+2. Enter the branch name you want to work with
+3. Enter a commit message if committing changes
+4. Use the buttons to perform Git operations
+5. View the output in the results area below
+
+**Note:** Git operations require proper authentication for remote repositories. For local development, ensure your Git user identity is configured.
+
 ### Running Tests
 
 1. **Fetch Test Cases**: Click "Fetch Test Cases" to load available test cases
