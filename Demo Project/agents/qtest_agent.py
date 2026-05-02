@@ -27,7 +27,32 @@ class QTestAgent(BaseAgent):
         if not os.path.isfile(json_path):
             return []
         with open(json_path, encoding="utf-8") as f:
-            return json.load(f)
+            loaded = json.load(f)
+        return self._ensure_minimum_testcases(loaded, minimum=50)
+
+    def _ensure_minimum_testcases(self, testcases, minimum=50):
+        """Expand demo data deterministically so scalability screens have enough TCs."""
+        if len(testcases) >= minimum or not testcases:
+            return testcases
+
+        expanded = list(testcases)
+        source_count = len(testcases)
+        while len(expanded) < minimum:
+            idx = len(expanded)
+            source = testcases[idx % source_count]
+            clone = json.loads(json.dumps(source))
+            clone["id"] = 90001 + idx
+            clone["pid"] = f"TC-{idx + 1:03d}"
+            clone["name"] = f"{source.get('name', 'Demo Test Case')} - Scale Variant {idx + 1:02d}"
+            clone["description"] = (
+                f"Scalable demo variant generated from {source.get('pid')}. "
+                f"{source.get('description', '')}"
+            )
+            props = clone.setdefault("properties", {})
+            props["Scale Variant"] = "true"
+            props["Source Test Case"] = source.get("pid", "")
+            expanded.append(clone)
+        return expanded
 
     def fetch_test_case(self, test_case_id):
         """

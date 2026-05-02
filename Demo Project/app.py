@@ -31,7 +31,7 @@ import time
 import uuid
 from datetime import datetime
 
-from flask import Flask, render_template, jsonify, request, Response
+from flask import Flask, render_template, jsonify, request, Response, send_file
 
 # ---- project imports -------------------------------------------------------
 from config import (
@@ -42,6 +42,11 @@ from config import (
     OUTPUT_DIR, LOGS_DIR, GENERATED_TESTS_DIR, REPORTS_DIR, BASE_DIR,
 )
 from agents.orchestrator_agent import OrchestratorAgent
+from backend.pipeline.service import TestGenerationService
+from backend.pipeline.research_extensions import (
+    build_research_extension_report,
+    persist_feedback_snapshot,
+)
 
 # RAG System
 rag_system = None
@@ -74,6 +79,7 @@ logging.basicConfig(
     handlers=[logging.StreamHandler(sys.stdout)],
 )
 logger = logging.getLogger("webapp")
+nl_test_service = TestGenerationService()
 
 
 # ===========================================================================
@@ -230,22 +236,22 @@ _CONFIG_SCHEMA = [
     # Test Case Source
     {"key": "TESTCASE_SOURCE",     "group": "Test Case Source", "label": "Source (local/qtest)",  "type": "text",     "editable": True},
     {"key": "TESTCASE_JSON_PATH",  "group": "Test Case Source", "label": "JSON File Path",        "type": "text",     "editable": True},
-    {"key": "QTEST_BASE_URL",     "group": "Test Case Source", "label": "qTest Base URL",        "type": "text",     "editable": True},
-    {"key": "QTEST_API_TOKEN",    "group": "Test Case Source", "label": "qTest API Token",       "type": "password", "editable": True},
-    {"key": "PROJECT_ID",         "group": "Test Case Source", "label": "Project ID",            "type": "number",   "editable": True},
-    {"key": "API_VERSION",        "group": "Test Case Source", "label": "API Version",           "type": "text",     "editable": True},
+    {"key": "QTEST_BASE_URL",     "group": "Test Case Source", "label": "qTest Base URL",        "type": "text",     "editable": True, "help": "Base URL for qTest API when using qTest as the source."},
+    {"key": "QTEST_API_TOKEN",    "group": "Test Case Source", "label": "qTest API Token",       "type": "password", "editable": True, "help": "Personal access token for qTest API access."},
+    {"key": "PROJECT_ID",         "group": "Test Case Source", "label": "Project ID",            "type": "number",   "editable": True, "help": "qTest project identifier used to fetch test cases."},
+    {"key": "API_VERSION",        "group": "Test Case Source", "label": "API Version",           "type": "text",     "editable": True, "help": "API version string for the qTest endpoint."},
     # ShopEasy API
-    {"key": "SHOPEASE_API_URL",    "group": "ShopEasy API",  "label": "API URL",             "type": "text",     "editable": True},
-    {"key": "SHOPEASE_API_KEY",    "group": "ShopEasy API",  "label": "API Key",             "type": "password", "editable": True},
-    {"key": "SHOPEASE_ADMIN_USER", "group": "ShopEasy API",  "label": "Admin Username",      "type": "text",     "editable": True},
-    {"key": "SHOPEASE_ADMIN_PASS", "group": "ShopEasy API",  "label": "Admin Password",      "type": "password", "editable": True},
+    {"key": "SHOPEASE_API_URL",    "group": "ShopEasy API",  "label": "API URL",             "type": "text",     "editable": True, "help": "The base URL for the ShopEasy target API used during execution."},
+    {"key": "SHOPEASE_API_KEY",    "group": "ShopEasy API",  "label": "API Key",             "type": "password", "editable": True, "help": "API key for authenticating against ShopEasy."},
+    {"key": "SHOPEASE_ADMIN_USER", "group": "ShopEasy API",  "label": "Admin Username",      "type": "text",     "editable": True, "help": "Admin username used for end-to-end ShopEasy actions."},
+    {"key": "SHOPEASE_ADMIN_PASS", "group": "ShopEasy API",  "label": "Admin Password",      "type": "password", "editable": True, "help": "Admin password used alongside the admin user."},
     # LLM
-    {"key": "LLM_PROVIDER",    "group": "LLM / AI",  "label": "Provider (openai / azure)", "type": "text",     "editable": True},
-    {"key": "LLM_API_KEY",     "group": "LLM / AI",  "label": "API Key",                   "type": "password", "editable": True},
-    {"key": "LLM_MODEL",       "group": "LLM / AI",  "label": "Model",                     "type": "text",     "editable": True},
-    {"key": "LLM_BASE_URL",    "group": "LLM / AI",  "label": "Base URL (Azure / local)",  "type": "text",     "editable": True},
-    {"key": "LLM_TEMPERATURE", "group": "LLM / AI",  "label": "Temperature",               "type": "number",   "editable": True},
-    {"key": "LLM_MAX_TOKENS",  "group": "LLM / AI",  "label": "Max Tokens",                "type": "number",   "editable": True},
+    {"key": "LLM_PROVIDER",    "group": "LLM / AI",  "label": "Provider (openai / azure)", "type": "text",     "editable": True, "help": "Choose the LLM provider for AI-powered test generation."},
+    {"key": "LLM_API_KEY",     "group": "LLM / AI",  "label": "API Key",                   "type": "password", "editable": True, "help": "Your LLM service API key. Leave empty to use demo template generation."},
+    {"key": "LLM_MODEL",       "group": "LLM / AI",  "label": "Model",                     "type": "text",     "editable": True, "help": "Model name used for inference, e.g. gpt-4."},
+    {"key": "LLM_BASE_URL",    "group": "LLM / AI",  "label": "Base URL (Azure / local)",  "type": "text",     "editable": True, "help": "Optional base URL for Azure or local LLM endpoints."},
+    {"key": "LLM_TEMPERATURE", "group": "LLM / AI",  "label": "Temperature",               "type": "number",   "editable": True, "help": "Adjust randomness for AI generation. Lower values are more deterministic."},
+    {"key": "LLM_MAX_TOKENS",  "group": "LLM / AI",  "label": "Max Tokens",                "type": "number",   "editable": True, "help": "Maximum token budget for the LLM response."},
     # Execution
     {"key": "MAX_RETRIES",          "group": "Execution",  "label": "Max Retries",           "type": "number", "editable": True},
     {"key": "RETRY_DELAY_SECONDS",  "group": "Execution",  "label": "Retry Delay (sec)",     "type": "number", "editable": True},
@@ -256,10 +262,10 @@ _CONFIG_SCHEMA = [
     {"key": "GITHUB_TOKEN",             "group": "Reference Repository",  "label": "GitHub Token (PAT)",    "type": "password", "editable": True},
     {"key": "GITHUB_BRANCH",            "group": "Reference Repository",  "label": "Branch",                "type": "text",     "editable": True},
     # Paths
-    {"key": "OUTPUT_DIR",          "group": "Paths",  "label": "Output Dir",          "type": "text", "editable": True},
-    {"key": "LOGS_DIR",            "group": "Paths",  "label": "Logs Dir",            "type": "text", "editable": True},
-    {"key": "GENERATED_TESTS_DIR", "group": "Paths",  "label": "Generated Tests Dir", "type": "text", "editable": True},
-    {"key": "REPORTS_DIR",         "group": "Paths",  "label": "Reports Dir",         "type": "text", "editable": True},
+    {"key": "OUTPUT_DIR",          "group": "Paths",  "label": "Output Dir",          "type": "text", "editable": True, "help": "Directory where temporary pipeline outputs are written."},
+    {"key": "LOGS_DIR",            "group": "Paths",  "label": "Logs Dir",            "type": "text", "editable": True, "help": "Directory used to store execution log files."},
+    {"key": "GENERATED_TESTS_DIR", "group": "Paths",  "label": "Generated Tests Dir", "type": "text", "editable": True, "help": "Directory where generated pytest scripts are saved."},
+    {"key": "REPORTS_DIR",         "group": "Paths",  "label": "Reports Dir",         "type": "text", "editable": True, "help": "Directory where execution reports are stored."},
 ]
 
 
@@ -426,6 +432,15 @@ def api_generated_test_detail(filename):
         return jsonify({"filename": filename, "code": f.read()})
 
 
+@app.route("/api/download/generated/<filename>")
+def api_download_generated(filename):
+    path = os.path.abspath(os.path.join(GENERATED_TESTS_DIR, filename))
+    root = os.path.abspath(GENERATED_TESTS_DIR)
+    if not path.startswith(root) or not os.path.isfile(path):
+        return jsonify({"error": "Not found"}), 404
+    return send_file(path, as_attachment=True, download_name=os.path.basename(path))
+
+
 # ===========================================================================
 #   API  - Logs
 # ===========================================================================
@@ -442,14 +457,59 @@ def api_logs_list():
 
 @app.route("/api/logs/<filename>")
 def api_log_detail(filename):
-    """Return a log file's content (last 500 lines)."""
+    """Return a log file's full content."""
     path = os.path.join(LOGS_DIR, filename)
     if not os.path.isfile(path):
         return jsonify({"error": "Not found"}), 404
     with open(path, encoding="utf-8", errors="replace") as f:
-        lines = f.readlines()
-    tail = lines[-500:] if len(lines) > 500 else lines
-    return jsonify({"filename": filename, "content": "".join(tail)})
+        content = f.read()
+    return jsonify({"filename": filename, "content": content})
+
+
+@app.route("/api/download/logs/<filename>")
+def api_download_log(filename):
+    path = os.path.abspath(os.path.join(LOGS_DIR, filename))
+    root = os.path.abspath(LOGS_DIR)
+    if not path.startswith(root) or not os.path.isfile(path):
+        return jsonify({"error": "Not found"}), 404
+    return send_file(path, as_attachment=True, download_name=os.path.basename(path))
+
+
+@app.route("/api/download/reports/<filename>")
+def api_download_report(filename):
+    path = os.path.abspath(os.path.join(REPORTS_DIR, filename))
+    root = os.path.abspath(REPORTS_DIR)
+    if not path.startswith(root) or not os.path.isfile(path):
+        return jsonify({"error": "Not found"}), 404
+    return send_file(path, as_attachment=True, download_name=os.path.basename(path))
+
+
+@app.route("/api/logs/<filename>", methods=["DELETE"])
+def api_delete_log(filename):
+    """Delete a log file."""
+    path = os.path.abspath(os.path.join(LOGS_DIR, filename))
+    root = os.path.abspath(LOGS_DIR)
+    if not path.startswith(root) or not os.path.isfile(path):
+        return jsonify({"error": "Not found"}), 404
+    try:
+        os.remove(path)
+        return jsonify({"ok": True})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+@app.route("/api/generated-tests/<filename>", methods=["DELETE"])
+def api_delete_generated_test(filename):
+    """Delete a generated test file."""
+    path = os.path.abspath(os.path.join(GENERATED_TESTS_DIR, filename))
+    root = os.path.abspath(GENERATED_TESTS_DIR)
+    if not path.startswith(root) or not os.path.isfile(path):
+        return jsonify({"error": "Not found"}), 404
+    try:
+        os.remove(path)
+        return jsonify({"ok": True})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 
 @app.route("/api/reload", methods=["POST"])
@@ -543,7 +603,7 @@ def api_pipeline_generate():
         return jsonify({
             "test_case_id": tc_id,
             "test_case_data": tc,
-            "generated_file": result["filename"],
+            "generated_file": os.path.basename(result["file_path"]),
             "generated_file_path": result["file_path"],
             "generation_method": "template",
             "code_preview": code[:3000],
@@ -556,23 +616,98 @@ def api_pipeline_generate():
         return jsonify({"error": str(e)}), 500
 
 
+@app.route("/generate-test", methods=["POST"])
+@app.route("/api/pipeline/generate-from-steps", methods=["POST"])
+def api_generate_test_from_steps():
+    """Generate, validate, execute, and return pytest code from natural-language steps."""
+    data = request.get_json(force=True)
+    steps = data.get("steps", [])
+    if isinstance(steps, str):
+        steps = [s.strip() for s in steps.splitlines() if s.strip()]
+    steps = [str(step).strip() for step in steps if str(step).strip()]
+
+    if not steps:
+        return jsonify({
+            "generated_code": "",
+            "status": "failure",
+            "logs": "",
+            "errors": "At least one test step is required.",
+        }), 400
+
+    try:
+        result = nl_test_service.generate_and_execute(steps)
+        return jsonify(result.model_dump())
+    except Exception as e:
+        logger.exception("Natural-language test generation failed")
+        return jsonify({
+            "generated_code": "",
+            "status": "failure",
+            "logs": "",
+            "errors": str(e),
+        }), 500
+
+
 # ===========================================================================
 #   API  - Full pipeline execution (with live SSE)
 # ===========================================================================
-def _run_pipeline(run_id, test_case_ids, extra_env, max_retries):
+def _test_file_for_tc_id(tc_id):
+    safe_id = re.sub(r"[^A-Za-z0-9_-]", "_", tc_id.strip())
+    return os.path.join(GENERATED_TESTS_DIR, f"test_{safe_id.replace('-', '_')}.py")
+
+
+def _parse_pytest_counts(stdout, stderr=""):
+    """Return pytest pass/fail/error/skip counts from terminal output."""
+    combined = f"{stdout}\n{stderr}"
+    counts = {"passed": 0, "failed": 0, "errors": 0, "skipped": 0}
+    for line in reversed(combined.splitlines()):
+        text = line.strip().lower()
+        if not text or " in " not in text:
+            continue
+        for key in counts:
+            match = re.search(rf"(\d+)\s+{key[:-1] if key == 'errors' else key}", text)
+            if match:
+                counts[key] = int(match.group(1))
+        if any(counts.values()):
+            break
+    return counts
+
+
+def _fetch_test_case_name_and_steps(tc_id):
+    try:
+        from agents.qtest_agent import QTestAgent
+        tc = QTestAgent().fetch_test_case(tc_id)
+        return tc.get("name", ""), tc.get("step_count") or len(tc.get("steps", []))
+    except Exception:
+        return "", 0
+
+
+def _run_pipeline(run_id, test_case_ids, extra_env, max_retries, min_duration_seconds=0):
     """Background worker that runs the full pipeline and pushes events."""
+    from datetime import datetime
     run = _runs[run_id]
     eq = run["events"]
 
     def push(event_type, data=None):
-        eq.put(json.dumps({"type": event_type, "ts": datetime.now().isoformat(),
-                           **(data or {})}))
+        if isinstance(data, dict):
+            eq.put(json.dumps({"type": event_type, "ts": datetime.now().isoformat(),
+                               **data}))
+        else:
+            eq.put(json.dumps({"type": event_type, "ts": datetime.now().isoformat(),
+                               "message": data}))
 
     try:
-        push("started", {"test_case_ids": test_case_ids})
+        started_at = time.time()
+        push("started", {
+            "agent": "OrchestratorAgent",
+            "message": f"Started pipeline for {', '.join(test_case_ids)}",
+            "test_case_ids": test_case_ids,
+        })
 
         # Step 1: Regenerate all test files with standalone framework
-        push("phase", "Regenerating test files with standalone framework")
+        push("phase", {
+            "agent": "GeneratorAgent",
+            "message": "Regenerating test files with standalone framework",
+        })
         
         # Use subprocess to run regenerate script in fresh environment
         import subprocess
@@ -585,43 +720,195 @@ def _run_pipeline(run_id, test_case_ids, extra_env, max_retries):
         )
         
         if result.returncode != 0:
-            push("generate_fail", f"Failed to regenerate test files: {result.stderr}")
+            push("generate_fail", {
+                "agent": "GeneratorAgent",
+                "message": f"Failed to regenerate test files: {result.stderr}",
+            })
             raise Exception(f"Test regeneration failed: {result.stderr}")
         
-        push("generate_ok", "Successfully regenerated all test files with standalone framework")
+        push("generate_ok", {
+            "agent": "GeneratorAgent",
+            "message": "Successfully regenerated test files",
+        })
 
-        # Step 2: Run tests using pytest in fresh environment
-        push("phase", "Running tests with pytest")
-        
-        # Build pytest command
-        pytest_cmd = [sys.executable, "-m", "pytest", "generated_tests/"] + test_case_ids + ["-v", "--tb=short"]
-        
-        # Add environment variables if provided
+        # Step 2: Run only the selected generated test files.
+        push("phase", {
+            "agent": "ExecutorAgent",
+            "message": "Running selected tests with pytest",
+        })
+
         env = os.environ.copy()
         if extra_env:
             env.update(extra_env)
-        
-        # Run pytest
-        result = subprocess.run(
-            pytest_cmd,
-            cwd=os.getcwd(),
-            capture_output=True,
-            text=True,
-            timeout=60,
-            env=env
-        )
-        
-        # Parse pytest output
-        output_lines = result.stdout.split('\n')
-        passed = 0
-        failed = 0
-        
-        for line in output_lines:
-            if 'PASSED' in line:
-                passed += 1
-            elif 'FAILED' in line:
-                failed += 1
-        
+        if min_duration_seconds:
+            env["DEMO_MIN_TEST_SECONDS"] = str(int(min_duration_seconds))
+
+        test_cases = []
+        analysis = []
+        agent_events = {
+            "OrchestratorAgent": [],
+            "GeneratorAgent": [],
+            "ExecutorAgent": [],
+            "FixerAgent": [],
+        }
+        all_stdout = []
+        all_stderr = []
+
+        def add_agent_event(agent, message):
+            agent_events.setdefault(agent, []).append({
+                "timestamp": datetime.now().isoformat(),
+                "agent": agent,
+                "message": message,
+            })
+
+        add_agent_event("OrchestratorAgent", f"Started pipeline for {', '.join(test_case_ids)}")
+        add_agent_event("GeneratorAgent", "Generated standalone pytest files")
+
+        max_attempts = max(1, int(max_retries or 1))
+        os.makedirs(LOGS_DIR, exist_ok=True)
+        for tc_id in test_case_ids:
+            test_file = _test_file_for_tc_id(tc_id)
+            tc_name, step_count = _fetch_test_case_name_and_steps(tc_id)
+            tc_start = time.time()
+            execution_results = []
+            final_status = "failed"
+
+            if not os.path.isfile(test_file):
+                message = f"Generated test file not found for {tc_id}: {test_file}"
+                push("error", {"agent": "ExecutorAgent", "message": message})
+                execution_results.append({
+                    "attempt": 1,
+                    "status": "failed",
+                    "exit_code": 1,
+                    "stdout": "",
+                    "stderr_tail": message,
+                    "error_type": "missing_test_file",
+                    "error_message": message,
+                    "traceback": "",
+                })
+            else:
+                for attempt in range(1, max_attempts + 1):
+                    push("phase", {
+                        "agent": "ExecutorAgent",
+                        "message": f"Running {tc_id} attempt {attempt}/{max_attempts}",
+                    })
+                    add_agent_event("ExecutorAgent", f"Running {tc_id} attempt {attempt}/{max_attempts}")
+
+                    pytest_cmd = [
+                        sys.executable, "-m", "pytest", test_file,
+                        "-v", "--tb=short", "--disable-warnings",
+                        "-o", "log_cli=true", "--log-cli-level=INFO",
+                    ]
+                    result = subprocess.run(
+                        pytest_cmd,
+                        cwd=os.getcwd(),
+                        capture_output=True,
+                        text=True,
+                        timeout=TEST_TIMEOUT_SECONDS,
+                        env=env,
+                    )
+                    counts = _parse_pytest_counts(result.stdout, result.stderr)
+                    status = "passed" if result.returncode == 0 else "failed"
+                    log_filename = f"{tc_id}_run_{run_id}_attempt{attempt}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.log"
+                    log_path = os.path.join(LOGS_DIR, log_filename)
+                    log_content = "\n".join([
+                        "=" * 90,
+                        f"Run ID: {run_id}",
+                        f"Test Case: {tc_id}",
+                        f"Attempt: {attempt}/{max_attempts}",
+                        f"Status: {status}",
+                        f"Command: {' '.join(pytest_cmd)}",
+                        f"Active Test Runtime Target: {env.get('DEMO_MIN_TEST_SECONDS', '0')}s",
+                        f"Started: {datetime.now().isoformat()}",
+                        "=" * 90,
+                        "PYTEST STDOUT",
+                        result.stdout or "(empty)",
+                        "PYTEST STDERR",
+                        result.stderr or "(empty)",
+                        "PARSED COUNTS",
+                        json.dumps(counts, indent=2),
+                    ])
+                    with open(log_path, "w", encoding="utf-8") as f:
+                        f.write(log_content)
+                    all_stdout.append(f"$ {' '.join(pytest_cmd)}\n{result.stdout}")
+                    if result.stderr:
+                        all_stderr.append(result.stderr)
+
+                    execution_results.append({
+                        "attempt": attempt,
+                        "status": status,
+                        "exit_code": result.returncode,
+                        "passed": counts["passed"],
+                        "failed": counts["failed"],
+                        "errors": counts["errors"],
+                        "skipped": counts["skipped"],
+                        "stdout": result.stdout,
+                        "stderr_tail": result.stderr[-2000:],
+                        "log_file": log_filename,
+                        "log_path": log_path,
+                        "error_type": "assertion_error" if counts["failed"] else ("pytest_error" if result.returncode else ""),
+                        "error_message": (result.stderr or result.stdout)[-1000:] if result.returncode else "",
+                        "traceback": (result.stdout + "\n" + result.stderr)[-4000:] if result.returncode else "",
+                    })
+
+                    if status == "passed":
+                        final_status = "passed"
+                        push("test_passed", {
+                            "agent": "ExecutorAgent",
+                            "message": f"{tc_id} passed on attempt {attempt}",
+                        })
+                        break
+
+                    push("test_failed", {
+                        "agent": "ExecutorAgent",
+                        "message": f"{tc_id} failed on attempt {attempt}",
+                    })
+                    if attempt < max_attempts:
+                        add_agent_event("FixerAgent", f"Retrying {tc_id} after failed attempt {attempt}")
+                        push("phase", {
+                            "agent": "FixerAgent",
+                            "message": f"Retrying {tc_id}; no script regeneration needed for standalone tests",
+                        })
+
+            failures = []
+            for ex in execution_results:
+                if ex["status"] == "passed":
+                    continue
+                cat, detail = _classify_root_cause(
+                    ex.get("error_type", ""),
+                    ex.get("error_message", ""),
+                    ex.get("traceback", ""),
+                    ex.get("stderr_tail", ""),
+                )
+                failures.append({"attempt": ex["attempt"], "category": cat, **detail})
+
+            duration = round(time.time() - tc_start, 2)
+            test_case_result = {
+                "test_case_id": tc_id,
+                "test_case_name": tc_name,
+                "final_status": final_status,
+                "total_attempts": len(execution_results),
+                "step_count": step_count,
+                "duration_seconds": duration,
+                "execution_results": execution_results,
+                "log_files": [ex.get("log_file") for ex in execution_results if ex.get("log_file")],
+                "failures": failures,
+            }
+            test_cases.append(test_case_result)
+            analysis.append({
+                "test_case_id": tc_id,
+                "final_status": final_status,
+                "total_attempts": len(execution_results),
+                "failures": failures,
+            })
+
+        passed = sum(1 for tc in test_cases if tc["final_status"] == "passed")
+        failed = len(test_cases) - passed
+        total_attempts = sum(tc["total_attempts"] for tc in test_cases)
+        total_duration = round(time.time() - started_at, 2)
+        extension_report = build_research_extension_report(test_cases)
+        persist_feedback_snapshot(extension_report)
+
         # Generate simple report
         from datetime import datetime
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -634,14 +921,19 @@ def _run_pipeline(run_id, test_case_ids, extra_env, max_retries):
         report_data = {
             "timestamp": timestamp,
             "test_case_ids": test_case_ids,
-            "pytest_output": result.stdout,
-            "pytest_error": result.stderr if result.returncode != 0 else None,
+            "pytest_output": "\n\n".join(all_stdout),
+            "pytest_error": "\n\n".join(all_stderr) or None,
             "summary": {
-                "total": len(test_case_ids),
+                "total_test_cases": len(test_cases),
                 "passed": passed,
                 "failed": failed,
-                "exit_code": result.returncode
-            }
+                "total_attempts": total_attempts,
+                "total_duration_s": total_duration,
+                "exit_code": 0 if failed == 0 else 1,
+            },
+            "test_cases": test_cases,
+            "agent_events": agent_events,
+            "research_extensions": extension_report,
         }
 
         with open(report_json, 'w') as f:
@@ -655,14 +947,16 @@ def _run_pipeline(run_id, test_case_ids, extra_env, max_retries):
         <h1>Test Report</h1>
         <p>Generated: {timestamp}</p>
         <h2>Summary</h2>
-        <p>Total: {report_data['summary']['total']}</p>
+        <p>Total: {report_data['summary']['total_test_cases']}</p>
         <p>Passed: {report_data['summary']['passed']}</p>
         <p>Failed: {report_data['summary']['failed']}</p>
+        <p>Total Attempts: {report_data['summary']['total_attempts']}</p>
+        <p>Duration: {report_data['summary']['total_duration_s']}s</p>
         <h2>Pytest Output</h2>
-        <pre>{result.stdout}</pre>
+        <pre>{report_data['pytest_output']}</pre>
         """
-        if result.stderr:
-            html_content += f"<h2>Errors</h2><pre>{result.stderr}</pre>"
+        if report_data["pytest_error"]:
+            html_content += f"<h2>Errors</h2><pre>{report_data['pytest_error']}</pre>"
         html_content += "</body></html>"
 
         with open(report_html, 'w') as f:
@@ -675,7 +969,10 @@ def _run_pipeline(run_id, test_case_ids, extra_env, max_retries):
 
         summary = report_data["summary"]
         push("completed", {
+            "agent": "OrchestratorAgent",
+            "message": "Pipeline completed",
             "summary": summary,
+            "analysis": analysis,
             "report_json": os.path.basename(report_json),
             "report_html": os.path.basename(report_html),
         })
@@ -707,6 +1004,11 @@ def api_pipeline_run():
     extra_env = {k: v for k, v in user_inputs.items() if v}
 
     max_retries = data.get("max_retries", MAX_RETRIES)
+    min_duration_seconds = data.get("min_duration_seconds", 0)
+    try:
+        min_duration_seconds = max(0, int(min_duration_seconds))
+    except (TypeError, ValueError):
+        min_duration_seconds = 0
 
     run_id = str(uuid.uuid4())[:8]
     with _run_lock:
@@ -721,7 +1023,7 @@ def api_pipeline_run():
         }
 
     t = threading.Thread(target=_run_pipeline, daemon=True,
-                         args=(run_id, tc_ids, extra_env, max_retries))
+                         args=(run_id, tc_ids, extra_env, max_retries, min_duration_seconds))
     t.start()
 
     return jsonify({"run_id": run_id, "status": "running"})
@@ -847,6 +1149,124 @@ def api_rag_context():
             "error": "Failed to get context",
             "message": str(e)
         }), 500
+
+
+# ===========================================================================
+#   API  - Git Operations
+# ===========================================================================
+import subprocess
+
+# Git repository root (one level up from BASE_DIR)
+GIT_REPO_DIR = os.path.dirname(BASE_DIR)
+
+@app.route("/api/git/status")
+def api_git_status():
+    """Get git status."""
+    try:
+        result = subprocess.run(
+            ["git", "status", "--porcelain"],
+            cwd=GIT_REPO_DIR,
+            capture_output=True,
+            text=True,
+            timeout=30
+        )
+        return jsonify({"output": result.stdout or "No changes"})
+    except subprocess.TimeoutExpired:
+        return jsonify({"error": "Git status timed out"}), 500
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+@app.route("/api/git/add", methods=["POST"])
+def api_git_add():
+    """Stage all changes."""
+    try:
+        result = subprocess.run(
+            ["git", "add", "."],
+            cwd=GIT_REPO_DIR,
+            capture_output=True,
+            text=True,
+            timeout=30
+        )
+        if result.returncode != 0:
+            return jsonify({"error": result.stderr}), 500
+        return jsonify({"output": "All changes staged"})
+    except subprocess.TimeoutExpired:
+        return jsonify({"error": "Git add timed out"}), 500
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+@app.route("/api/git/pull", methods=["POST"])
+def api_git_pull():
+    """Pull from remote branch."""
+    try:
+        data = request.get_json()
+        branch = data.get("branch", "main")
+        
+        result = subprocess.run(
+            ["git", "pull", "origin", branch],
+            cwd=GIT_REPO_DIR,
+            capture_output=True,
+            text=True,
+            timeout=60
+        )
+        if result.returncode != 0:
+            return jsonify({"error": result.stderr}), 500
+        return jsonify({"output": result.stdout or "Pull successful"})
+    except subprocess.TimeoutExpired:
+        return jsonify({"error": "Git pull timed out"}), 500
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+@app.route("/api/git/commit", methods=["POST"])
+def api_git_commit():
+    """Commit staged changes."""
+    try:
+        data = request.get_json()
+        message = data.get("message", "")
+        
+        if not message:
+            return jsonify({"error": "Commit message is required"}), 400
+        
+        result = subprocess.run(
+            ["git", "commit", "-m", message],
+            cwd=GIT_REPO_DIR,
+            capture_output=True,
+            text=True,
+            timeout=30
+        )
+        if result.returncode != 0:
+            return jsonify({"error": result.stderr}), 500
+        return jsonify({"output": result.stdout or "Commit successful"})
+    except subprocess.TimeoutExpired:
+        return jsonify({"error": "Git commit timed out"}), 500
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+@app.route("/api/git/push", methods=["POST"])
+def api_git_push():
+    """Push to remote branch."""
+    try:
+        data = request.get_json()
+        branch = data.get("branch", "main")
+        
+        result = subprocess.run(
+            ["git", "push", "origin", branch],
+            cwd=GIT_REPO_DIR,
+            capture_output=True,
+            text=True,
+            timeout=60
+        )
+        if result.returncode != 0:
+            return jsonify({"error": result.stderr}), 500
+        return jsonify({"output": result.stdout or "Push successful"})
+    except subprocess.TimeoutExpired:
+        return jsonify({"error": "Git push timed out"}), 500
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 
 # ===========================================================================

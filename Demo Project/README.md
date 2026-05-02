@@ -118,6 +118,38 @@ The system runs in demo mode by default, which:
 - Simulates the ShopEasy API for demonstration
 - Works entirely offline
 
+## Git Workflow
+
+To make changes safely, create a child branch from `main`, work there, and push your changes back to the remote repository.
+
+```bash
+# 1. Ensure you are on the main branch and up to date
+git checkout main
+git pull origin main
+
+# 2. Create a new child branch for your work
+git checkout -b feature/your-feature-name
+
+# 3. Make your code changes and commit them
+git add .
+git commit -m "Add requested UI enhancements and Git workflow docs"
+
+# 4. Push the new branch to the remote repository
+git push -u origin feature/your-feature-name
+
+# 5. Open a pull request on GitHub from the child branch into main
+```
+
+If you need to update the branch later, repeat:
+
+```bash
+git add .
+git commit -m "Update feature implementation"
+git push
+```
+
+When your PR is approved, merge it into `main` using GitHub or the command line.
+
 ### Running Tests
 
 1. **Fetch Test Cases**: Click "Fetch Test Cases" to load available test cases
@@ -198,6 +230,62 @@ This demo project:
 - Runs entirely locally without external API calls
 - Uses simulated/mock data for demonstration
 - Does not store or transmit sensitive information
+
+## Development Workflow - Git Branching
+
+### Creating a Child Branch and Pushing to Main
+
+When working on new features or fixes, follow this Git workflow:
+
+1. **Check Current Status**
+   ```bash
+   git status
+   git branch -a  # See all branches
+   ```
+
+2. **Create a New Feature Branch**
+   ```bash
+   git checkout -b feature/your-feature-name
+   # Or for bug fixes:
+   git checkout -b bugfix/issue-description
+   ```
+
+3. **Make Your Changes**
+   ```bash
+   # Edit files, add features, fix bugs
+   git add .
+   git commit -m "Description of changes"
+   ```
+
+4. **Push Your Branch to Remote**
+   ```bash
+   git push -u origin feature/your-feature-name
+   ```
+
+5. **Create a Pull Request (PR)**
+   - Go to GitHub/GitLab and create a PR from your branch to `main`
+   - Add description of changes
+   - Request review if needed
+
+6. **Merge to Main (After Review)**
+   ```bash
+   # After PR is approved and merged via GitHub/GitLab:
+   git checkout main
+   git pull origin main
+   ```
+
+### Branch Naming Conventions
+- `feature/feature-name` - New features
+- `bugfix/issue-description` - Bug fixes
+- `hotfix/critical-fix` - Critical production fixes
+- `refactor/component-name` - Code refactoring
+
+### Best Practices
+- Always create branches from `main`
+- Keep branches focused on single features/issues
+- Write clear commit messages
+- Pull latest changes before starting work
+- Delete branches after merging
 
 To enable AI features, you must explicitly configure LLM credentials in `config.py`.
 

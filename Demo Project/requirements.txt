@@ -2,8 +2,11 @@
 # Essential requirements for demo execution
 # Install with: pip install -r requirements.txt
 
-# Web Framework (for web UI - optional for demo)
+# Web Frameworks
 Flask==3.0.0
+fastapi>=0.115.0
+uvicorn>=0.30.0
+pydantic>=2.10.0
 
 # Testing Framework (REQUIRED for demo)
 pytest==7.4.3

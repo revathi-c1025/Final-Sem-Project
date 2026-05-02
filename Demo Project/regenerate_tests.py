@@ -26,7 +26,7 @@ def main():
     qtest = QTestAgent()
     gen = SimpleTestGenerator()
     
-    for i in range(1, 11):
+    for i in range(1, 51):
         tc_id = f'TC-{i:03d}'
         try:
             tc = qtest.fetch_test_case(tc_id)

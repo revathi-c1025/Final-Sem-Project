@@ -1,0 +1,18 @@
+﻿# Python artifacts
+**/__pycache__/
+**/*.py[cod]
+**/*.pyc
+**/.pytest_cache/
+**/.mypy_cache/
+
+# IDE/runtime artifacts
+**/.idea/
+**/.git_diff_check.txt
+**/logs/
+**/reports/
+**/output/
+# Ignore generated test caches
+**/generated_tests/__pycache__/
+
+# Local packaging / archives
+Demo Project.zip

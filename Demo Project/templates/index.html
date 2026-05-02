@@ -27,7 +27,7 @@ input:focus,select:focus,textarea:focus{border-color:var(--blue);box-shadow:0 0 
 .sidebar .logo h2{font-size:15px;color:var(--blue);letter-spacing:.5px;}
 .sidebar .logo span{font-size:11px;color:var(--text-dim);display:block;margin-top:2px;}
 .sidebar nav{flex:1;padding:12px 10px;}
-.sidebar nav a{display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:8px;color:var(--text-dim);font-size:13.5px;font-weight:500;transition:.15s;margin-bottom:2px;}
+.sidebar nav a{display:flex;align-items:center;gap:10px;padding:9px 14px;border-radius:8px;color:var(--text-dim);font-size:13.2px;font-weight:500;transition:.15s;margin-bottom:2px;}
 .sidebar nav a:hover{background:var(--bg-card2);color:var(--text);text-decoration:none;}
 .sidebar nav a.active{background:var(--blue-glow);color:var(--blue);font-weight:600;}
 .sidebar nav a .icon{font-size:18px;width:22px;text-align:center;}
@@ -71,6 +71,7 @@ input:focus,select:focus,textarea:focus{border-color:var(--blue);box-shadow:0 0 
 .btn-secondary{background:var(--bg-card2);color:var(--text);border:1px solid var(--border);}.btn-secondary:hover{border-color:var(--blue);color:var(--blue);background:#e8ebf0;}
 .btn-sm{padding:5px 12px;font-size:12px;}
 .btn-green{background:var(--green);color:#fff;}.btn-green:hover{background:#27ae60;}
+.btn-red{background:var(--red);color:#fff;}.btn-red:hover{background:#c0392b;}
 .btn:disabled{opacity:.5;cursor:not-allowed;}
 
 /* Forms */
@@ -152,6 +153,7 @@ input:focus,select:focus,textarea:focus{border-color:var(--blue);box-shadow:0 0 
 ::-webkit-scrollbar{width:6px;height:6px;}::-webkit-scrollbar-track{background:var(--bg-card2);}::-webkit-scrollbar-thumb{background:#c1c7cf;border-radius:3px;}::-webkit-scrollbar-thumb:hover{background:#a0a7b0;}
 .step-card{background:var(--bg-card2);border:1px solid var(--border);border-radius:8px;padding:12px 16px;margin-bottom:8px;font-size:13px;}
 .step-card strong{color:var(--cyan);}
+.scope-pill{display:inline-block;margin:4px 6px 4px 0;padding:7px 10px;border:1px solid var(--border);border-radius:8px;background:#fff;font-size:12.5px;color:var(--text-dim);}
 </style>
 </head>
 <body>
@@ -163,8 +165,10 @@ input:focus,select:focus,textarea:focus{border-color:var(--blue);box-shadow:0 0 
       <a href="#" data-page="pipeline"><span class="icon">&#9654;</span> Pipeline Runner</a>
       <a href="#" data-page="testcases"><span class="icon">&#9776;</span> Test Cases</a>
       <a href="#" data-page="reports"><span class="icon">&#9744;</span> Reports</a>
+      <a href="#" data-page="logs"><span class="icon">&#9636;</span> Logs</a>
       <a href="#" data-page="generated"><span class="icon">&#10100;</span> Generated Tests</a>
       <a href="#" data-page="config"><span class="icon">&#9881;</span> Configuration</a>
+      <a href="#" data-page="git"><span class="icon">&#9899;</span> Git Operations</a>
     </nav>
     <div class="version">v1.0 &mdash; M.Tech Project 2024TM93022</div>
   </aside>
@@ -174,6 +178,10 @@ input:focus,select:focus,textarea:focus{border-color:var(--blue);box-shadow:0 0 
 
 <!-- ===================== DASHBOARD ===================== -->
 <div class="page active" id="page-dashboard">
+  <div class="flex-between mb-20">
+    <h3 style="font-size:15px;">Dashboard</h3>
+    <button class="btn btn-secondary btn-sm" id="btnClearDashboard" onclick="clearDashboard()">Clear Dashboard</button>
+  </div>
   <div class="cards" id="dashCards">
     <div class="card"><div class="label">Total Runs</div><div class="value blue" id="dTotal">-</div></div>
     <div class="card"><div class="label">Passed</div><div class="value green" id="dPassed">-</div></div>
@@ -277,6 +285,16 @@ input:focus,select:focus,textarea:focus{border-color:var(--blue);box-shadow:0 0 
       <button class="btn btn-primary" id="btnWizFetch" style="padding:12px 28px;">Fetch Test Case &#8594;</button>
       <div id="wizFetchResult" style="margin-top:20px;"></div>
     </div>
+    <div style="max-width:800px;margin-top:28px;background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:var(--shadow);">
+      <h3 style="font-size:15px;margin-bottom:10px;color:var(--cyan);">Generate From Natural Language Steps</h3>
+      <p style="color:var(--text-dim);font-size:13px;margin-bottom:14px;">Enter one API test step per line. You can use full URLs or relative endpoints such as <code>/products</code>.</p>
+      <div class="form-group">
+        <label>Test Steps</label>
+        <textarea id="nlSteps" rows="7" placeholder='GET /products should return status code 200&#10;POST /products with {"name":"Demo","price":10} should return status code 201' style="font-family:var(--mono);font-size:13px;line-height:1.5;"></textarea>
+      </div>
+      <button class="btn btn-green" id="btnNlGenerate" style="padding:12px 28px;">Generate Test</button>
+      <div id="nlGenerateResult" style="margin-top:18px;"></div>
+    </div>
   </div>
 
   <!-- Step 2: Generate -->
@@ -298,6 +316,10 @@ input:focus,select:focus,textarea:focus{border-color:var(--blue);box-shadow:0 0 
     <div class="form-group" style="margin-top:8px;">
       <label>Max Retries on Failure</label>
       <input type="number" id="wMaxRetries" value="3" min="1" max="10" style="width:100px;">
+    </div>
+    <div class="form-group" style="margin-top:8px;">
+      <label>Minimum Active Test Execution Time (seconds)</label>
+      <input type="number" id="wMinDuration" value="30" min="0" max="600" style="width:120px;">
     </div>
     <div style="margin-top:16px;">
       <button class="btn btn-secondary" onclick="wizGoTo(2)">&larr; Back</button>
@@ -355,6 +377,16 @@ input:focus,select:focus,textarea:focus{border-color:var(--blue);box-shadow:0 0 
   <div id="reportDetail" style="display:none;"></div>
 </div>
 
+<!-- ===================== LOGS ===================== -->
+<div class="page" id="page-logs">
+  <div class="flex-between mb-20">
+    <div><h3 style="font-size:15px;">Execution Logs</h3><p style="color:var(--text-dim);font-size:13px;margin-top:4px;">Full pytest logs with API request, response, assertion, and failure details.</p></div>
+    <button class="btn btn-secondary btn-sm" id="btnRefreshLogs">&#8635; Refresh</button>
+  </div>
+  <div id="logsList"></div>
+  <div id="logDetail" style="display:none;margin-top:20px;"></div>
+</div>
+
 <!-- ===================== GENERATED TESTS ===================== -->
 <div class="page" id="page-generated">
   <div class="flex-between mb-20"><h3 style="font-size:15px;">Generated Test Scripts</h3><button class="btn btn-secondary btn-sm" id="btnRefreshGen">&#8635; Refresh</button></div>
@@ -378,6 +410,34 @@ input:focus,select:focus,textarea:focus{border-color:var(--blue);box-shadow:0 0 
   <div class="config-grid" id="configGrid"><div class="empty" style="grid-column:1/-1;"><div class="icon">&#9881;</div><p>Loading...</p></div></div>
 </div>
 
+<!-- ===================== GIT OPERATIONS ===================== -->
+<div class="page" id="page-git">
+  <div class="flex-between mb-20">
+    <div>
+      <h3 style="font-size:15px;">Git Operations</h3>
+      <p style="color:var(--text-dim);font-size:13px;margin-top:4px;">Manage version control for your project.</p>
+    </div>
+  </div>
+  <div class="input-group">
+    <h4>Branch Name</h4>
+    <input type="text" id="gitBranch" placeholder="Enter branch name (e.g., main, develop)" style="width:100%;max-width:400px;">
+  </div>
+  <div class="input-group">
+    <h4>Commit Message</h4>
+    <textarea id="gitCommitMsg" placeholder="Enter commit message" rows="3" style="width:100%;max-width:600px;"></textarea>
+  </div>
+  <div class="flex-between mb-20">
+    <div style="display:flex;gap:8px;">
+      <button class="btn btn-secondary" onclick="gitStatus()">Git Status</button>
+      <button class="btn btn-secondary" onclick="gitAdd()">Git Add</button>
+      <button class="btn btn-secondary" onclick="gitPull()">Git Pull</button>
+      <button class="btn btn-primary" onclick="gitCommit()">Git Commit</button>
+      <button class="btn btn-green" onclick="gitPush()">Git Push</button>
+    </div>
+  </div>
+  <div id="gitOutput" class="code-block" style="display:none;"></div>
+</div>
+
     </div>
   </div>
 </div>
@@ -397,7 +457,7 @@ document.querySelectorAll('.sidebar nav a').forEach(a=>{
     document.querySelectorAll('.page').forEach(pg=>pg.classList.remove('active'));
     document.getElementById('page-'+p).classList.add('active');
     document.getElementById('pageTitle').textContent=a.textContent.trim();
-    if(p==='reports')loadReports();if(p==='generated')loadGeneratedTests();if(p==='config')loadConfig();if(p==='dashboard')loadDashboard();
+    if(p==='reports')loadReports();if(p==='logs')loadLogs();if(p==='generated')loadGeneratedTests();if(p==='config')loadConfig();if(p==='dashboard')loadDashboard();
   });
 });
 
@@ -427,6 +487,14 @@ async function loadDashboard(){
     });
     document.getElementById('dashRecentTable').innerHTML=`<table class="tbl"><tr><th>Test Case</th><th>Name</th><th>Status</th><th>Attempts</th><th>Steps</th><th>Duration</th></tr>${rows}</table>`;
   }catch(e){console.error(e);}
+}
+
+function clearDashboard(){
+  if(confirm('Are you sure you want to clear all dashboard data? This will reset all counters to zero.')){
+    ['dTotal','dPassed','dFailed','dAttempts'].forEach(id=>document.getElementById(id).textContent='0');
+    document.getElementById('dDuration').textContent='0s';
+    document.getElementById('dashRecentTable').innerHTML='<div class="empty"><p>Dashboard cleared. Run the pipeline to generate new results.</p></div>';
+  }
 }
 
 // ===================== WIZARD =====================
@@ -478,6 +546,39 @@ document.getElementById('btnWizFetch').addEventListener('click',async()=>{
   }catch(e){
     document.getElementById('wizFetchResult').innerHTML=`<div style="color:var(--red);margin-top:12px;">Error: ${esc(e.message)}</div>`;
   }finally{btn.disabled=false;btn.innerHTML='Fetch Test Case &#8594;';}
+});
+
+document.getElementById('btnNlGenerate').addEventListener('click',async()=>{
+  const raw=document.getElementById('nlSteps').value;
+  const steps=raw.split('\n').map(s=>s.trim()).filter(Boolean);
+  const btn=document.getElementById('btnNlGenerate');
+  const out=document.getElementById('nlGenerateResult');
+  if(!steps.length){alert('Enter at least one natural-language test step');return;}
+  btn.disabled=true;btn.innerHTML='<span class="spinner"></span> Generating...';
+  out.innerHTML='<div style="display:flex;align-items:center;gap:8px;color:var(--text-dim);"><span class="spinner"></span> Generating pytest and running validation...</div>';
+  try{
+    const resp=await fetch(API+'/generate-test',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({steps})});
+    const data=await resp.json();
+    if(!resp.ok)throw new Error(data.errors||data.error||'Generation failed');
+    const statusClass=data.status==='success'?'passed':'failed';
+    out.innerHTML=`
+      <div class="cards" style="grid-template-columns:repeat(3,1fr);">
+        <div class="card"><div class="label">Execution Result</div><div class="value ${data.status==='success'?'green':'red'}" style="font-size:20px;">${esc((data.status||'failure').toUpperCase())}</div></div>
+        <div class="card"><div class="label">Steps</div><div class="value blue" style="font-size:20px;">${steps.length}</div></div>
+        <div class="card"><div class="label">Status</div><span class="status ${statusClass}">${esc(data.status||'failure')}</span></div>
+      </div>
+      <h4 style="font-size:13px;margin:12px 0 8px;color:var(--cyan);">Generated Code</h4>
+      <div class="code-block">${highlightPython(data.generated_code||'')}</div>
+      <h4 style="font-size:13px;margin:16px 0 8px;color:var(--green);">Logs</h4>
+      <div class="code-block">${esc(data.logs||'(no logs)')}</div>
+      <h4 style="font-size:13px;margin:16px 0 8px;color:var(--red);">Errors</h4>
+      <div class="code-block">${esc(data.errors||'(no errors)')}</div>`;
+    loadGeneratedTests();
+  }catch(e){
+    out.innerHTML=`<div style="color:var(--red);padding:12px;border:1px solid var(--red);border-radius:8px;background:rgba(231,76,60,.08);">Error: ${esc(e.message)}</div>`;
+  }finally{
+    btn.disabled=false;btn.innerHTML='Generate Test';
+  }
 });
 
 // Step 2: Generate
@@ -544,9 +645,10 @@ document.getElementById('btnWizExecute').addEventListener('click',async()=>{
   });
   const tcId=document.getElementById('wTcId').value.trim();
   const maxRetries=parseInt(document.getElementById('wMaxRetries').value)||3;
+  const minDuration=parseInt(document.getElementById('wMinDuration').value)||0;
 
   try{
-    const resp=await fetch(API+'/api/pipeline/run',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({test_case_ids:[tcId],user_inputs:userInputs,max_retries:maxRetries})});
+    const resp=await fetch(API+'/api/pipeline/run',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({test_case_ids:[tcId],user_inputs:userInputs,max_retries:maxRetries,min_duration_seconds:minDuration})});
     const data=await resp.json();
     if(data.error)throw new Error(data.error);
 
@@ -632,7 +734,7 @@ function wizBuildAnalysis(analysis, summary){
   });
 
   if(wizData.report){
-    html+=`<p style="font-size:13px;color:var(--text-dim);margin-top:8px;">Full report: ${esc(wizData.report)}</p>`;
+    html+=`<p style="font-size:13px;color:var(--text-dim);margin-top:8px;">Full report: ${esc(wizData.report)} <a class="btn btn-secondary btn-sm" href="/api/download/reports/${encodeURIComponent(wizData.report)}">Download</a></p>`;
   }
   document.getElementById('wizAnalysis').innerHTML=html;
 }
@@ -671,7 +773,8 @@ function renderTestCases(tcs){
   document.getElementById('tcResults').innerHTML=`<table class="tbl"><tr><th>ID</th><th>Name / Steps</th><th>Steps</th><th></th></tr>${rows}</table>`;
 }
 function runFromBrowser(tcId){
-  document.getElementById('wTcId').value=tcId;wizReset();
+  wizReset();
+  document.getElementById('wTcId').value=tcId;
   document.querySelector('[data-page="pipeline"]').click();
 }
 
@@ -690,20 +793,22 @@ async function loadReports(){
 async function loadReportDetail(filename){
   const data=await api('/api/reports/'+filename);const s=data.summary;
   let html=`<button class="btn btn-secondary btn-sm mb-20" onclick="loadReports()">&larr; Back to Reports</button>
+    <a class="btn btn-primary btn-sm mb-20" style="margin-left:8px;" href="/api/download/reports/${encodeURIComponent(filename)}">Download Report</a>
     <h3 style="margin-bottom:16px;font-size:15px;">Report: ${esc(filename)}</h3>
     <div class="cards"><div class="card"><div class="label">Total</div><div class="value blue">${s.total_test_cases}</div></div><div class="card"><div class="label">Passed</div><div class="value green">${s.passed}</div></div><div class="card"><div class="label">Failed</div><div class="value red">${s.failed}</div></div><div class="card"><div class="label">Attempts</div><div class="value orange">${s.total_attempts}</div></div><div class="card"><div class="label">Duration</div><div class="value">${s.total_duration_s}s</div></div></div>`;
   // TC results
   let rows='';(data.test_cases||[]).forEach(tc=>{
-    rows+=`<tr><td><strong>${esc(tc.test_case_id)}</strong></td><td>${esc(tc.test_case_name||'').substring(0,70)}</td><td><span class="status ${tc.final_status}">${tc.final_status}</span></td><td>${tc.total_attempts}</td><td>${tc.step_count}</td><td>${tc.duration_seconds}s</td></tr>`;
+    const logLinks=(tc.log_files||[]).map(l=>`<button class="btn btn-secondary btn-sm" onclick="openLog('${esc(l)}')">View Log</button>`).join(' ');
+    rows+=`<tr><td><strong>${esc(tc.test_case_id)}</strong></td><td>${esc(tc.test_case_name||'').substring(0,70)}</td><td><span class="status ${tc.final_status}">${tc.final_status}</span></td><td>${tc.total_attempts}</td><td>${tc.step_count}</td><td>${tc.duration_seconds}s</td><td>${logLinks||'-'}</td></tr>`;
   });
-  html+=`<h3 style="margin:20px 0 12px;font-size:14px;">Test Cases</h3><table class="tbl"><tr><th>ID</th><th>Name</th><th>Status</th><th>Attempts</th><th>Steps</th><th>Duration</th></tr>${rows}</table>`;
+  html+=`<h3 style="margin:20px 0 12px;font-size:14px;">Test Cases</h3><table class="tbl"><tr><th>ID</th><th>Name</th><th>Status</th><th>Attempts</th><th>Steps</th><th>Duration</th><th>Logs</th></tr>${rows}</table>`;
 
   // Root-cause analysis for failed executions
   let hasAnalysis=false;
   (data.test_cases||[]).forEach(tc=>{
     (tc.execution_results||[]).forEach(ex=>{
       if(ex.root_cause_category && ex.root_cause_category!=='none'){
-        if(!hasAnalysis){html+=`<h3 style="margin:24px 0 12px;font-size:14px;">Failure Analysis</h3>`;hasAnalysis=true;}
+        if(!hasAnalysis){html+=`<div class="flex-between mb-12"><h3 style="font-size:14px;">Failure Analysis</h3><button class="btn btn-secondary btn-sm" onclick="switchToLogs()">View All Logs</button></div>`;hasAnalysis=true;}
         const cat=ex.root_cause_category;const d=ex.root_cause_detail||{};
         html+=`<div class="analysis-box ${cat}"><div style="margin-bottom:6px;"><span class="analysis-tag ${cat}">${cat.replace('_',' ')}</span>${d.auto_fixable?'<span class="analysis-tag auto-fix">Auto-fixed</span>':''}<span style="font-size:12px;color:var(--text-dim);">${esc(tc.test_case_id)} attempt #${ex.attempt}</span></div>
           <h4>${esc(d.sub_type||'').replace('_',' ')}</h4><p style="font-size:13px;margin-top:4px;">${esc(d.detail||'')}</p>`;
@@ -727,25 +832,102 @@ async function loadReportDetail(filename){
     });
     html+='</div>';
   }
+  if(data.research_extensions){
+    const ext=data.research_extensions;
+    html+=`<h3 style="margin:24px 0 12px;font-size:14px;">Implemented Extension Intelligence</h3>
+      <div class="config-grid">
+        <div class="config-section"><h3>Feedback-Driven Improvement</h3><pre class="code-block" style="max-height:220px;">${esc(JSON.stringify(ext.feedback_driven_improvement||{},null,2))}</pre></div>
+        <div class="config-section"><h3>Extended Domain Support</h3><pre class="code-block" style="max-height:220px;">${esc(JSON.stringify(ext.extended_domain_support||{},null,2))}</pre></div>
+        <div class="config-section"><h3>Self-Healing Repair</h3><pre class="code-block" style="max-height:220px;">${esc(JSON.stringify(ext.self_healing_test_repair||{},null,2))}</pre></div>
+        <div class="config-section"><h3>Cross-Repo Intelligence</h3><pre class="code-block" style="max-height:220px;">${esc(JSON.stringify(ext.cross_repo_intelligence||{},null,2))}</pre></div>
+        <div class="config-section"><h3>Proactive Gap Detection</h3><pre class="code-block" style="max-height:220px;">${esc(JSON.stringify(ext.proactive_gap_detection||{},null,2))}</pre></div>
+        <div class="config-section"><h3>Guardrails</h3><pre class="code-block" style="max-height:220px;">${esc(JSON.stringify(ext.guardrails||[],null,2))}</pre></div>
+      </div>`;
+  }
   document.getElementById('reportsList').style.display='none';
   document.getElementById('reportDetail').innerHTML=html;document.getElementById('reportDetail').style.display='block';
 }
 document.getElementById('btnRefreshReports').addEventListener('click',loadReports);
 
+function switchToLogs(){
+  document.querySelectorAll('.sidebar nav a').forEach(x=>x.classList.remove('active'));
+  document.querySelector('[data-page="logs"]').classList.add('active');
+  document.querySelectorAll('.page').forEach(pg=>pg.classList.remove('active'));
+  document.getElementById('page-logs').classList.add('active');
+  document.getElementById('pageTitle').textContent='Logs';
+  loadLogs();
+}
+
+// ===================== LOGS =====================
+async function loadLogs(){
+  document.getElementById('logDetail').style.display='none';
+  document.getElementById('logsList').style.display='block';
+  const files=await api('/api/logs');
+  if(!files.length){document.getElementById('logsList').innerHTML='<div class="empty"><p>No logs found.</p></div>';return;}
+  let rows='';files.forEach(f=>{
+    rows+=`<tr><td><strong>${esc(f)}</strong></td><td><button class="btn btn-secondary btn-sm" onclick="openLog('${esc(f)}')">View Entries</button> <a class="btn btn-primary btn-sm" href="/api/download/logs/${encodeURIComponent(f)}">Download</a> <button class="btn btn-red btn-sm" onclick="deleteLog('${esc(f)}')">Delete</button></td></tr>`;
+  });
+  document.getElementById('logsList').innerHTML=`<table class="tbl"><tr><th>Log File</th><th>Actions</th></tr>${rows}</table>`;
+}
+async function openLog(filename){
+  document.querySelectorAll('.sidebar nav a').forEach(x=>x.classList.remove('active'));
+  document.querySelector('[data-page="logs"]').classList.add('active');
+  document.querySelectorAll('.page').forEach(pg=>pg.classList.remove('active'));
+  document.getElementById('page-logs').classList.add('active');
+  document.getElementById('pageTitle').textContent='Logs';
+  const data=await api('/api/logs/'+encodeURIComponent(filename));
+  document.getElementById('logsList').style.display='none';
+  document.getElementById('logDetail').innerHTML=`<button class="btn btn-secondary btn-sm mb-20" onclick="loadLogs()">&larr; Back to Logs</button> <a class="btn btn-primary btn-sm mb-20" href="/api/download/logs/${encodeURIComponent(filename)}">Download Log</a><h3 style="margin-bottom:12px;font-size:14px;">${esc(filename)}</h3><div class="code-block">${esc(data.content||'')}</div>`;
+  document.getElementById('logDetail').style.display='block';
+}
+
+async function deleteLog(filename){
+  if(confirm(`Are you sure you want to delete the log file "${filename}"? This action cannot be undone.`)){
+    try{
+      const response = await fetch('/api/logs/'+encodeURIComponent(filename), {method: 'DELETE'});
+      if(response.ok){
+        loadLogs(); // Refresh the list
+      }else{
+        alert('Failed to delete log file');
+      }
+    }catch(e){
+      alert('Error deleting log file');
+    }
+  }
+}
+document.getElementById('btnRefreshLogs').addEventListener('click',loadLogs);
+
 // ===================== GENERATED TESTS =====================
 async function loadGeneratedTests(){
   document.getElementById('genDetail').style.display='none';
+  document.getElementById('genList').style.display='block';
   const files=await api('/api/generated-tests');
   if(!files.length){document.getElementById('genList').innerHTML='<div class="empty"><p>No generated test files found.</p></div>';return;}
   let rows='';files.forEach(f=>{
-    rows+=`<tr style="cursor:pointer" onclick="loadGenDetail('${f.name}')"><td><strong>${esc(f.name)}</strong></td><td>${(f.size_bytes/1024).toFixed(1)} KB</td><td>${f.modified.replace('T',' ').substring(0,19)}</td><td><button class="btn btn-secondary btn-sm">View Code</button></td></tr>`;
+    rows+=`<tr><td><strong>${esc(f.name)}</strong></td><td>${(f.size_bytes/1024).toFixed(1)} KB</td><td>${f.modified.replace('T',' ').substring(0,19)}</td><td><button class="btn btn-secondary btn-sm" onclick="loadGenDetail('${f.name}')">View Code</button> <a class="btn btn-primary btn-sm" href="/api/download/generated/${encodeURIComponent(f.name)}">Download</a> <button class="btn btn-red btn-sm" onclick="deleteGeneratedTest('${f.name}')">Delete</button></td></tr>`;
   });
   document.getElementById('genList').innerHTML=`<table class="tbl"><tr><th>File</th><th>Size</th><th>Modified</th><th></th></tr>${rows}</table>`;
 }
 async function loadGenDetail(filename){
   const data=await api('/api/generated-tests/'+filename);
-  document.getElementById('genDetail').innerHTML=`<button class="btn btn-secondary btn-sm mb-20" onclick="document.getElementById('genDetail').style.display='none';document.getElementById('genList').style.display='block';">&larr; Back</button><h3 style="margin-bottom:12px;font-size:14px;">${esc(filename)}</h3><div class="code-block">${highlightPython(data.code)}</div>`;
+  document.getElementById('genList').style.display='none';
+  document.getElementById('genDetail').innerHTML=`<button class="btn btn-secondary btn-sm mb-20" onclick="document.getElementById('genDetail').style.display='none';document.getElementById('genList').style.display='block';">&larr; Back to Generated Scripts</button> <a class="btn btn-primary btn-sm mb-20" href="/api/download/generated/${encodeURIComponent(filename)}">Download Script</a><h3 style="margin-bottom:12px;font-size:14px;">${esc(filename)}</h3><div class="code-block">${highlightPython(data.code)}</div>`;
   document.getElementById('genDetail').style.display='block';
+}
+
+async function deleteGeneratedTest(filename){
+  if(confirm(`Are you sure you want to delete the generated test file "${filename}"? This action cannot be undone.`)){
+    try{
+      const response = await fetch('/api/generated-tests/'+encodeURIComponent(filename), {method: 'DELETE'});
+      if(response.ok){
+        loadGeneratedTests(); // Refresh the list
+      }else{
+        alert('Failed to delete generated test file');
+      }
+    }catch(e){
+      alert('Error deleting generated test file');
+    }
+  }
 }
 function highlightPython(code){
   let h=esc(code);
@@ -795,6 +977,7 @@ async function loadConfig(){
                  oninput="cfgOnChange()">
           ${isSecret && val ? `<button class="btn btn-secondary btn-sm" style="white-space:nowrap;font-size:11px;" onclick="cfgToggleShow(this)">Show</button>` : ''}
         </div>
+        ${f.help ? `<div style="margin-top:6px;font-size:12px;color:var(--text-dim);">${esc(f.help)}</div>` : ''}
       </div>`;
     });
     html+='</div>';
@@ -854,6 +1037,99 @@ document.getElementById('btnCfgSave').addEventListener('click', async ()=>{
     btn.disabled=false; btn.innerHTML='Save Changes';
   }
 });
+
+// ===================== GIT OPERATIONS =====================
+async function gitStatus(){
+  try{
+    const resp = await fetch(API+'/api/git/status');
+    const data = await resp.json();
+    if(!resp.ok) throw new Error(data.error || 'Git status failed');
+    document.getElementById('gitOutput').style.display='block';
+    document.getElementById('gitOutput').innerHTML = esc(data.output || 'No output');
+  }catch(e){
+    document.getElementById('gitOutput').style.display='block';
+    document.getElementById('gitOutput').innerHTML = `Error: ${esc(e.message)}`;
+  }
+}
+
+async function gitAdd(){
+  try{
+    const resp = await fetch(API+'/api/git/add', {method: 'POST'});
+    const data = await resp.json();
+    if(!resp.ok) throw new Error(data.error || 'Git add failed');
+    document.getElementById('gitOutput').style.display='block';
+    document.getElementById('gitOutput').innerHTML = esc(data.output || 'Added files successfully');
+  }catch(e){
+    document.getElementById('gitOutput').style.display='block';
+    document.getElementById('gitOutput').innerHTML = `Error: ${esc(e.message)}`;
+  }
+}
+
+async function gitPull(){
+  const branch = document.getElementById('gitBranch').value.trim();
+  if(!branch){
+    alert('Please enter a branch name');
+    return;
+  }
+  try{
+    const resp = await fetch(API+'/api/git/pull', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({branch})
+    });
+    const data = await resp.json();
+    if(!resp.ok) throw new Error(data.error || 'Git pull failed');
+    document.getElementById('gitOutput').style.display='block';
+    document.getElementById('gitOutput').innerHTML = esc(data.output || 'Pull successful');
+  }catch(e){
+    document.getElementById('gitOutput').style.display='block';
+    document.getElementById('gitOutput').innerHTML = `Error: ${esc(e.message)}`;
+  }
+}
+
+async function gitCommit(){
+  const message = document.getElementById('gitCommitMsg').value.trim();
+  if(!message){
+    alert('Please enter a commit message');
+    return;
+  }
+  try{
+    const resp = await fetch(API+'/api/git/commit', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({message})
+    });
+    const data = await resp.json();
+    if(!resp.ok) throw new Error(data.error || 'Git commit failed');
+    document.getElementById('gitOutput').style.display='block';
+    document.getElementById('gitOutput').innerHTML = esc(data.output || 'Commit successful');
+  }catch(e){
+    document.getElementById('gitOutput').style.display='block';
+    document.getElementById('gitOutput').innerHTML = `Error: ${esc(e.message)}`;
+  }
+}
+
+async function gitPush(){
+  const branch = document.getElementById('gitBranch').value.trim();
+  if(!branch){
+    alert('Please enter a branch name');
+    return;
+  }
+  try{
+    const resp = await fetch(API+'/api/git/push', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({branch})
+    });
+    const data = await resp.json();
+    if(!resp.ok) throw new Error(data.error || 'Git push failed');
+    document.getElementById('gitOutput').style.display='block';
+    document.getElementById('gitOutput').innerHTML = esc(data.output || 'Push successful');
+  }catch(e){
+    document.getElementById('gitOutput').style.display='block';
+    document.getElementById('gitOutput').innerHTML = `Error: ${esc(e.message)}`;
+  }
+}
 
 // Init
 loadDashboard();
