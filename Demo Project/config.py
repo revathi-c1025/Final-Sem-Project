@@ -56,6 +56,14 @@ RETRY_DELAY_SECONDS = int(os.environ.get("RETRY_DELAY_SECONDS", "5"))
 TEST_TIMEOUT_SECONDS = int(os.environ.get("TEST_TIMEOUT_SECONDS", "300"))
 
 # =============================================================================
+# Git Configuration (for version control and repository management)
+# =============================================================================
+# Project repository information
+GIT_PROJECT_REPO_URL = os.environ.get("GIT_PROJECT_REPO_URL", "https://github.com/revathi-c1025/Final-Sem-Project.git")
+GIT_PROJECT_TOKEN = os.environ.get("GIT_PROJECT_TOKEN", "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")  # GitHub Personal Access Token
+GIT_PROJECT_DEFAULT_BRANCH = os.environ.get("GIT_PROJECT_DEFAULT_BRANCH", "main")
+
+# =============================================================================
 # Reference Test Repository (for context-aware code generation)
 # =============================================================================
 REFERENCE_REPO_LOCAL_PATH = os.environ.get(

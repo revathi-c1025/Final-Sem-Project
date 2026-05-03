@@ -150,6 +150,80 @@ git push
 
 When your PR is approved, merge it into `main` using GitHub or the command line.
 
+### Git Operations via Web UI
+
+The web interface includes a **Git Operations** page for managing version control directly from the browser.
+
+#### Setup: GitHub Authentication
+
+To use push operations, you need to configure your GitHub Personal Access Token (PAT):
+
+**Step 1: Generate a GitHub PAT**
+1. Go to [https://github.com/settings/tokens](https://github.com/settings/tokens)
+2. Click "Generate new token (classic)"
+3. Give it a name (e.g., "Test Automation")
+4. Select scopes:
+   - `repo` (full control of private repositories)
+   - `workflow` (update GitHub workflows)
+5. Copy the generated token (you won't be able to see it again)
+
+**Step 2: Configure the Token in the Web UI**
+1. Click on "Configuration" in the sidebar
+2. Scroll to the "Git Configuration" section
+3. Paste your token in the "GitHub Personal Access Token" field
+4. Update "Project Repository URL" if needed (default: your fork/repo)
+5. Click "Save Changes"
+
+#### Features
+
+- **Git Status**: View current repository status (modified, staged, untracked files)
+- **Git Add**: Stage all changes for commit
+- **Git Pull**: Pull latest changes from a specified branch
+- **Git Commit**: Commit staged changes with a custom message
+- **Git Push**: Push committed changes to a specified branch
+  - Automatically creates the branch if it doesn't exist
+  - Requires GitHub token for authentication
+
+#### Usage
+
+1. Navigate to the "Git Operations" page in the sidebar
+2. Enter the branch name you want to work with (e.g., `feature/new-tests`)
+3. For commits, enter a descriptive commit message
+4. Click the appropriate button:
+   - **📊 Git Status**: See what files have changed
+   - **➕ Git Add**: Stage all changes
+   - **⬇️ Git Pull**: Pull latest from remote branch
+   - **✓ Git Commit**: Create a commit with your message
+   - **⬆️ Git Push**: Push to remote (requires token)
+5. View the output/results below
+
+#### Example Workflow
+
+```
+1. Click "📊 Git Status" → See your changes
+2. Click "➕ Git Add" → Stage all files
+3. Enter commit message → Click "✓ Git Commit" → Committed!
+4. Enter branch name "feature/my-update" → Click "⬆️ Git Push" → Branch created and pushed!
+5. Go to GitHub → Create a Pull Request from your branch to main
+```
+
+#### Troubleshooting
+
+**Error: "GitHub token not configured"**
+- Go to Configuration → Git Configuration
+- Add your GitHub PAT in the "GitHub Personal Access Token" field
+- Click "Save Changes"
+
+**Error: "failed to push some refs"**
+- Ensure your token has `repo` scope permissions
+- Check that the target repository URL is correct
+- Verify you have push access to the repository
+
+**Error: "src refspec does not match"**
+- The branch name may contain special characters
+- Try using a simpler branch name (e.g., `feature-update` instead of `usr/r_c/test1`)
+- Git branch names should only contain alphanumeric, hyphens, underscores, dots, and slashes
+
 ### Running Tests
 
 1. **Fetch Test Cases**: Click "Fetch Test Cases" to load available test cases

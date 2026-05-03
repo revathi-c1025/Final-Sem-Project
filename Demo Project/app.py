@@ -256,6 +256,10 @@ _CONFIG_SCHEMA = [
     {"key": "MAX_RETRIES",          "group": "Execution",  "label": "Max Retries",           "type": "number", "editable": True},
     {"key": "RETRY_DELAY_SECONDS",  "group": "Execution",  "label": "Retry Delay (sec)",     "type": "number", "editable": True},
     {"key": "TEST_TIMEOUT_SECONDS", "group": "Execution",  "label": "Test Timeout (sec)",    "type": "number", "editable": True},
+    # Git Configuration
+    {"key": "GIT_PROJECT_REPO_URL",       "group": "Git Configuration",  "label": "Project Repository URL",  "type": "text",     "editable": True, "help": "The GitHub repository URL for this project (e.g., https://github.com/user/repo.git)."},
+    {"key": "GIT_PROJECT_TOKEN",         "group": "Git Configuration",  "label": "GitHub Personal Access Token", "type": "password", "editable": True, "help": "Your GitHub PAT for authentication. Required for push operations to private repos. Get one from: https://github.com/settings/tokens"},
+    {"key": "GIT_PROJECT_DEFAULT_BRANCH", "group": "Git Configuration", "label": "Default Branch",         "type": "text",     "editable": True, "help": "The default branch for this project (typically 'main' or 'master')."},
     # Reference Repository
     {"key": "REFERENCE_REPO_LOCAL_PATH", "group": "Reference Repository",  "label": "Local Repo Path",       "type": "text",     "editable": True},
     {"key": "GITHUB_REPO_URL",          "group": "Reference Repository",  "label": "GitHub Repo URL",       "type": "text",     "editable": True},
@@ -1164,6 +1168,33 @@ import subprocess
 # Git repository root (one level up from BASE_DIR)
 GIT_REPO_DIR = os.path.dirname(BASE_DIR)
 
+def _setup_git_credentials():
+    """Setup Git credentials using GitHub token from config."""
+    try:
+        from config import GIT_PROJECT_TOKEN, GIT_PROJECT_REPO_URL
+        
+        if not GIT_PROJECT_TOKEN or not GIT_PROJECT_TOKEN.strip():
+            return False, "GitHub token not configured. Please set GIT_PROJECT_TOKEN in Configuration."
+        
+        # Extract repo URL without https:// protocol
+        repo_url = GIT_PROJECT_REPO_URL.replace("https://", "").replace("http://", "")
+        
+        # Configure git to use credentials
+        subprocess.run(
+            ["git", "config", "--global", "credential.helper", "store"],
+            cwd=GIT_REPO_DIR,
+            capture_output=True,
+            timeout=10
+        )
+        
+        # Create credential entry: https://token@github.com
+        cred_entry = f"https://{GIT_PROJECT_TOKEN}@{repo_url.replace('.git', '')}\n"
+        
+        # For local operations, we'll use the token directly in commands
+        return True, "Credentials configured"
+    except Exception as e:
+        return False, f"Failed to setup credentials: {str(e)}"
+
 @app.route("/api/git/status")
 def api_git_status():
     """Get git status."""
@@ -1195,7 +1226,7 @@ def api_git_add():
         )
         if result.returncode != 0:
             return jsonify({"error": result.stderr}), 500
-        return jsonify({"output": "All changes staged"})
+        return jsonify({"output": "All changes staged successfully"})
     except subprocess.TimeoutExpired:
         return jsonify({"error": "Git add timed out"}), 500
     except Exception as e:
@@ -1207,17 +1238,28 @@ def api_git_pull():
     """Pull from remote branch."""
     try:
         data = request.get_json()
-        branch = data.get("branch", "main")
+        branch = data.get("branch", "main").strip()
+        
+        if not branch:
+            return jsonify({"error": "Branch name is required"}), 400
+        
+        # Setup credentials if token is configured
+        from config import GIT_PROJECT_TOKEN
+        env = os.environ.copy()
+        if GIT_PROJECT_TOKEN:
+            env["GIT_PASSWORD"] = GIT_PROJECT_TOKEN
         
         result = subprocess.run(
             ["git", "pull", "origin", branch],
             cwd=GIT_REPO_DIR,
             capture_output=True,
             text=True,
-            timeout=60
+            timeout=60,
+            env=env
         )
         if result.returncode != 0:
-            return jsonify({"error": result.stderr}), 500
+            error_msg = result.stderr or result.stdout
+            return jsonify({"error": error_msg, "hint": "Ensure the branch exists on the remote and your GitHub token is valid"}), 500
         return jsonify({"output": result.stdout or "Pull successful"})
     except subprocess.TimeoutExpired:
         return jsonify({"error": "Git pull timed out"}), 500
@@ -1230,7 +1272,7 @@ def api_git_commit():
     """Commit staged changes."""
     try:
         data = request.get_json()
-        message = data.get("message", "")
+        message = data.get("message", "").strip()
         
         if not message:
             return jsonify({"error": "Commit message is required"}), 400
@@ -1243,7 +1285,10 @@ def api_git_commit():
             timeout=30
         )
         if result.returncode != 0:
-            return jsonify({"error": result.stderr}), 500
+            error_msg = result.stderr or result.stdout
+            if "nothing to commit" in error_msg.lower():
+                return jsonify({"output": "No changes to commit"}), 200
+            return jsonify({"error": error_msg}), 500
         return jsonify({"output": result.stdout or "Commit successful"})
     except subprocess.TimeoutExpired:
         return jsonify({"error": "Git commit timed out"}), 500
@@ -1253,21 +1298,66 @@ def api_git_commit():
 
 @app.route("/api/git/push", methods=["POST"])
 def api_git_push():
-    """Push to remote branch."""
+    """Push to remote branch. Creates branch if it doesn't exist locally."""
     try:
         data = request.get_json()
-        branch = data.get("branch", "main")
+        branch = data.get("branch", "main").strip()
         
+        if not branch:
+            return jsonify({"error": "Branch name is required"}), 400
+        
+        from config import GIT_PROJECT_TOKEN
+        
+        if not GIT_PROJECT_TOKEN or not GIT_PROJECT_TOKEN.strip():
+            return jsonify({
+                "error": "GitHub token not configured",
+                "hint": "Please configure GIT_PROJECT_TOKEN in the Configuration page to enable push operations"
+            }), 400
+        
+        # First check if branch exists locally, if not create it
+        check_branch = subprocess.run(
+            ["git", "rev-parse", "--verify", branch],
+            cwd=GIT_REPO_DIR,
+            capture_output=True,
+            timeout=10
+        )
+        
+        if check_branch.returncode != 0:
+            # Branch doesn't exist locally, create it from current branch
+            create_result = subprocess.run(
+                ["git", "checkout", "-b", branch],
+                cwd=GIT_REPO_DIR,
+                capture_output=True,
+                text=True,
+                timeout=30
+            )
+            if create_result.returncode != 0:
+                return jsonify({"error": f"Failed to create branch: {create_result.stderr}"}), 500
+        
+        # Construct remote URL with token for authentication
+        from config import GIT_PROJECT_REPO_URL
+        repo_url = GIT_PROJECT_REPO_URL.replace("https://", f"https://{GIT_PROJECT_TOKEN}@")
+        
+        # Push to remote
         result = subprocess.run(
-            ["git", "push", "origin", branch],
+            ["git", "push", "-u", "origin", branch],
             cwd=GIT_REPO_DIR,
             capture_output=True,
             text=True,
-            timeout=60
+            timeout=60,
+            env={**os.environ.copy(), "GIT_TERMINAL_PROMPT": "0"}
         )
+        
         if result.returncode != 0:
-            return jsonify({"error": result.stderr}), 500
-        return jsonify({"output": result.stdout or "Push successful"})
+            error_msg = result.stderr or result.stdout
+            # Remove token from error messages for security
+            error_msg = error_msg.replace(GIT_PROJECT_TOKEN, "[TOKEN]")
+            return jsonify({
+                "error": error_msg,
+                "hint": "Check your GitHub token and ensure you have push access to the repository"
+            }), 500
+        
+        return jsonify({"output": f"Successfully pushed branch '{branch}' to remote"})
     except subprocess.TimeoutExpired:
         return jsonify({"error": "Git push timed out"}), 500
     except Exception as e:

@@ -415,24 +415,37 @@ input:focus,select:focus,textarea:focus{border-color:var(--blue);box-shadow:0 0 
   <div class="flex-between mb-20">
     <div>
       <h3 style="font-size:15px;">Git Operations</h3>
-      <p style="color:var(--text-dim);font-size:13px;margin-top:4px;">Manage version control for your project.</p>
+      <p style="color:var(--text-dim);font-size:13px;margin-top:4px;">Manage version control for your project. Configure your GitHub token in the <a href="#" onclick="document.querySelector('[data-page=\'config\']').click();">Configuration</a> page to enable push operations.</p>
     </div>
+  </div>
+  <div style="background:rgba(26,115,232,.08);border:1px solid var(--blue);border-radius:8px;padding:16px;margin-bottom:20px;">
+    <div style="font-size:13px;color:var(--blue);margin-bottom:8px;font-weight:600;">ℹ️ Setup Required</div>
+    <p style="font-size:12px;color:var(--text);margin:0;">
+      To use push operations, you need to:
+      <ol style="margin:8px 0;padding-left:20px;font-size:12px;">
+        <li>Generate a GitHub Personal Access Token (PAT) from <a href="https://github.com/settings/tokens" target="_blank" style="color:var(--blue);">https://github.com/settings/tokens</a></li>
+        <li>Go to <strong>Configuration</strong> page → <strong>Git Configuration</strong> section</li>
+        <li>Paste your token in the "GitHub Personal Access Token" field</li>
+        <li>Click "Save Changes"</li>
+      </ol>
+    </p>
   </div>
   <div class="input-group">
     <h4>Branch Name</h4>
-    <input type="text" id="gitBranch" placeholder="Enter branch name (e.g., main, develop)" style="width:100%;max-width:400px;">
+    <input type="text" id="gitBranch" placeholder="Enter branch name (e.g., main, feature/new-feature)" style="width:100%;max-width:400px;">
+    <p style="font-size:11px;color:var(--text-dim);margin-top:4px;">If the branch doesn't exist locally, it will be created automatically when you push.</p>
   </div>
   <div class="input-group">
     <h4>Commit Message</h4>
     <textarea id="gitCommitMsg" placeholder="Enter commit message" rows="3" style="width:100%;max-width:600px;"></textarea>
   </div>
   <div class="flex-between mb-20">
-    <div style="display:flex;gap:8px;">
-      <button class="btn btn-secondary" onclick="gitStatus()">Git Status</button>
-      <button class="btn btn-secondary" onclick="gitAdd()">Git Add</button>
-      <button class="btn btn-secondary" onclick="gitPull()">Git Pull</button>
-      <button class="btn btn-primary" onclick="gitCommit()">Git Commit</button>
-      <button class="btn btn-green" onclick="gitPush()">Git Push</button>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;">
+      <button class="btn btn-secondary" onclick="gitStatus()">📊 Git Status</button>
+      <button class="btn btn-secondary" onclick="gitAdd()">➕ Git Add</button>
+      <button class="btn btn-secondary" onclick="gitPull()">⬇️ Git Pull</button>
+      <button class="btn btn-primary" onclick="gitCommit()">✓ Git Commit</button>
+      <button class="btn btn-green" onclick="gitPush()">⬆️ Git Push</button>
     </div>
   </div>
   <div id="gitOutput" class="code-block" style="display:none;"></div>
@@ -1087,6 +1100,60 @@ async function gitPull(){
   }
 }
 
+async function gitPush(){
+  const branch = document.getElementById('gitBranch').value.trim();
+  if(!branch){
+    alert('Please enter a branch name');
+    return;
+  }
+  try{
+    const resp = await fetch(API+'/api/git/push', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({branch})
+    });
+    const data = await resp.json();
+    if(!resp.ok){
+      const error = data.error || 'Git push failed';
+      const hint = data.hint || '';
+      const fullError = hint ? `${error}\n\n💡 ${hint}` : error;
+      throw new Error(fullError);
+    }
+    document.getElementById('gitOutput').style.display='block';
+    document.getElementById('gitOutput').innerHTML = `<div style="color:var(--green);padding:12px;border:1px solid var(--green);border-radius:8px;background:rgba(46,204,113,.08);">✓ ${esc(data.output || 'Push successful')}</div>`;
+  }catch(e){
+    document.getElementById('gitOutput').style.display='block';
+    const errorMsg = esc(e.message);
+    const isTokenError = errorMsg.includes('GitHub token') || errorMsg.includes('TOKEN');
+    const content = isTokenError
+      ? `<div style="color:var(--orange);padding:12px;border:1px solid var(--orange);border-radius:8px;background:rgba(243,156,18,.08);"><strong>⚠️ GitHub Token Required</strong><p style="margin:8px 0 0;font-size:12px;line-height:1.5;">${errorMsg}</p><p style="margin:8px 0 0;font-size:12px;"><a href="#" onclick="document.querySelector('[data-page=\\'config\\']').click();">→ Go to Configuration</a> to add your GitHub token</p></div>`
+      : `<div style="color:var(--red);padding:12px;border:1px solid var(--red);border-radius:8px;background:rgba(231,76,60,.08);">❌ Error: ${errorMsg}</div>`;
+    document.getElementById('gitOutput').innerHTML = content;
+  }
+}
+
+async function gitPull(){
+  const branch = document.getElementById('gitBranch').value.trim();
+  if(!branch){
+    alert('Please enter a branch name');
+    return;
+  }
+  try{
+    const resp = await fetch(API+'/api/git/pull', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({branch})
+    });
+    const data = await resp.json();
+    if(!resp.ok) throw new Error(data.error || 'Git pull failed');
+    document.getElementById('gitOutput').style.display='block';
+    document.getElementById('gitOutput').innerHTML = `<div style="color:var(--green);padding:12px;border:1px solid var(--green);border-radius:8px;background:rgba(46,204,113,.08);">✓ ${esc(data.output || 'Pull successful')}</div>`;
+  }catch(e){
+    document.getElementById('gitOutput').style.display='block';
+    document.getElementById('gitOutput').innerHTML = `<div style="color:var(--red);padding:12px;border:1px solid var(--red);border-radius:8px;background:rgba(231,76,60,.08);">❌ Error: ${esc(e.message)}</div>`;
+  }
+}
+
 async function gitCommit(){
   const message = document.getElementById('gitCommitMsg').value.trim();
   if(!message){
@@ -1102,32 +1169,11 @@ async function gitCommit(){
     const data = await resp.json();
     if(!resp.ok) throw new Error(data.error || 'Git commit failed');
     document.getElementById('gitOutput').style.display='block';
-    document.getElementById('gitOutput').innerHTML = esc(data.output || 'Commit successful');
+    document.getElementById('gitOutput').innerHTML = `<div style="color:var(--green);padding:12px;border:1px solid var(--green);border-radius:8px;background:rgba(46,204,113,.08);">✓ ${esc(data.output || 'Commit successful')}</div>`;
+    document.getElementById('gitCommitMsg').value = '';
   }catch(e){
     document.getElementById('gitOutput').style.display='block';
-    document.getElementById('gitOutput').innerHTML = `Error: ${esc(e.message)}`;
-  }
-}
-
-async function gitPush(){
-  const branch = document.getElementById('gitBranch').value.trim();
-  if(!branch){
-    alert('Please enter a branch name');
-    return;
-  }
-  try{
-    const resp = await fetch(API+'/api/git/push', {
-      method: 'POST',
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({branch})
-    });
-    const data = await resp.json();
-    if(!resp.ok) throw new Error(data.error || 'Git push failed');
-    document.getElementById('gitOutput').style.display='block';
-    document.getElementById('gitOutput').innerHTML = esc(data.output || 'Push successful');
-  }catch(e){
-    document.getElementById('gitOutput').style.display='block';
-    document.getElementById('gitOutput').innerHTML = `Error: ${esc(e.message)}`;
+    document.getElementById('gitOutput').innerHTML = `<div style="color:var(--red);padding:12px;border:1px solid var(--red);border-radius:8px;background:rgba(231,76,60,.08);">❌ Error: ${esc(e.message)}</div>`;
   }
 }
 
