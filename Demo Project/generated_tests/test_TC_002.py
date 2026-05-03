@@ -87,3 +87,4 @@ class TestTC_002(BaseTestCase):
         LOGGER.info(f"Found {len(response['products'])} products in category")
 
 
+

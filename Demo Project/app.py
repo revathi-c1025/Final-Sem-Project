@@ -605,11 +605,11 @@ def api_pipeline_generate():
             "test_case_data": tc,
             "generated_file": os.path.basename(result["file_path"]),
             "generated_file_path": result["file_path"],
-            "generation_method": "template",
+            "generation_method": result.get("method", "template"),
             "code_preview": code[:3000],
             "code_lines": code.count("\n") + 1,
             "required_inputs": required_inputs,
-            "repo_context_used": False,
+            "repo_context_used": result.get("repo_context_used", False),
         })
     except Exception as e:
         logger.exception("Generate failed for %s", tc_id)
@@ -683,17 +683,18 @@ def _fetch_test_case_name_and_steps(tc_id):
 
 def _run_pipeline(run_id, test_case_ids, extra_env, max_retries, min_duration_seconds=0):
     """Background worker that runs the full pipeline and pushes events."""
-    from datetime import datetime
+    from datetime import datetime as dt
     run = _runs[run_id]
     eq = run["events"]
 
     def push(event_type, data=None):
-        if isinstance(data, dict):
-            eq.put(json.dumps({"type": event_type, "ts": datetime.now().isoformat(),
-                               **data}))
-        else:
-            eq.put(json.dumps({"type": event_type, "ts": datetime.now().isoformat(),
-                               "message": data}))
+        event_obj = {"type": event_type, "ts": dt.now().isoformat()}
+        if data:
+            if isinstance(data, dict):
+                event_obj.update(data)
+            elif isinstance(data, str):
+                event_obj["message"] = data
+        eq.put(json.dumps(event_obj))
 
     try:
         started_at = time.time()
@@ -737,6 +738,10 @@ def _run_pipeline(run_id, test_case_ids, extra_env, max_retries, min_duration_se
             "message": "Running selected tests with pytest",
         })
 
+        # Step 2: Run tests using pytest in fresh environment
+        pytest_cmd = [sys.executable, "-m", "pytest", "generated_tests/", "-v", "--tb=short"]
+        
+        # Add environment variables if provided
         env = os.environ.copy()
         if extra_env:
             env.update(extra_env)
@@ -756,7 +761,7 @@ def _run_pipeline(run_id, test_case_ids, extra_env, max_retries, min_duration_se
 
         def add_agent_event(agent, message):
             agent_events.setdefault(agent, []).append({
-                "timestamp": datetime.now().isoformat(),
+                "timestamp": dt.now().isoformat(),
                 "agent": agent,
                 "message": message,
             })

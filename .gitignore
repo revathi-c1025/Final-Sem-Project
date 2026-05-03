@@ -1,4 +1,4 @@
-﻿# Python artifacts
+# Python artifacts
 **/__pycache__/
 **/*.py[cod]
 **/*.pyc
@@ -7,12 +7,24 @@
 
 # IDE/runtime artifacts
 **/.idea/
+**/.vscode/
 **/.git_diff_check.txt
 **/logs/
 **/reports/
 **/output/
-# Ignore generated test caches
-**/generated_tests/__pycache__/
 
 # Local packaging / archives
 Demo Project.zip
+
+# Virtual environment
+venv/
+ENV/
+.env/
+
+# Editor swap files
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
