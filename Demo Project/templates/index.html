@@ -1084,28 +1084,6 @@ async function gitAdd(){
   }
 }
 
-async function gitPull(){
-  const branch = document.getElementById('gitBranch').value.trim();
-  if(!branch){
-    alert('Please enter a branch name');
-    return;
-  }
-  try{
-    const resp = await fetch(API+'/api/git/pull', {
-      method: 'POST',
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({branch})
-    });
-    const data = await resp.json();
-    if(!resp.ok) throw new Error(data.error || 'Git pull failed');
-    document.getElementById('gitOutput').style.display='block';
-    document.getElementById('gitOutput').innerHTML = esc(data.output || 'Pull successful');
-  }catch(e){
-    document.getElementById('gitOutput').style.display='block';
-    document.getElementById('gitOutput').innerHTML = `Error: ${esc(e.message)}`;
-  }
-}
-
 async function gitPush(){
   const branch = document.getElementById('gitBranch').value.trim();
   if(!branch){
@@ -1139,21 +1117,16 @@ async function gitPush(){
 }
 
 async function gitPull(){
-  const branch = document.getElementById('gitBranch').value.trim();
-  if(!branch){
-    alert('Please enter a branch name');
-    return;
-  }
   try{
     const resp = await fetch(API+'/api/git/pull', {
       method: 'POST',
       headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({branch})
+      body: JSON.stringify({source_branch:'main'})
     });
     const data = await resp.json();
     if(!resp.ok) throw new Error(data.error || 'Git pull failed');
     document.getElementById('gitOutput').style.display='block';
-    document.getElementById('gitOutput').innerHTML = `<div style="color:var(--green);padding:12px;border:1px solid var(--green);border-radius:8px;background:rgba(46,204,113,.08);">✓ ${esc(data.output || 'Pull successful')}</div>`;
+    document.getElementById('gitOutput').innerHTML = `<div style="color:var(--green);padding:12px;border:1px solid var(--green);border-radius:8px;background:rgba(46,204,113,.08);">✓ ${esc(data.output || 'Pulled latest changes from origin/main')}</div>`;
   }catch(e){
     document.getElementById('gitOutput').style.display='block';
     document.getElementById('gitOutput').innerHTML = `<div style="color:var(--red);padding:12px;border:1px solid var(--red);border-radius:8px;background:rgba(231,76,60,.08);">❌ Error: ${esc(e.message)}</div>`;

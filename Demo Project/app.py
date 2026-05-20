@@ -1125,6 +1125,23 @@ import subprocess
 # Git repository root (one level up from BASE_DIR)
 GIT_REPO_DIR = os.path.dirname(BASE_DIR)
 
+def _is_git_ui_candidate(path):
+    normalized = path.replace("\\", "/")
+    ignored_parts = [
+        "/__pycache__/",
+        "/.pytest_cache/",
+        "/logs/",
+        "/reports/",
+        "/output/",
+    ]
+    ignored_suffixes = (".pyc", ".pyo", ".pyd")
+    return not (
+        any(part in f"/{normalized}" for part in ignored_parts)
+        or normalized.endswith(ignored_suffixes)
+        or normalized.endswith(".zip")
+    )
+
+
 def _parse_git_status_z(raw_status):
     """Parse `git status --porcelain -z` into UI-friendly changed file rows."""
     rows = []
@@ -1136,10 +1153,11 @@ def _parse_git_status_z(raw_status):
         path = entry[3:] if len(entry) > 3 else ""
         if status[0] in {"R", "C"} and i + 1 < len(parts):
             old_path = parts[i + 1]
-            rows.append({"status": status.strip(), "path": path, "old_path": old_path})
+            if _is_git_ui_candidate(path):
+                rows.append({"status": status.strip(), "path": path, "old_path": old_path})
             i += 2
             continue
-        if path:
+        if path and _is_git_ui_candidate(path):
             rows.append({"status": status.strip() or "M", "path": path})
         i += 1
     return rows
@@ -1156,6 +1174,12 @@ def _git_changed_files():
     if result.returncode != 0:
         raise RuntimeError(result.stderr or result.stdout or "Git status failed")
     return _parse_git_status_z(result.stdout)
+
+
+def _format_git_rows(rows):
+    if not rows:
+        return "No changes"
+    return "\n".join(f"{row['status']:>2} {row['path']}" for row in rows)
 
 
 def _validate_git_paths(paths):
@@ -1207,16 +1231,8 @@ def _setup_git_credentials():
 def api_git_status():
     """Get git status."""
     try:
-        result = subprocess.run(
-            ["git", "status", "--porcelain"],
-            cwd=GIT_REPO_DIR,
-            capture_output=True,
-            text=True,
-            timeout=30
-        )
-        if result.returncode != 0:
-            return jsonify({"error": result.stderr or result.stdout}), 500
-        return jsonify({"output": result.stdout or "No changes", "files": _git_changed_files()})
+        files = _git_changed_files()
+        return jsonify({"output": _format_git_rows(files), "files": files})
     except subprocess.TimeoutExpired:
         return jsonify({"error": "Git status timed out"}), 500
     except Exception as e:
@@ -1248,7 +1264,8 @@ def api_git_add():
         )
         if result.returncode != 0:
             return jsonify({"error": result.stderr}), 500
-        return jsonify({"output": output, "files": _git_changed_files()})
+        files = _git_changed_files()
+        return jsonify({"output": output, "files": files})
     except subprocess.TimeoutExpired:
         return jsonify({"error": "Git add timed out"}), 500
     except Exception as e:
@@ -1257,13 +1274,9 @@ def api_git_add():
 
 @app.route("/api/git/pull", methods=["POST"])
 def api_git_pull():
-    """Pull from remote branch."""
+    """Fetch and merge the latest changes from origin/main into the current branch."""
     try:
-        data = request.get_json()
-        branch = data.get("branch", "main").strip()
-        
-        if not branch:
-            return jsonify({"error": "Branch name is required"}), 400
+        source_branch = "main"
         
         # Setup credentials if token is configured
         from config import GIT_PROJECT_TOKEN
@@ -1272,7 +1285,7 @@ def api_git_pull():
             env["GIT_PASSWORD"] = GIT_PROJECT_TOKEN
         
         result = subprocess.run(
-            ["git", "pull", "origin", branch],
+            ["git", "pull", "origin", source_branch],
             cwd=GIT_REPO_DIR,
             capture_output=True,
             text=True,
@@ -1281,8 +1294,11 @@ def api_git_pull():
         )
         if result.returncode != 0:
             error_msg = result.stderr or result.stdout
-            return jsonify({"error": error_msg, "hint": "Ensure the branch exists on the remote and your GitHub token is valid"}), 500
-        return jsonify({"output": result.stdout or "Pull successful"})
+            return jsonify({
+                "error": error_msg,
+                "hint": f"Pull fetches from origin/{source_branch}. Commit, stash, or discard local conflicting changes before pulling if Git reports conflicts."
+            }), 500
+        return jsonify({"output": result.stdout or f"Pulled latest changes from origin/{source_branch}"})
     except subprocess.TimeoutExpired:
         return jsonify({"error": "Git pull timed out"}), 500
     except Exception as e:
