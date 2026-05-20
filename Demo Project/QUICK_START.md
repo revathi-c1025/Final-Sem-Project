@@ -1,4 +1,4 @@
-# Quick Start Commands - Demo Setup
+# Quick Start Commands - Slack-Based DevOps AI Assistant Demo
 
 ## Complete Setup (3 Commands)
 
@@ -9,14 +9,14 @@ These are the only 3 commands needed to set up and run the demo on a fresh syste
 pip install -r requirements.txt
 ```
 
-### 2. Generate Test Cases
+### 2. Initialize Cloud Integration
 ```cmd
-py regenerate_tests.py
+py agents/cloud_orchestrator_agent.py
 ```
 
-### 3. Run Tests
+### 3. Start Slack Bot & NLP Engine
 ```cmd
-py -m pytest generated_tests/ -v
+py agents/nlp_parser_agent.py
 ```
 
 ---
@@ -29,9 +29,12 @@ py run_demo.py
 ```
 
 This single command will:
-- Generate all test cases
-- Execute all tests
-- Display results
+- Initialize Slack bot connection
+- Connect to Kubernetes cluster
+- Establish Prometheus monitoring
+- Validate RBAC policies
+- Demonstrate conversational commands
+- Display audit logs
 
 ---
 

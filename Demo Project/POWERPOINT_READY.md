@@ -13,9 +13,9 @@
 The PowerPoint file contains:
 - ✅ 17 fully formatted slides
 - ✅ All content pre-populated
-- ✅ Professional color scheme (blue/teal)
+- ✅ Professional color scheme (purple/teal)
 - ✅ Placeholder boxes for screenshots
-- ✅ Placeholder boxes for diagrams
+- ✅ Placeholder boxes for system architecture diagrams
 - ✅ Speaker notes for each slide
 - ✅ Consistent formatting throughout
 
@@ -40,13 +40,13 @@ The presentation has placeholder boxes that say:
 `[INSERT SCREENSHOT: ...]`
 
 Replace these with actual screenshots:
-1. **Slide 10:** Test Generation Console Output
-   - Run: `py regenerate_tests.py`
-   - Capture the console output
+1. **Slide 10:** Slack Bot Initialization
+   - Run: `py agents/nlp_parser_agent.py`
+   - Capture the bot connection startup
 
-2. **Slide 11:** Pytest Execution Results
-   - Run: `py -m pytest generated_tests/ -v`
-   - Capture the pytest results
+2. **Slide 11:** Kubernetes Integration
+   - Show: Kubernetes cluster connection status
+   - Capture the connected resources display
 
 3. **Additional screenshots** mentioned in other slides
 

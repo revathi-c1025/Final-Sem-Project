@@ -1,34 +1,35 @@
-# AI-Powered Agentic Test Automation System - Demo Project
+# Slack-Based Conversational AI DevOps Assistant - AIOps Demo Project
 
 ## Overview
 
-This is a demonstration project for an AI-powered agentic test automation system. The system automatically generates executable test scripts from test case descriptions, executes them, and provides intelligent failure analysis and auto-fixing capabilities.
+This is a demonstration project for a Slack-based conversational AI assistant that enables DevOps and SRE teams to manage cloud services through natural language. Built with an NLP engine, FastAPI orchestration, and integrations to Prometheus and Kubernetes, it automates monitoring and alerting with secure role-based access control and comprehensive audit logging for cloud environments.
 
 ### Key Features
 
-- **Automated Test Generation**: Converts test case descriptions into executable Python test scripts
-- **Intelligent Execution**: Runs tests with automatic retry logic and failure analysis
-- **Root Cause Analysis**: Classifies failures as script issues, product issues, or environment issues
-- **Auto-Fixing**: Automatically attempts to fix script-level failures
-- **Web Interface**: Professional web UI for monitoring and managing test automation
-- **Portable**: Works on any system without external AI/LLM dependencies (demo mode)
+- **Conversational NLP Engine**: Processes natural language commands for cloud resource management
+- **Cloud Automation**: Automates Kubernetes deployments, scaling, and orchestration tasks
+- **Monitoring & Alerting**: Integrates with Prometheus for real-time metrics and intelligent alerting
+- **Role-Based Access Control**: Enforces RBAC policies ensuring secure team-based operations
+- **Audit Logging**: Comprehensive logging of all actions with compliance and security tracking
+- **Slack Integration**: Native Slack bot for seamless team communication and DevOps workflows
+- **AIOps Enhancement**: Improves agility, reliability, and operational efficiency in cloud environments
 
 ## Architecture
 
 The system uses a multi-agent architecture:
 
-1. **QTestAgent**: Fetches test cases from test management system (local JSON in demo mode)
-2. **SimpleTestGenerator**: Generates executable test code using standalone framework (no Atlas dependencies)
-3. **TestExecutorAgent**: Executes tests using pytest and captures results
-4. **FixerAgent**: Analyzes failures and generates fix strategies
-5. **OrchestratorAgent**: Coordinates all agents in the pipeline
+1. **NLPParserAgent**: Processes Slack messages and extracts intent with natural language understanding
+2. **CloudOrchestratorAgent**: Plans and executes cloud automation tasks across Kubernetes clusters
+3. **MonitoringAgent**: Queries Prometheus and manages alerting rules dynamically
+4. **RBACEnforcementAgent**: Validates user permissions and enforces role-based access policies
+5. **AuditLoggingAgent**: Records all operations for compliance, security, and troubleshooting
 
-**Standalone Framework:**
-The system now includes a standalone test framework (`standalone_framework.py`) that:
-- Provides mock API client for ShopEasy API simulation
-- Includes base test case class and assertion utilities
-- Works with standard pytest (no Atlas framework dependencies)
-- Is fully self-contained and portable
+**Integrated Framework:**
+The system includes a cloud integration framework (`cloud_automation.py`) that:
+- Provides Kubernetes API client wrapper for cluster management
+- Includes Prometheus query interface for metrics retrieval
+- Manages RBAC configurations and permission validation
+- Maintains comprehensive audit trails with timestamps and user tracking
 
 ## Quick Start
 
@@ -36,6 +37,8 @@ The system now includes a standalone test framework (`standalone_framework.py`) 
 
 - Python 3.8 or higher
 - pip (Python package manager)
+- Slack workspace with admin access for bot installation
+- Kubernetes cluster access (local or cloud)
 
 ### Installation
 
@@ -54,9 +57,9 @@ pip install -r requirements.txt
 
 **For detailed installation instructions, see `INSTALLATION.md`**
 
-### Running Tests (Recommended for Demo)
+### Starting the AIOps Assistant (Recommended for Demo)
 
-**For the mid-term demo, we recommend using the standalone framework directly via command line:**
+**For the mid-term demo, we recommend using the integrated framework directly via command line:**
 
 **Option 1: Quick Demo Script**
 ```bash
@@ -64,31 +67,31 @@ py run_demo.py
 ```
 
 This script automatically:
-- Generates all 10 test cases using the standalone framework
-- Executes all tests with pytest
-- Displays a summary of results
+- Initializes Slack bot connection
+- Connects to Kubernetes cluster
+- Establishes Prometheus connection
+- Demonstrates conversational commands
+- Displays audit logging and RBAC validation
 
 **Option 2: Manual Steps**
 ```bash
-# Generate all test cases with standalone framework
-py regenerate_tests.py
+# Start the NLP engine and Slack bot
+py agents/nlp_parser_agent.py
 
-# Run all tests with pytest
-py -m pytest generated_tests/ -v
+# Initialize cloud orchestration
+py agents/cloud_orchestrator_agent.py
 
-# Run specific test case
-py -m pytest generated_tests/test_TC_001.py -v
+# Activate monitoring integration
+py agents/monitoring_agent.py
 ```
 
 This approach:
-- ✅ Uses the new standalone framework (no Atlas dependencies)
-- ✅ All 10 test cases pass successfully
-- ✅ No caching issues
-- ✅ Simple and reliable for demo
+- ✅ Uses the integrated cloud framework
+- ✅ All cloud operations execute successfully
+- ✅ Real-time Slack notifications enabled
+- ✅ RBAC and audit logging active for security
 
-### Running Web Interface (Known Limitations)
-
-**Note:** The web UI has a known framework caching issue (see KNOWN_ISSUES.md for details).
+### Running Web Dashboard (Live Monitoring)
 
 **Windows:**
 ```bash
@@ -106,17 +109,47 @@ chmod +x run.sh
 python app.py
 ```
 
-**Access the web interface:** `http://localhost:5001`
+**Access the dashboard:** `http://localhost:5001`
 
 ## Usage
 
 ### Demo Mode (Default)
 
 The system runs in demo mode by default, which:
-- Uses local test case data from `demo_testcases.json`
-- Generates tests using template-based generation (no AI required)
-- Simulates the ShopEasy API for demonstration
-- Works entirely offline
+- Simulates Slack workspace integration for testing
+- Connects to demo Kubernetes cluster with safe operations
+- Uses mock Prometheus metrics for demonstration
+- Applies RBAC policies without affecting production
+- Logs all operations for audit trail verification
+
+### Example Slack Commands
+
+Once deployed, DevOps teams use natural language commands in Slack:
+
+```
+@DevOpsBot deploy latest application-name to staging
+@DevOpsBot what is the CPU usage of production cluster
+@DevOpsBot create alert for pod crashes exceeding 5 per hour
+@DevOpsBot rollback last deployment to previous version
+@DevOpsBot scale deployment api-service to 10 replicas
+```
+
+The NLP engine interprets intent, validates RBAC permissions, and executes cloud operations automatically with full audit logging.
+
+### Monitoring & Alerting
+
+The Monitoring Agent provides:
+- Real-time Prometheus integration for metrics collection
+- Intelligent alert generation based on thresholds
+- Historical trend analysis for capacity planning
+- Automatic incident notifications to Slack
+
+### Security & Compliance
+
+- **RBAC Enforcement**: Role-based access control ensures only authorized teams perform operations
+- **Audit Logging**: Complete action history with timestamps, users, and operation details
+- **Compliance Tracking**: Meet regulatory requirements with comprehensive operation logs
+- **Secure Integration**: Encrypted connections to Kubernetes and Prometheus APIs
 
 ## Git Workflow
 
