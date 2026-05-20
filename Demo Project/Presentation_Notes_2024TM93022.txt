@@ -1,8 +1,8 @@
 ================================================================================
-SPEAKER NOTES — AI-Powered Agentic Test Automation System for Dell OME
+SPEAKER NOTES — Slack-Based Conversational AI for Cloud DevOps (AIOps)
 Final Semester Project | MTech AI & ML | BITS Pilani | 2024TM93022
 ================================================================================
-File: Final_Presentation_2024TM93022.pptx  (16 slides)
+File: Final_Presentation_2024TM93022.pptx  (17 slides)
 Estimated duration: 30–35 minutes + 10 min Q&A
 ================================================================================
 
@@ -10,59 +10,62 @@ Estimated duration: 30–35 minutes + 10 min Q&A
 ────────────────────────────────────────────────────────────────────────────────
 SLIDE 1 — TITLE SLIDE
 ────────────────────────────────────────────────────────────────────────────────
-Title: AI-Powered Agentic Test Automation System for Dell OpenManage Enterprise
+Title: Slack-Based Conversational AI Assistant for Cloud DevOps & AIOps
 
 NOTES:
-"Good [morning/afternoon], everyone. I am Ankit Kumar, Roll No 2024TM93022,
+"Good [morning/afternoon], everyone. I am Revathi, Roll No 2024TM93022,
 pursuing MTech in Artificial Intelligence and Machine Learning at BITS Pilani.
 
-Today I will present my Final Semester Project: an AI-powered, multi-agent
-system that fully automates the test lifecycle for Dell OpenManage Enterprise —
-the enterprise hardware management platform used by Dell Technologies.
+Today I will present my Final Semester Project: a Slack-based conversational
+AI assistant that enables DevOps and SRE teams to manage cloud services through
+natural language commands. The system integrates with Kubernetes, Prometheus,
+and enforces RBAC with comprehensive audit logging — all through Slack.
 
-The core idea is: given a test case ID from qTest Manager, the system
-automatically fetches the test steps, generates executable Python test code,
-runs it, and if it fails, intelligently fixes and retries — with zero human
-intervention."
+The core idea is: type a natural language command in Slack, the NLP engine
+parses your intent, validates permissions via RBAC, executes the cloud operation,
+logs everything for compliance, and responds with the result — instantly."
 
 KEY TECHNOLOGIES to mention briefly:
-- Multi-Agent AI architecture
-- RAG with FAISS vector database
-- qTest Manager REST API
-- atlas-ome-staging framework
-- LLM / GPT-4 (optional)
-- pytest for execution
+- Natural Language Processing (NLP) Engine
+- Conversational AI & Intent Recognition
+- Kubernetes API client for orchestration
+- Prometheus integration for monitoring
+- Role-Based Access Control (RBAC)
+- Comprehensive Audit Logging
+- Slack Bot API integration
 
 
 ────────────────────────────────────────────────────────────────────────────────
 SLIDE 2 — INTRODUCTION
 ────────────────────────────────────────────────────────────────────────────────
-Title: Introduction — The Problem We Are Solving
+Title: Introduction — The Challenge of Cloud Operations
 
 NOTES:
 "Let me start with the problem.
 
-Dell OME has thousands of manual test cases documented in qTest Manager.
-Each test case describes what needs to be tested — but there are NO executable
-scripts. A test engineer has to manually read each test case, understand the
-OME framework APIs, and hand-write a Python script. This takes days per test.
+Modern DevOps teams manage complex cloud infrastructure across Kubernetes,
+Prometheus, multiple cloud providers, and security systems. Yet operations
+remain fragmented: engineers use CLIs, dashboards, and multiple tools. When
+production issues occur, response time is critical but context-switching is slow.
 
 On top of that:
-- When a test fails, engineers manually debug logs and re-run.
-- The atlas-ome-staging framework changes frequently, breaking old scripts.
-- There is no systematic way to classify failures or learn from past fixes.
+- Managing permissions across teams requires complex RBAC configurations.
+- There is no centralized audit trail for compliance and security reviews.
+- Operational knowledge lives in individual engineers' heads, not shared.
+- Cloud operations often require specialized domain knowledge to execute safely.
 
 Our solution addresses all of this:
-- Automatically fetches steps from qTest via REST API.
-- Generates valid pytest code using AI or deterministic templates.
-- Executes on a real OME appliance.
-- Classifies failures into 8 error categories and auto-fixes.
-- Retries up to 3 times with improved code each time.
+- Accepts natural language commands directly in Slack where teams already work.
+- Parses intent using sophisticated NLP engine with fallback patterns.
+- Validates all operations against RBAC policies for secure execution.
+- Executes cloud operations with full audit logging for compliance.
+- Responds in Slack with results, making knowledge accessible to the entire team.
 
-This transforms a process that took days into one that takes seconds."
+This transforms cloud operations from manual, error-prone CLI work into
+secure, auditable, conversational automation."
 
-EMPHASIS: The left-right comparison panel — contrast the manual vs automated
-approach visually for the audience.
+EMPHASIS: The workflow comparison panel — contrast the traditional vs AIOps
+approach visually for the audience with time savings highlighted.
 
 
 ────────────────────────────────────────────────────────────────────────────────
@@ -75,27 +78,26 @@ NOTES:
 
 Wooldridge (2009) established the theoretical basis for multi-agent systems —
 how autonomous agents with specialized roles can solve complex tasks through
-cooperation.
+cooperation. This underpins our conversational AI orchestration.
 
-Chen et al. (2021) with GitHub Codex showed that large language models can
-generate syntactically correct, executable code from natural language descriptions.
-This directly enables our test generation capability.
+Devlin et al. (2019) with BERT demonstrated transformer-based models for
+natural language understanding. This enables our intent recognition capability
+from Slack messages with high accuracy.
 
-Lewis et al. (2020) introduced Retrieval-Augmented Generation — combining a
-retrieval system with LLM generation so the model has access to relevant
-domain context. We use this to inject atlas-ome framework patterns into our
-prompt.
+Vaswani et al. (2017) introduced the Attention mechanism, which revolutionized
+NLP by allowing models to understand context. We leverage this for intent
+disambiguation in operational commands.
 
-Harman and Anand's surveys on automated test case generation cover
-search-based and model-based approaches but do not integrate LLMs.
+Kenton and Toutanova showed fine-tuning BERT on domain-specific data improves
+understanding. We apply this principle to cloud operation terminology.
 
-More recent work — TestPilot, CodaMosa — demonstrates LLM-guided test
-generation for open-source projects, but none target enterprise hardware
-management systems with proprietary frameworks.
+Recent work — Alexa for business, AWS Well-Architected Framework automation —
+shows industry interest but lacks integration with open-source cloud stacks
+and comprehensive RBAC with audit trails.
 
-The RESEARCH GAP: No existing system combines qTest Manager data extraction
-+ atlas-ome-staging framework integration + LLM/RAG-based generation +
-agentic auto-fix in a single, real-world enterprise pipeline.
+The RESEARCH GAP: No existing system combines conversational AI + Kubernetes +
+Prometheus + RBAC + audit logging + Slack integration into a single, secure,
+compliant AIOps platform for modern DevOps teams.
 
 That is the exact gap this project fills."
 

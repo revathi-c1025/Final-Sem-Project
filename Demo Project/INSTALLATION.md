@@ -1,4 +1,4 @@
-# Quick Installation Guide
+# Installation Guide - Slack-Based DevOps AI Assistant
 
 ## Single Command Installation
 
@@ -18,11 +18,13 @@ pip3 install -r requirements.txt
 
 The `requirements.txt` file will install these essential packages:
 
-1. **Flask 3.0.0** - Web framework (for web UI, optional for demo)
-2. **pytest 7.4.3** - Testing framework (REQUIRED)
-3. **pytest-html 3.2.0** - HTML test reports (optional)
-4. **requests 2.31.0** - HTTP library (REQUIRED for mock API)
-5. **python-dateutil 2.8.2** - Date processing (REQUIRED)
+1. **FastAPI 0.115.0** - Web framework for API orchestration
+2. **slack-sdk 3.23.0** - Slack bot integration (REQUIRED)
+3. **kubernetes 28.0.0** - Kubernetes API client (REQUIRED for cloud orchestration)
+4. **prometheus-client 0.17.0** - Prometheus metrics interface (REQUIRED)
+5. **requests 2.31.0** - HTTP library (REQUIRED for API calls)
+6. **python-dateutil 2.8.2** - Date processing for audit logs
+7. **pydantic 2.10.0** - Data validation for configurations
 
 ## Installation Time
 
@@ -36,7 +38,7 @@ After installation, verify with:
 pip list
 ```
 
-You should see the packages listed above.
+You should see all the packages listed above.
 
 ## Troubleshooting
 

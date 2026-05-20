@@ -1,46 +1,49 @@
 """
-Configuration for the AI-Powered Agentic Test Automation System (Demo).
-Uses ShopEasy E-Commerce Platform as the demo target.
+Configuration for the Slack-Based Conversational AI DevOps Assistant (AIOps Demo).
+Integrates with Kubernetes, Prometheus, and Slack for cloud automation.
 
 DEMO MODE:
 - This configuration is set up for demo mode by default
-- No external AI/LLM dependencies required
-- Uses local test case data from JSON file
-- Template-based test generation (no API keys needed)
-- Works entirely offline for demonstration
+- Simulates Kubernetes cluster operations safely
+- Uses mock Prometheus metrics for demonstration
+- Slack bot integration in sandbox mode
+- RBAC and audit logging enabled for all operations
 
-TO ENABLE AI FEATURES:
-- Set LLM_API_KEY to your OpenAI or Azure API key
-- Configure LLM_PROVIDER as "openai" or "azure"
-- Set LLM_MODEL to your preferred model
+TO ENABLE PRODUCTION FEATURES:
+- Set KUBERNETES_CLUSTER_URL to your actual cluster endpoint
+- Configure PROMETHEUS_URL to your metrics server
+- Set SLACK_BOT_TOKEN and SLACK_SIGNING_SECRET from your Slack app
+- Enable RBAC_ENFORCEMENT and AUDIT_LOGGING for compliance
 """
 import os
 
 # =============================================================================
-# Test Case Source Configuration (Demo: local JSON file)
+# Slack Integration Configuration (Conversational AI)
 # =============================================================================
-TESTCASE_SOURCE = "local"  # "local" for demo JSON, "qtest" for real qTest
-TESTCASE_JSON_PATH = os.path.join(os.path.dirname(__file__), "demo_testcases.json")
+SLACK_CHANNEL = "devops-automation"  # Primary Slack channel for bot
+SLACK_BOT_TOKEN = os.environ.get("SLACK_BOT_TOKEN", "demo-bot-token")
+SLACK_SIGNING_SECRET = os.environ.get("SLACK_SIGNING_SECRET", "demo-signing-secret")
+NLP_CONFIDENCE_THRESHOLD = float(os.environ.get("NLP_CONFIDENCE_THRESHOLD", "0.75"))
 
-# qTest settings (unused in demo mode, kept for compatibility)
-QTEST_BASE_URL = "https://testmanager.example.com"
-QTEST_API_TOKEN = ""
-PROJECT_ID = 100
-API_VERSION = "v3"
-
+# Kubernetes Configuration (Cloud Orchestration)
 # =============================================================================
-# ShopEasy API Configuration (Demo Target System)
-# =============================================================================
-SHOPEASE_API_URL = os.environ.get("SHOPEASE_API_URL", "https://api.shopease-demo.com")
-SHOPEASE_API_KEY = os.environ.get("SHOPEASE_API_KEY", "demo-api-key-12345")
-SHOPEASE_ADMIN_USER = os.environ.get("SHOPEASE_ADMIN_USER", "admin")
-SHOPEASE_ADMIN_PASS = os.environ.get("SHOPEASE_ADMIN_PASS", "")
+KUBERNETES_CLUSTER_URL = os.environ.get("KUBERNETES_CLUSTER_URL", "https://localhost:6443")
+KUBERNETES_API_TOKEN = os.environ.get("KUBERNETES_API_TOKEN", "demo-k8s-token")
+KUBERNETES_NAMESPACE = os.environ.get("KUBERNETES_NAMESPACE", "default")
+KUBERNETES_CONTEXT = os.environ.get("KUBERNETES_CONTEXT", "docker-desktop")
 
 # =============================================================================
-# AI / LLM Configuration (OPTIONAL - for AI-powered test generation)
+# Prometheus Configuration (Monitoring & Alerting)
 # =============================================================================
-# NOTE: Leave LLM_API_KEY empty to use template-based generation (demo mode)
-# Template mode works offline and requires no external dependencies
+PROMETHEUS_URL = os.environ.get("PROMETHEUS_URL", "http://localhost:9090")
+PROMETHEUS_QUERY_TIMEOUT = int(os.environ.get("PROMETHEUS_QUERY_TIMEOUT", "30"))
+ALERT_MANAGER_URL = os.environ.get("ALERT_MANAGER_URL", "http://localhost:9093")
+
+# =============================================================================
+# AI / NLP Configuration (Natural Language Processing Engine)
+# =============================================================================
+# NOTE: Leave LLM_API_KEY empty to use rule-based intent detection (demo mode)
+# Rule-based mode works offline and requires no external AI dependencies
 LLM_PROVIDER = os.environ.get("LLM_PROVIDER", "openai")  # openai, azure, local
 LLM_API_KEY = os.environ.get("LLM_API_KEY", "")  # Leave empty for demo mode
 LLM_MODEL = os.environ.get("LLM_MODEL", "gpt-4")  # Used only if LLM_API_KEY is set
@@ -49,11 +52,14 @@ LLM_TEMPERATURE = float(os.environ.get("LLM_TEMPERATURE", "0.2"))
 LLM_MAX_TOKENS = int(os.environ.get("LLM_MAX_TOKENS", "4096"))
 
 # =============================================================================
-# Execution Configuration
+# Security & Compliance Configuration
 # =============================================================================
+RBAC_ENFORCEMENT = os.environ.get("RBAC_ENFORCEMENT", "true").lower() == "true"
+AUDIT_LOGGING = os.environ.get("AUDIT_LOGGING", "true").lower() == "true"
+ENCRYPTION_KEY = os.environ.get("ENCRYPTION_KEY", "demo-encryption-key")
 MAX_RETRIES = int(os.environ.get("MAX_RETRIES", "3"))
 RETRY_DELAY_SECONDS = int(os.environ.get("RETRY_DELAY_SECONDS", "5"))
-TEST_TIMEOUT_SECONDS = int(os.environ.get("TEST_TIMEOUT_SECONDS", "300"))
+OPERATION_TIMEOUT_SECONDS = int(os.environ.get("OPERATION_TIMEOUT_SECONDS", "300"))
 
 # =============================================================================
 # Git Configuration (for version control and repository management)
@@ -64,11 +70,11 @@ GIT_PROJECT_TOKEN = os.environ.get("GIT_PROJECT_TOKEN", "ghp_vqlgBXKnyf5Dkh2mlTD
 GIT_PROJECT_DEFAULT_BRANCH = os.environ.get("GIT_PROJECT_DEFAULT_BRANCH", "main")
 
 # =============================================================================
-# Reference Test Repository (for context-aware code generation)
+# Reference Cloud Infrastructure Repository
 # =============================================================================
 REFERENCE_REPO_LOCAL_PATH = os.environ.get(
     "REFERENCE_REPO_LOCAL_PATH",
-    os.path.join(os.path.dirname(__file__), "demo_reference_tests"),
+    os.path.join(os.path.dirname(__file__), "demo_infrastructure"),
 )
 GITHUB_REPO_URL = os.environ.get("GITHUB_REPO_URL", "")
 GITHUB_TOKEN = os.environ.get("GITHUB_TOKEN", "")
@@ -82,3 +88,23 @@ OUTPUT_DIR = os.path.join(BASE_DIR, "output")
 LOGS_DIR = os.path.join(BASE_DIR, "logs")
 GENERATED_TESTS_DIR = os.path.join(BASE_DIR, "generated_tests")
 REPORTS_DIR = os.path.join(BASE_DIR, "reports")
+
+# =============================================================================
+# QTest Integration Configuration
+# =============================================================================
+QTEST_BASE_URL = os.environ.get("QTEST_BASE_URL", "http://localhost:8080")
+PROJECT_ID = os.environ.get("PROJECT_ID", "1")
+API_VERSION = os.environ.get("API_VERSION", "v3")
+
+# =============================================================================
+# ShopEase API Configuration
+# =============================================================================
+SHOPEASE_API_URL = os.environ.get("SHOPEASE_API_URL", "http://localhost:5000")
+SHOPEASE_API_KEY = os.environ.get("SHOPEASE_API_KEY", "demo-api-key")
+SHOPEASE_ADMIN_USER = os.environ.get("SHOPEASE_ADMIN_USER", "admin")
+SHOPEASE_ADMIN_PASS = os.environ.get("SHOPEASE_ADMIN_PASS", "admin123")
+
+# =============================================================================
+# Test Execution Configuration
+# =============================================================================
+TEST_TIMEOUT_SECONDS = int(os.environ.get("TEST_TIMEOUT_SECONDS", "300"))
