@@ -285,16 +285,6 @@ input:focus,select:focus,textarea:focus{border-color:var(--blue);box-shadow:0 0 
       <button class="btn btn-primary" id="btnWizFetch" style="padding:12px 28px;">Fetch Test Case &#8594;</button>
       <div id="wizFetchResult" style="margin-top:20px;"></div>
     </div>
-    <div style="max-width:800px;margin-top:28px;background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:var(--shadow);">
-      <h3 style="font-size:15px;margin-bottom:10px;color:var(--cyan);">Generate From Natural Language Steps</h3>
-      <p style="color:var(--text-dim);font-size:13px;margin-bottom:14px;">Enter one API test step per line. You can use full URLs or relative endpoints such as <code>/products</code>.</p>
-      <div class="form-group">
-        <label>Test Steps</label>
-        <textarea id="nlSteps" rows="7" placeholder='GET /products should return status code 200&#10;POST /products with {"name":"Demo","price":10} should return status code 201' style="font-family:var(--mono);font-size:13px;line-height:1.5;"></textarea>
-      </div>
-      <button class="btn btn-green" id="btnNlGenerate" style="padding:12px 28px;">Generate Test</button>
-      <div id="nlGenerateResult" style="margin-top:18px;"></div>
-    </div>
   </div>
 
   <!-- Step 2: Generate -->
@@ -439,10 +429,23 @@ input:focus,select:focus,textarea:focus{border-color:var(--blue);box-shadow:0 0 
     <h4>Commit Message</h4>
     <textarea id="gitCommitMsg" placeholder="Enter commit message" rows="3" style="width:100%;max-width:600px;"></textarea>
   </div>
+  <div class="input-group">
+    <div class="flex-between mb-12" style="max-width:900px;">
+      <h4 style="margin:0;">Changed Files</h4>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <button class="btn btn-secondary btn-sm" onclick="gitSelectAllChanged(true)">Select All</button>
+        <button class="btn btn-secondary btn-sm" onclick="gitSelectAllChanged(false)">Clear</button>
+      </div>
+    </div>
+    <div id="gitChangedFiles" style="max-width:900px;border:1px solid var(--border);border-radius:8px;background:var(--bg-card);padding:12px;color:var(--text-dim);font-size:13px;">
+      Click Git Status to load changed files.
+    </div>
+    <p style="font-size:11px;color:var(--text-dim);margin-top:6px;">Only checked files will be staged when you click Git Add Selected.</p>
+  </div>
   <div class="flex-between mb-20">
     <div style="display:flex;gap:8px;flex-wrap:wrap;">
       <button class="btn btn-secondary" onclick="gitStatus()">📊 Git Status</button>
-      <button class="btn btn-secondary" onclick="gitAdd()">➕ Git Add</button>
+      <button class="btn btn-secondary" onclick="gitAdd()">➕ Git Add Selected</button>
       <button class="btn btn-secondary" onclick="gitPull()">⬇️ Git Pull</button>
       <button class="btn btn-primary" onclick="gitCommit()">✓ Git Commit</button>
       <button class="btn btn-green" onclick="gitPush()">⬆️ Git Push</button>
@@ -559,39 +562,6 @@ document.getElementById('btnWizFetch').addEventListener('click',async()=>{
   }catch(e){
     document.getElementById('wizFetchResult').innerHTML=`<div style="color:var(--red);margin-top:12px;">Error: ${esc(e.message)}</div>`;
   }finally{btn.disabled=false;btn.innerHTML='Fetch Test Case &#8594;';}
-});
-
-document.getElementById('btnNlGenerate').addEventListener('click',async()=>{
-  const raw=document.getElementById('nlSteps').value;
-  const steps=raw.split('\n').map(s=>s.trim()).filter(Boolean);
-  const btn=document.getElementById('btnNlGenerate');
-  const out=document.getElementById('nlGenerateResult');
-  if(!steps.length){alert('Enter at least one natural-language test step');return;}
-  btn.disabled=true;btn.innerHTML='<span class="spinner"></span> Generating...';
-  out.innerHTML='<div style="display:flex;align-items:center;gap:8px;color:var(--text-dim);"><span class="spinner"></span> Generating pytest and running validation...</div>';
-  try{
-    const resp=await fetch(API+'/generate-test',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({steps})});
-    const data=await resp.json();
-    if(!resp.ok)throw new Error(data.errors||data.error||'Generation failed');
-    const statusClass=data.status==='success'?'passed':'failed';
-    out.innerHTML=`
-      <div class="cards" style="grid-template-columns:repeat(3,1fr);">
-        <div class="card"><div class="label">Execution Result</div><div class="value ${data.status==='success'?'green':'red'}" style="font-size:20px;">${esc((data.status||'failure').toUpperCase())}</div></div>
-        <div class="card"><div class="label">Steps</div><div class="value blue" style="font-size:20px;">${steps.length}</div></div>
-        <div class="card"><div class="label">Status</div><span class="status ${statusClass}">${esc(data.status||'failure')}</span></div>
-      </div>
-      <h4 style="font-size:13px;margin:12px 0 8px;color:var(--cyan);">Generated Code</h4>
-      <div class="code-block">${highlightPython(data.generated_code||'')}</div>
-      <h4 style="font-size:13px;margin:16px 0 8px;color:var(--green);">Logs</h4>
-      <div class="code-block">${esc(data.logs||'(no logs)')}</div>
-      <h4 style="font-size:13px;margin:16px 0 8px;color:var(--red);">Errors</h4>
-      <div class="code-block">${esc(data.errors||'(no errors)')}</div>`;
-    loadGeneratedTests();
-  }catch(e){
-    out.innerHTML=`<div style="color:var(--red);padding:12px;border:1px solid var(--red);border-radius:8px;background:rgba(231,76,60,.08);">Error: ${esc(e.message)}</div>`;
-  }finally{
-    btn.disabled=false;btn.innerHTML='Generate Test';
-  }
 });
 
 // Step 2: Generate
@@ -1052,11 +1022,37 @@ document.getElementById('btnCfgSave').addEventListener('click', async ()=>{
 });
 
 // ===================== GIT OPERATIONS =====================
+function renderGitChangedFiles(files){
+  const box = document.getElementById('gitChangedFiles');
+  if(!box) return;
+  if(!files || files.length===0){
+    box.innerHTML = '<div style="color:var(--green);font-weight:600;">No changed files.</div>';
+    return;
+  }
+  box.innerHTML = files.map((f,idx)=>`
+    <label style="display:flex;align-items:flex-start;gap:10px;padding:8px;border-bottom:${idx===files.length-1?'none':'1px solid var(--border)'};cursor:pointer;">
+      <input type="checkbox" class="git-file-check" value="${esc(f.path)}" style="margin-top:2px;">
+      <span style="font-family:var(--mono);font-size:12px;color:var(--text);word-break:break-all;">
+        <strong style="color:var(--cyan);margin-right:8px;">${esc(f.status||'M')}</strong>${esc(f.path)}
+      </span>
+    </label>
+  `).join('');
+}
+
+function gitSelectedFiles(){
+  return Array.from(document.querySelectorAll('.git-file-check:checked')).map(cb=>cb.value);
+}
+
+function gitSelectAllChanged(checked){
+  document.querySelectorAll('.git-file-check').forEach(cb=>{ cb.checked = checked; });
+}
+
 async function gitStatus(){
   try{
     const resp = await fetch(API+'/api/git/status');
     const data = await resp.json();
     if(!resp.ok) throw new Error(data.error || 'Git status failed');
+    renderGitChangedFiles(data.files || []);
     document.getElementById('gitOutput').style.display='block';
     document.getElementById('gitOutput').innerHTML = esc(data.output || 'No output');
   }catch(e){
@@ -1066,10 +1062,20 @@ async function gitStatus(){
 }
 
 async function gitAdd(){
+  const files = gitSelectedFiles();
+  if(files.length===0){
+    alert('Select one or more changed files first.');
+    return;
+  }
   try{
-    const resp = await fetch(API+'/api/git/add', {method: 'POST'});
+    const resp = await fetch(API+'/api/git/add', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({files})
+    });
     const data = await resp.json();
     if(!resp.ok) throw new Error(data.error || 'Git add failed');
+    renderGitChangedFiles(data.files || []);
     document.getElementById('gitOutput').style.display='block';
     document.getElementById('gitOutput').innerHTML = esc(data.output || 'Added files successfully');
   }catch(e){

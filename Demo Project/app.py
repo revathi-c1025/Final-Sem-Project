@@ -42,7 +42,6 @@ from config import (
     OUTPUT_DIR, LOGS_DIR, GENERATED_TESTS_DIR, REPORTS_DIR, BASE_DIR,
 )
 from agents.orchestrator_agent import OrchestratorAgent
-from backend.pipeline.service import TestGenerationService
 from backend.pipeline.research_extensions import (
     build_research_extension_report,
     persist_feedback_snapshot,
@@ -79,7 +78,6 @@ logging.basicConfig(
     handlers=[logging.StreamHandler(sys.stdout)],
 )
 logger = logging.getLogger("webapp")
-nl_test_service = TestGenerationService()
 
 
 # ===========================================================================
@@ -620,37 +618,6 @@ def api_pipeline_generate():
         return jsonify({"error": str(e)}), 500
 
 
-@app.route("/generate-test", methods=["POST"])
-@app.route("/api/pipeline/generate-from-steps", methods=["POST"])
-def api_generate_test_from_steps():
-    """Generate, validate, execute, and return pytest code from natural-language steps."""
-    data = request.get_json(force=True)
-    steps = data.get("steps", [])
-    if isinstance(steps, str):
-        steps = [s.strip() for s in steps.splitlines() if s.strip()]
-    steps = [str(step).strip() for step in steps if str(step).strip()]
-
-    if not steps:
-        return jsonify({
-            "generated_code": "",
-            "status": "failure",
-            "logs": "",
-            "errors": "At least one test step is required.",
-        }), 400
-
-    try:
-        result = nl_test_service.generate_and_execute(steps)
-        return jsonify(result.model_dump())
-    except Exception as e:
-        logger.exception("Natural-language test generation failed")
-        return jsonify({
-            "generated_code": "",
-            "status": "failure",
-            "logs": "",
-            "errors": str(e),
-        }), 500
-
-
 # ===========================================================================
 #   API  - Full pipeline execution (with live SSE)
 # ===========================================================================
@@ -707,32 +674,27 @@ def _run_pipeline(run_id, test_case_ids, extra_env, max_retries, min_duration_se
             "test_case_ids": test_case_ids,
         })
 
-        # Step 1: Regenerate all test files with standalone framework
+        # Step 1: Regenerate only the selected test files with standalone framework
         push("phase", {
             "agent": "GeneratorAgent",
-            "message": "Regenerating test files with standalone framework",
+            "message": f"Regenerating selected test files: {', '.join(test_case_ids)}",
         })
-        
-        # Use subprocess to run regenerate script in fresh environment
-        import subprocess
-        result = subprocess.run(
-            [sys.executable, "regenerate_tests.py"],
-            cwd=os.getcwd(),
-            capture_output=True,
-            text=True,
-            timeout=30
-        )
-        
-        if result.returncode != 0:
-            push("generate_fail", {
-                "agent": "GeneratorAgent",
-                "message": f"Failed to regenerate test files: {result.stderr}",
-            })
-            raise Exception(f"Test regeneration failed: {result.stderr}")
-        
+
+        from simple_test_generator import SimpleTestGenerator
+        from agents.qtest_agent import QTestAgent
+
+        qtest = QTestAgent()
+        generator = SimpleTestGenerator()
+        generated_files = []
+        for tc_id in test_case_ids:
+            tc = qtest.fetch_test_case(tc_id)
+            result = generator.generate_test(tc)
+            generated_files.append(os.path.basename(result["file_path"]))
+
         push("generate_ok", {
             "agent": "GeneratorAgent",
-            "message": "Successfully regenerated test files",
+            "message": f"Successfully regenerated {len(generated_files)} selected test file(s)",
+            "files": generated_files,
         })
 
         # Step 2: Run only the selected generated test files.
@@ -766,7 +728,7 @@ def _run_pipeline(run_id, test_case_ids, extra_env, max_retries, min_duration_se
             })
 
         add_agent_event("OrchestratorAgent", f"Started pipeline for {', '.join(test_case_ids)}")
-        add_agent_event("GeneratorAgent", "Generated standalone pytest files")
+        add_agent_event("GeneratorAgent", f"Generated selected pytest files: {', '.join(generated_files)}")
 
         max_attempts = max(1, int(max_retries or 1))
         os.makedirs(LOGS_DIR, exist_ok=True)
@@ -1163,6 +1125,57 @@ import subprocess
 # Git repository root (one level up from BASE_DIR)
 GIT_REPO_DIR = os.path.dirname(BASE_DIR)
 
+def _parse_git_status_z(raw_status):
+    """Parse `git status --porcelain -z` into UI-friendly changed file rows."""
+    rows = []
+    parts = [p for p in raw_status.split("\0") if p]
+    i = 0
+    while i < len(parts):
+        entry = parts[i]
+        status = entry[:2]
+        path = entry[3:] if len(entry) > 3 else ""
+        if status[0] in {"R", "C"} and i + 1 < len(parts):
+            old_path = parts[i + 1]
+            rows.append({"status": status.strip(), "path": path, "old_path": old_path})
+            i += 2
+            continue
+        if path:
+            rows.append({"status": status.strip() or "M", "path": path})
+        i += 1
+    return rows
+
+
+def _git_changed_files():
+    result = subprocess.run(
+        ["git", "status", "--porcelain", "-z"],
+        cwd=GIT_REPO_DIR,
+        capture_output=True,
+        text=True,
+        timeout=30
+    )
+    if result.returncode != 0:
+        raise RuntimeError(result.stderr or result.stdout or "Git status failed")
+    return _parse_git_status_z(result.stdout)
+
+
+def _validate_git_paths(paths):
+    if not isinstance(paths, list):
+        raise ValueError("files must be a list")
+
+    valid = {row["path"] for row in _git_changed_files()}
+    clean_paths = []
+    for path in paths:
+        path = str(path).replace("\\", "/").strip()
+        if not path:
+            continue
+        if os.path.isabs(path) or ".." in path.split("/"):
+            raise ValueError(f"Unsafe path: {path}")
+        if path not in valid:
+            raise ValueError(f"Path is not a changed file: {path}")
+        clean_paths.append(path)
+    return clean_paths
+
+
 def _setup_git_credentials():
     """Setup Git credentials using GitHub token from config."""
     try:
@@ -1201,7 +1214,9 @@ def api_git_status():
             text=True,
             timeout=30
         )
-        return jsonify({"output": result.stdout or "No changes"})
+        if result.returncode != 0:
+            return jsonify({"error": result.stderr or result.stdout}), 500
+        return jsonify({"output": result.stdout or "No changes", "files": _git_changed_files()})
     except subprocess.TimeoutExpired:
         return jsonify({"error": "Git status timed out"}), 500
     except Exception as e:
@@ -1210,10 +1225,22 @@ def api_git_status():
 
 @app.route("/api/git/add", methods=["POST"])
 def api_git_add():
-    """Stage all changes."""
+    """Stage selected changes. If no files are provided, stage all changes."""
     try:
+        data = request.get_json(silent=True) or {}
+        files = data.get("files")
+        if files is None:
+            cmd = ["git", "add", "."]
+            output = "All changes staged successfully"
+        else:
+            selected_files = _validate_git_paths(files)
+            if not selected_files:
+                return jsonify({"error": "Select at least one changed file to add"}), 400
+            cmd = ["git", "add", "--", *selected_files]
+            output = f"Staged {len(selected_files)} selected file(s):\n" + "\n".join(selected_files)
+
         result = subprocess.run(
-            ["git", "add", "."],
+            cmd,
             cwd=GIT_REPO_DIR,
             capture_output=True,
             text=True,
@@ -1221,7 +1248,7 @@ def api_git_add():
         )
         if result.returncode != 0:
             return jsonify({"error": result.stderr}), 500
-        return jsonify({"output": "All changes staged successfully"})
+        return jsonify({"output": output, "files": _git_changed_files()})
     except subprocess.TimeoutExpired:
         return jsonify({"error": "Git add timed out"}), 500
     except Exception as e:
